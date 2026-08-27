@@ -229,6 +229,48 @@ reinterpreted, so it stays accurate if CRIM's own definitions change.
         """
     )
 
+with st.expander("How does the cadence detector actually work?"):
+    st.markdown(
+        """
+It doesn't look at the full chord at once -- it looks at **pairs of
+voices**, and tracks two things between each pair over time: the
+harmonic interval separating them (3rd, 5th, octave, ...) and each
+voice's own melodic motion (step up, step down, leap, by how much). A
+cadence, contrapuntally, is really a small number of well-known
+two-voice interval progressions -- e.g. a major 6th expanding to an
+octave (a classic Cantizans-Tenorizans pair), or a major 3rd contracting
+to a unison. CRIM has a table of these named two-voice patterns
+(`CVFLabels.csv`, inside the library itself) and scans **every pair of
+voices** in the piece for a match, at every point in time.
+
+**Why it needs at least 2 voices in the file, but works fine on a
+2-voice passage inside a bigger piece:** with only 1 voice there's no
+pair to compare at all -- there's no "other voice" to measure an
+interval against, so nothing can ever match. But a passage where only 2
+of a piece's, say, 4 voices happen to be sounding (the others resting)
+works completely normally -- that's not a special case, it's the exact
+situation the whole method is built around. (This is also the real
+reason the two music21-bundled composers left out of the Composer
+dropdown above don't work here: their files are a single monophonic
+voice, full stop -- not "a 2-voice passage," genuinely no second voice
+to pair with, ever.)
+
+**What it genuinely can't see:** a moment where a voice pair's interval
+is literally `Rest` (checked directly in CRIM's own code -- a rest
+isn't blank/missing data, it's an explicit `'Rest'` value in the
+interval table) instead of a real interval. None of CRIM's coded
+patterns expect `Rest` mid-progression, so if most or all voices stop
+sounding right where a cadence would otherwise land, nothing matches --
+even though, musically, that silence right before a resolution is often
+a very deliberate expressive gesture. Fixing that specific class of miss
+isn't a small edit to CRIM's cadence-type table -- the whole method is
+built on sounding voice *pairs*, so it would need a genuinely separate
+detection strategy layered on top (e.g. explicitly watching for a
+simultaneous multi-voice rest following built-up approach motion), not
+a patch to the existing one.
+        """
+    )
+
 tab_corpus, tab_crim, tab_upload = st.tabs(
     ["Built-in Palestrina corpus", "CRIM Project corpus", "Upload your own file"]
 )
@@ -280,6 +322,18 @@ with tab_crim:
             if piece is None:
                 import_failed = True
             else:
+                # ci.importScore extracts title/composer from the MEI header
+                # into piece.metadata (its own plain dict) -- but NOT into
+                # piece.score.metadata (the actual music21 Metadata object
+                # Score.write() reads from), so left alone the exported file
+                # ends up with no real title/composer and music21's writer
+                # falls back to generic placeholder text ("Music21 Fragment"/
+                # "Music21" -- confirmed directly: piece.score.metadata.title
+                # was None even though piece.metadata['title'] had the real
+                # value). Copy them across before anything gets written out.
+                piece.score.metadata.title = piece.metadata.get('title') or piece.score.metadata.title
+                piece.score.metadata.composer = piece.metadata.get('composer') or piece.score.metadata.composer
+
                 cadences = piece.cadences(voice_detail=True, include_final=True)
                 if not cadences.empty:
                     annotated_score, stats = annotate_score(piece.score, cadences)
