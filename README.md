@@ -13,9 +13,6 @@ just harmonic labeling — built for exactly this repertoire. This tool adds
 the missing last step: writing those results back into a real, readable
 score file instead of only a table or an interactive chart.
 
-Built as a side tool for a physics thesis on network-science analysis of
-Palestrina's polyphony — the app itself has no dependency on that project.
-
 ## Use it
 
 Two ways to give it a piece:
