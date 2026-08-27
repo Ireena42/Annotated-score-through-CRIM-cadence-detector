@@ -2,3 +2,4 @@ crim_intervals==2.0.78
 music21==8.3.0
 pandas==2.3.3
 streamlit==1.62.0
+requests==2.31.0
