@@ -74,32 +74,106 @@ st.caption(
 # voices and returns nothing for a 1-part score, so those two would just
 # always report "no cadences detected." 'trecento' is a mixed-composer
 # collection (various, mostly anonymous), not a single composer, so it's
-# left out of this specific selector. music21's own composer metadata for
-# 'monteverdi' is buggy (returns a mangled title string, not the name) --
-# hardcoded here instead of trusted from the corpus.
+# left out of this specific selector. 'lusitano'/'luca' were tried and
+# dropped -- one piece each, not worth a permanent slot. CRIM's own corpus
+# already spans both sacred and secular Renaissance repertoire, so no
+# sacred/secular caveat is needed for monteverdi (secular madrigals) below
+# either -- it's simply more of what's already on offer via the CRIM tab.
 CORPUS_COMPOSERS = {
     'Palestrina': 'palestrina',
     'Monteverdi': 'monteverdi',
-    'Lusitano': 'lusitano',
-    'Luca': 'luca',
 }
+
+_ROMAN_NUMERALS = {'I', 'II', 'III', 'IV', 'V', 'VI'}
+
+
+@st.cache_resource(show_spinner=False)
+def _metadata_bundle():
+    """music21's pre-built metadata index for the whole bundled corpus --
+    lets every piece's title/composer/etc. be read WITHOUT parsing each
+    full score (parsing all 1318 Palestrina files just to build a piece
+    list would take minutes; querying the bundle is ~instant per piece,
+    timed directly before writing this). st.cache_resource (not
+    cache_data) because this holds a live, non-trivially-picklable index
+    object meant to be reused as-is across reruns, not serialized."""
+    return m21.corpus.corpora.CoreCorpus().metadataBundle
+
+
+def _palestrina_movement_label(stem):
+    """Turns a stem like 'Agnus_I_30' or 'Credo_29_a' into 'Agnus I' /
+    'Credo (part a)' -- NOT built from the metadata bundle's own 'title'
+    field, because that field is unreliable for a real chunk of this
+    corpus: pieces split into lettered sub-files (fragments across a
+    texture/meter change, e.g. the '_a'/'_b'/'_c' suffixes mentioned in
+    this project's own todo.md) come back with title='First Section' --
+    a generic placeholder that loses the actual movement identity
+    entirely (confirmed directly: e.g. 'Missa Ascendo ad Patrem'/'First
+    Section' covers a mix of real Agnus/Benedictus/Credo/Sanctus files).
+    The file stem's own prefix convention (genre name first) is the more
+    reliable source of truth here -- it's also literally what
+    CLAUDE.md's own metadata pattern already treats as the real piece ID.
+    """
+    tokens = stem.split('_')
+    genre = tokens[0]
+    rest = tokens[1:]
+    numeral = f' {rest[0]}' if rest and rest[0] in _ROMAN_NUMERALS else ''
+    if numeral:
+        rest = rest[1:]
+    part = f' (part {rest[-1]})' if rest and len(rest[-1]) == 1 and rest[-1].isalpha() else ''
+    return f'{genre}{numeral}{part}'
 
 
 @st.cache_data(show_spinner=False)
 def list_pieces_for_composer(corpus_key):
-    """Every piece id music21 bundles for one composer, e.g. 'Agnus_00'
-    for palestrina. Cached (st.cache_data) so this filesystem scan --
-    cheap, but pointless to repeat -- only runs once per composer per app
-    process, not once per button click/rerun.
+    """{label: piece_id} for one composer, e.g. 'Missa De Beata Marie
+    Virginis (II): Agnus' -> 'Agnus_00' for palestrina -- same naming
+    spirit as the CRIM tab's own dropdown. Cached (st.cache_data) so this
+    -- cheap once the bundle is loaded, but still real work across 1300+
+    pieces -- only runs once per composer per app process.
 
-    set(...) dedup is needed for at least one composer here: monteverdi's
-    corpus ships each madrigal as two files sharing a stem (a .mxl score
-    and a .rntxt roman-numeral analysis, e.g. 'madrigal.3.1' twice) --
-    without deduping, the piece dropdown would list every monteverdi
-    piece twice (confirmed against the actual file listing before fixing).
+    Palestrina gets 'Mass title: Movement' (see _palestrina_movement_label
+    for why movement isn't taken from raw metadata). Other composers (just
+    monteverdi for now) get the piece's own 'title' directly -- there's no
+    mass grouping for standalone madrigals, so nothing to build on top of.
+
+    Label collisions are real and checked for, not assumed away: 23 of
+    1318 Palestrina pieces still collide even with the scheme above (e.g.
+    two entirely different pieces both catalogued as 'Missa Veni Sancte
+    Spiritus') -- genuine same-title-different-piece cases, not a labeling
+    bug. Any label that would otherwise map to more than one piece id gets
+    that id appended in brackets, so nothing becomes unreachable in the
+    dropdown -- but only those rare cases, so the other ~98% stay clean.
     """
-    paths = m21.corpus.getComposer(corpus_key)
-    return sorted({p.stem for p in paths})
+    bundle = _metadata_bundle()
+    entries = bundle.search(corpus_key, field='composer')
+
+    raw_labels = {}  # label -> list of piece ids sharing it
+    for entry in entries:
+        md = entry.metadata
+        # sourcePath, not corpusFilePath: checked directly against BOTH
+        # music21 versions in play across this project's two envs --
+        # corpusFilePath doesn't exist at all on 8.3.0 (the crim env this
+        # app actually runs in -- confirmed by AttributeError, not assumed)
+        # while sourcePath holds the same relative-path value on both.
+        if not md.sourcePath:
+            continue
+        stem = Path(md.sourcePath).stem
+        if corpus_key == 'palestrina':
+            label = f'{md.parentTitle}: {_palestrina_movement_label(stem)}'
+        else:
+            label = md.title or stem
+        raw_labels.setdefault(label, [])
+        if stem not in raw_labels[label]:
+            raw_labels[label].append(stem)
+
+    result = {}
+    for label, stems in raw_labels.items():
+        if len(stems) == 1:
+            result[label] = stems[0]
+        else:
+            for stem in stems:
+                result[f'{label} [{stem}]'] = stem
+    return result
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -272,21 +346,17 @@ a patch to the existing one.
     )
 
 tab_corpus, tab_crim, tab_upload = st.tabs(
-    ["Built-in Palestrina corpus", "CRIM Project corpus", "Upload your own file"]
+    ["music21 corpus", "CRIM Project corpus", "Upload your own file"]
 )
 
 with tab_corpus:
     composer_name = st.selectbox("Composer", sorted(CORPUS_COMPOSERS.keys()))
     corpus_key = CORPUS_COMPOSERS[composer_name]
-    if corpus_key != 'palestrina':
-        st.caption(
-            "Secular repertoire, included for comparison/exploration -- not sacred polyphony."
-            if corpus_key in ('monteverdi', 'lusitano') else
-            "A single sacred piece (a Gloria) bundled under this name in music21's corpus."
-        )
-    piece_id = st.selectbox("Piece", list_pieces_for_composer(corpus_key))
+    piece_options = list_pieces_for_composer(corpus_key)
+    piece_label = st.selectbox("Piece", sorted(piece_options.keys()))
+    piece_id = piece_options[piece_label]
     if st.button("Annotate", key="annotate_corpus"):
-        with st.spinner(f"Parsing {piece_id} and detecting cadences..."):
+        with st.spinner(f"Parsing {piece_label} and detecting cadences..."):
             score = m21.corpus.parse(f"{corpus_key}/{piece_id}")
             annotated_score, stats = run_pipeline(score, piece_id)
         if annotated_score is None:
