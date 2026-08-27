@@ -42,6 +42,8 @@ as Humdrum .krn) still work fine via the dropdown, since music21's own
 corpus loader handles that format from its own bundled files -- only a
 raw uploaded .krn file's content is untested territory.
 """
+import html
+import re
 import sys
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -97,6 +99,27 @@ def _metadata_bundle():
     cache_data) because this holds a live, non-trivially-picklable index
     object meant to be reused as-is across reruns, not serialized."""
     return m21.corpus.corpora.CoreCorpus().metadataBundle
+
+
+def _generic_piece_label(md, stem):
+    """Title for a non-Palestrina piece (currently just monteverdi). Not
+    just `md.title or stem` -- checked directly and found 5 of
+    monteverdi's 53 entries have no `title` at all, so that fallback was
+    silently showing the raw internal stem (e.g. 'madrigal.5.7') as the
+    label. 4 of those 5 actually have the real title sitting in
+    `movementName` instead (e.g. '3.12: Perfidissimo Volto' -- just needs
+    its leading catalogue-number prefix stripped); only 1 of the 53
+    ('madrigal.5.7') has no real title anywhere in the file's own
+    metadata at all -- that's a genuine gap in the source data, not
+    something recoverable here, so it falls through to a humanized
+    version of the stem as a last resort ('Madrigal 5.7')."""
+    if md.title:
+        return md.title
+    mv = md.movementName
+    if mv and mv not in (stem, Path(md.sourcePath).name):
+        return re.sub(r'^\d+(\.\d+)?[:.]\s*', '', mv).strip()
+    parts = stem.split('.')
+    return f'{parts[0].capitalize()} {".".join(parts[1:])}' if len(parts) > 1 else stem.replace('_', ' ').title()
 
 
 def _palestrina_movement_label(stem):
@@ -161,7 +184,7 @@ def list_pieces_for_composer(corpus_key):
         if corpus_key == 'palestrina':
             label = f'{md.parentTitle}: {_palestrina_movement_label(stem)}'
         else:
-            label = md.title or stem
+            label = _generic_piece_label(md, stem)
         raw_labels.setdefault(label, [])
         if stem not in raw_labels[label]:
             raw_labels[label].append(stem)
@@ -190,6 +213,89 @@ def fetch_crim_pieces():
     response = requests.get('https://crimproject.org/data/pieces/', timeout=15)
     response.raise_for_status()
     return response.json()
+
+
+# Composer names for the Josquin Research Project (jrp-scores repo), read
+# directly from each composer folder's own file headers (!!!COM: lines in
+# a real, non-redirect .krn file) rather than trusted from the repo's own
+# index.hmd -- that index turned out to be stale (its file paths include a
+# '/kern/' subdirectory that doesn't exist in the actual current repo, and
+# it even uses a different code for Ockeghem, 'Ock' vs the real 'Oke').
+# 'Gas' is the one deliberate override: its own first real file happens to
+# be an anonymous-attribution piece, but the folder as a whole is
+# Gaspar van Weerbeke's per JRP's own about page. 'Mou' and 'binx' are
+# left out entirely -- checked directly and every single file under Mou/
+# is a tiny redirect stub (<45 bytes, a relative path to a file actually
+# stored under another composer's folder), so there's no real content to
+# offer under that code at all; binx/ is the repo's own build scripts.
+JRP_COMPOSER_NAMES = {
+    'Agr': 'Agricola, Alexander', 'Ano': 'Anonymous', 'Bin': 'Binchois, Gilles',
+    'Bru': 'Brumel, Antoine', 'Bus': 'Busnoys, Antoine', 'Com': 'Compere, Loyset',
+    'Das': 'Daser, Ludwig', 'Duf': 'Du Fay, Guillaume', 'Fry': 'Frye, Walter',
+    'Fva': 'Févin, Antoine de', 'Gas': 'Gaspar van Weerbeke', 'Isa': 'Isaac, Heinrich',
+    'Jap': 'Japart, Jean', 'Jos': 'Josquin des Prez', 'Mar': 'Martini, Johannes',
+    'Obr': 'Obrecht, Jacob', 'Oke': 'Okeghem, Johannes', 'Ort': 'de Orto, Marbrianus',
+    'Pip': 'Pipelare, Matthaeus', 'Reg': 'Regis, Johannes', 'Rue': 'la Rue, Pierre de',
+    'Tin': 'Tinctoris, Johannes',
+}
+
+
+def _jrp_piece_label(composer_name, stem):
+    """'Agr1001a-Missa_In_myne_zin-Gloria' -> 'Agricola, Alexander --
+    Missa In myne zin: Gloria'. The catalogue-number prefix (composer
+    code + work number + optional movement letter) is stripped; whatever
+    follows is underscore-to-space-converted and, if there's a further
+    '-'-separated movement/source segment, joined on ': ' the same way
+    the Palestrina tab formats mass:movement."""
+    rest = re.sub(r'^[A-Za-z]+\d+[a-z]?-', '', stem)
+    segments = [html.unescape(s.replace('_', ' ')) for s in rest.split('-')]
+    title = segments[0]
+    piece_desc = f'{title}: {" ".join(segments[1:])}' if len(segments) > 1 else title
+    return f'{composer_name} — {piece_desc}'
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_jrp_pieces():
+    """{label: repo path} for the Josquin Research Project's full corpus,
+    live from GitHub's tree API -- one request lists the ENTIRE repo
+    (1427 entries) at once, verified directly, rather than one request
+    per composer folder (would be 20+ separate calls against GitHub's
+    unauthenticated rate limit for no real benefit).
+
+    Two filters applied, both verified against the real data, not
+    assumed: only '.krn' files (skips the repo's README/LICENSE/scripts),
+    and only files >=500 bytes -- real scores here run from ~2KB to
+    ~20KB+, while every redirect stub found was under 60 bytes, so 500 is
+    a safe, wide margin between the two, not a fragile cutoff.
+    """
+    response = requests.get(
+        'https://api.github.com/repos/josquin-research-project/jrp-scores/git/trees/main',
+        params={'recursive': '1'}, timeout=20,
+    )
+    response.raise_for_status()
+    tree = response.json().get('tree', [])
+
+    raw_labels = {}
+    for item in tree:
+        path = item['path']
+        if not path.endswith('.krn') or item.get('size', 0) < 500:
+            continue
+        code = path.split('/')[0]
+        if code not in JRP_COMPOSER_NAMES:
+            continue
+        label = _jrp_piece_label(JRP_COMPOSER_NAMES[code], Path(path).stem)
+        raw_labels.setdefault(label, [])
+        if path not in raw_labels[label]:
+            raw_labels[label].append(path)
+
+    result = {}
+    for label, paths in raw_labels.items():
+        if len(paths) == 1:
+            result[label] = paths[0]
+        else:
+            for path in paths:
+                result[f'{label} [{Path(path).stem}]'] = path
+    return result
 
 
 def run_pipeline(score, source_label):
@@ -345,8 +451,8 @@ a patch to the existing one.
         """
     )
 
-tab_corpus, tab_crim, tab_upload = st.tabs(
-    ["music21 corpus", "CRIM Project corpus", "Upload your own file"]
+tab_corpus, tab_crim, tab_jrp, tab_upload = st.tabs(
+    ["music21 corpus", "CRIM Project corpus", "Josquin Research Project", "Upload your own file"]
 )
 
 with tab_corpus:
@@ -414,6 +520,29 @@ with tab_crim:
             st.warning("No cadences were detected in this piece.")
         else:
             show_result(annotated_score, stats, f"{selected['piece_id']}_annotated.xml")
+
+with tab_jrp:
+    st.caption(
+        "1,340+ pieces from the Josquin Research Project (Josquin, Ockeghem, "
+        "Obrecht, la Rue, Gaspar van Weerbeke, and 15+ more early Franco-Flemish "
+        "composers), fetched live from their public GitHub repository."
+    )
+    jrp_pieces = fetch_jrp_pieces()
+    jrp_label = st.selectbox("Piece", sorted(jrp_pieces.keys()), key="jrp_piece")
+    if st.button("Annotate", key="annotate_jrp"):
+        path = jrp_pieces[jrp_label]
+        raw_url = f"https://raw.githubusercontent.com/josquin-research-project/jrp-scores/main/{path}"
+        with st.spinner(f"Downloading and parsing {jrp_label}..."):
+            # Humdrum **kern format auto-detects fine from raw text content,
+            # same as music21's own converter.parse does for MusicXML/MEI in
+            # the other tabs -- verified directly before wiring this up.
+            kern_text = requests.get(raw_url, timeout=20).text
+            score = m21.converter.parse(kern_text)
+            annotated_score, stats = run_pipeline(score, Path(path).stem)
+        if annotated_score is None:
+            st.warning("No cadences were detected in this piece.")
+        else:
+            show_result(annotated_score, stats, f"{Path(path).stem}_annotated.xml")
 
 with tab_upload:
     st.caption("Accepted formats: MusicXML (.xml/.musicxml) or MEI (.mei).")
