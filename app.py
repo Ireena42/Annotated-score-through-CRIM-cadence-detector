@@ -66,14 +66,40 @@ st.caption(
 )
 
 
+# Every music21-bundled composer checked before landing on this set (see
+# conversation): 'josquin' and 'ciconia' both parse fine but come out as
+# single-part scores (josquin's ABC files are monophonic transcriptions
+# despite titles literally saying "4v."; ciconia's one piece has no nested
+# voices either) -- CRIM's cadence detector needs >=2 real contrapuntal
+# voices and returns nothing for a 1-part score, so those two would just
+# always report "no cadences detected." 'trecento' is a mixed-composer
+# collection (various, mostly anonymous), not a single composer, so it's
+# left out of this specific selector. music21's own composer metadata for
+# 'monteverdi' is buggy (returns a mangled title string, not the name) --
+# hardcoded here instead of trusted from the corpus.
+CORPUS_COMPOSERS = {
+    'Palestrina': 'palestrina',
+    'Monteverdi': 'monteverdi',
+    'Lusitano': 'lusitano',
+    'Luca': 'luca',
+}
+
+
 @st.cache_data(show_spinner=False)
-def list_palestrina_ids():
-    """Every piece id in music21's bundled Palestrina corpus, e.g.
-    'Agnus_00'. Cached (st.cache_data) so this filesystem scan -- cheap,
-    but pointless to repeat -- only runs once per app process, not once
-    per button click/rerun."""
-    paths = m21.corpus.getComposer('palestrina')
-    return sorted(p.stem for p in paths)
+def list_pieces_for_composer(corpus_key):
+    """Every piece id music21 bundles for one composer, e.g. 'Agnus_00'
+    for palestrina. Cached (st.cache_data) so this filesystem scan --
+    cheap, but pointless to repeat -- only runs once per composer per app
+    process, not once per button click/rerun.
+
+    set(...) dedup is needed for at least one composer here: monteverdi's
+    corpus ships each madrigal as two files sharing a stem (a .mxl score
+    and a .rntxt roman-numeral analysis, e.g. 'madrigal.3.1' twice) --
+    without deduping, the piece dropdown would list every monteverdi
+    piece twice (confirmed against the actual file listing before fixing).
+    """
+    paths = m21.corpus.getComposer(corpus_key)
+    return sorted({p.stem for p in paths})
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -208,10 +234,18 @@ tab_corpus, tab_crim, tab_upload = st.tabs(
 )
 
 with tab_corpus:
-    piece_id = st.selectbox("Piece", list_palestrina_ids())
+    composer_name = st.selectbox("Composer", sorted(CORPUS_COMPOSERS.keys()))
+    corpus_key = CORPUS_COMPOSERS[composer_name]
+    if corpus_key != 'palestrina':
+        st.caption(
+            "Secular repertoire, included for comparison/exploration -- not sacred polyphony."
+            if corpus_key in ('monteverdi', 'lusitano') else
+            "A single sacred piece (a Gloria) bundled under this name in music21's corpus."
+        )
+    piece_id = st.selectbox("Piece", list_pieces_for_composer(corpus_key))
     if st.button("Annotate", key="annotate_corpus"):
         with st.spinner(f"Parsing {piece_id} and detecting cadences..."):
-            score = m21.corpus.parse(f"palestrina/{piece_id}")
+            score = m21.corpus.parse(f"{corpus_key}/{piece_id}")
             annotated_score, stats = run_pipeline(score, piece_id)
         if annotated_score is None:
             st.warning("No cadences were detected in this piece (too short, or not "
