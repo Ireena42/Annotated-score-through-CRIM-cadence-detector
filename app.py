@@ -1539,11 +1539,12 @@ with tab_browse:
         "ZIP of raw MusicXML scores (up to 30 at a time)."
     )
     query = st.text_input(
-        'Search (every word must match, in any order -- e.g. "josquin missa")',
+        'Search (partial words OK -- try "josquin missa" or "159")',
         key="browse_query",
-        help='Matches composer names, titles, and words like "missa" or "agnus" that show up in a '
-             'title -- every word you type has to appear somewhere in the result, but not next to '
-             'each other or in that order, so "josquin missa" finds every Josquin mass movement.',
+        help='Matches any text in a result -- composer, title, movement, catalog year, anything '
+             'shown. Words don\'t need to be whole or in order ("159" matches any 1590s piece), '
+             'but every word you type must appear somewhere, so "josquin missa" finds every '
+             'Josquin mass movement.',
     )
 
     with st.expander("📦 Download the entire corpus, no search needed (all 7 collections)"):
