@@ -855,16 +855,51 @@ KERN_COLLECTION_BASE_URLS = {
 }
 
 
+# Human-readable names for the raw `collection` key used as a row field
+# throughout Browse -- the key itself (e.g. 'jrp', '1520s') is what
+# filtering compares against internally, this is purely for display in
+# the Collection filter widget.
+COLLECTION_DISPLAY_NAMES = {
+    'music21': 'music21 corpus', 'crim': 'CRIM Project',
+    'jrp': 'Josquin Research Project', '1520s': '1520s Project',
+    'tasso': 'Tasso in Music', 'seils': 'SEILS', 'lassus_psalms': 'Lassus Psalms',
+}
+
+
+def _split_composer_from_label(label):
+    """Pulls the composer back out of a label this app itself already
+    built in the 'Composer — Rest' convention -- CRIM, JRP, 1520s, Tasso,
+    and SEILS all use it (see _catalog_piece_label/_tasso_piece_label/
+    fetch_seils_pieces). Safe to parse back out since it's our own
+    generated string, not third-party data -- avoids threading a second
+    'composer' value through every fetcher's return contract just for
+    this. Falls back to 'Unknown' only if a label somehow doesn't follow
+    the convention (shouldn't happen by construction, but a filter
+    dropdown shouldn't crash over it either way)."""
+    composer, sep, _ = label.partition(' — ')
+    return composer if sep else 'Unknown'
+
+
 @st.cache_data(ttl=3600, show_spinner=False)
 def build_browse_index():
-    """One flat list of (display_label, collection, native_ref) spanning
-    all 7 collections (~4,300 pieces) -- built by tagging each
-    collection's own already-built {label: id} dict with a '[Collection]'
-    prefix, NOT by restructuring any of them into a new shared schema
-    (every existing per-collection tab's code is untouched by this).
-    native_ref is exactly whatever that collection's own fetcher already
-    uses as a dict value: (corpus_key, piece_id) for music21, the full
-    piece dict for CRIM, a repo path string for the five kern collections.
+    """One flat list of (display_label, collection, native_ref, composer,
+    genre) spanning all 7 collections (~4,300 pieces) -- built by tagging
+    each collection's own already-built {label: id} dict with a
+    '[Collection]' prefix, NOT by restructuring any of them into a new
+    shared schema (every existing per-collection tab's code is untouched
+    by this). native_ref is exactly whatever that collection's own
+    fetcher already uses as a dict value: (corpus_key, piece_id) for
+    music21, the full piece dict for CRIM, a repo path string for the
+    five kern collections. composer/genre are added purely for Browse's
+    own filter widgets -- genre is only ever populated for CRIM (the
+    only collection that actually carries genre metadata; every other
+    row gets None, which the genre filter treats as "not applicable"
+    rather than a match). composer naming is NOT normalized across
+    collections -- e.g. CRIM's 'Josquin Des Prez' and JRP's 'Josquin des
+    Prez' are genuinely different strings for the same composer, since
+    each collection's own convention is preserved rather than guessed
+    at; a known, honest limitation, not a bug.
+
     First call is slow-ish (calls every collection's own fetcher, several
     of which are themselves slow on a cold cache -- the metadata bundle
     alone takes ~7s to load the first time) but each of those is already
@@ -875,17 +910,23 @@ def build_browse_index():
     rows = []
     for composer_name, corpus_key in CORPUS_COMPOSERS.items():
         for label, piece_id in list_pieces_for_composer(corpus_key).items():
-            rows.append((f'[{composer_name}] {label}', 'music21', (corpus_key, piece_id)))
+            rows.append((f'[{composer_name}] {label}', 'music21', (corpus_key, piece_id), composer_name, None))
     for p in fetch_crim_pieces():
-        label = f"{p['composer']['name']} — {p['full_title']} [{p['genre']['name']}]"
-        rows.append((f'[CRIM] {label}', 'crim', p))
+        composer_name, genre = p['composer']['name'], p['genre']['name']
+        label = f"{composer_name} — {p['full_title']} [{genre}]"
+        rows.append((f'[CRIM] {label}', 'crim', p, composer_name, genre))
     for key, fetch_fn, prefix in [
         ('jrp', fetch_jrp_pieces, 'JRP'), ('1520s', fetch_1520s_pieces, '1520s'),
         ('tasso', fetch_tasso_pieces, 'Tasso'), ('seils', fetch_seils_pieces, 'SEILS'),
         ('lassus_psalms', fetch_lassus_psalms_pieces, 'Lassus Psalms'),
     ]:
+        # Lassus Psalms is a single-composer collection with no
+        # 'Composer — Title' prefix in its own labels (see
+        # fetch_lassus_psalms_pieces) -- composer is just fixed.
+        fixed_composer = 'Lassus' if key == 'lassus_psalms' else None
         for label, path in fetch_fn().items():
-            rows.append((f'[{prefix}] {label}', key, path))
+            composer_name = fixed_composer or _split_composer_from_label(label)
+            rows.append((f'[{prefix}] {label}', key, path, composer_name, None))
     return rows
 
 
@@ -1117,16 +1158,40 @@ tab_browse, tab_upload, tab_corpus, tab_crim, tab_jrp, tab_1520s, tab_tasso, tab
 with tab_browse:
     st.caption(
         "Search all ~4,300 pieces across every collection in this app at once, "
-        "preview a piece's voice count and whether it has encoded text/lyrics "
-        "before committing to the full analysis, then annotate it directly."
+        "narrow by collection/composer/genre, preview a piece's voice count and "
+        "whether it has encoded text/lyrics before committing to the full "
+        "analysis, then annotate it directly."
     )
-    query = st.text_input("Search by composer or title", key="browse_query")
+    # Loaded eagerly (not just when a query is typed) since the three filter
+    # widgets below need the real set of collections/composers/genres to
+    # populate their options -- same cache (@st.cache_data(ttl=3600) on
+    # build_browse_index itself), so this cost is still paid once per hour
+    # shared across every visitor, not per page load.
+    with st.spinner("Indexing all collections (first load after a quiet spell can "
+                     "take up to ~15s -- instant after that)..."):
+        index = build_browse_index()
 
-    if query:
-        with st.spinner("Searching (first search after a quiet spell indexes all "
-                         "collections, can take up to ~15s -- instant after that)..."):
-            index = build_browse_index()
-        matches = [row for row in index if query.lower() in row[0].lower()]
+    query = st.text_input("Search by composer or title", key="browse_query")
+    filter_col1, filter_col2, filter_col3 = st.columns(3)
+    collection_filter = filter_col1.multiselect(
+        "Collection", sorted({row[1] for row in index}),
+        format_func=lambda k: COLLECTION_DISPLAY_NAMES.get(k, k), key="browse_collection_filter",
+    )
+    composer_filter = filter_col2.multiselect(
+        "Composer", sorted({row[3] for row in index}), key="browse_composer_filter",
+    )
+    genre_filter = filter_col3.multiselect(
+        "Genre (CRIM only)", sorted({row[4] for row in index if row[4]}), key="browse_genre_filter",
+    )
+
+    if query or collection_filter or composer_filter or genre_filter:
+        matches = [
+            row for row in index
+            if (not query or query.lower() in row[0].lower())
+            and (not collection_filter or row[1] in collection_filter)
+            and (not composer_filter or row[3] in composer_filter)
+            and (not genre_filter or row[4] in genre_filter)
+        ]
 
         if not matches:
             st.info("No matches.")
@@ -1134,7 +1199,7 @@ with tab_browse:
             shown = matches[:50]
             st.caption(f"{len(matches)} match(es)" + (" -- showing first 50" if len(matches) > 50 else ""))
             browse_label = st.selectbox("Pick one", [m[0] for m in shown], key="browse_pick")
-            _, collection, native_ref = next(m for m in shown if m[0] == browse_label)
+            _, collection, native_ref, _composer, _genre = next(m for m in shown if m[0] == browse_label)
             stem = _browse_piece_filename_stem(collection, native_ref)
             render_preview_and_annotate(collection, native_ref, browse_label, stem, key_prefix='browse')
 
