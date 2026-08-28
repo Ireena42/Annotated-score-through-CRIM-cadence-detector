@@ -86,6 +86,13 @@ collection actually ships) without any CRIM analysis at all. The
 download button and file name are honest about which case you're in
 ("Download annotated MusicXML" vs. plain "Download MusicXML").
 
+Whenever at least one analysis actually finds something, a small strip
+plot shows where each event falls across the piece (0 = start, 1 =
+end) — one lane per analysis, in the same colors as the score (red
+cadences, blue points of imitation, green homorhythm) — so you can see
+a piece's structural shape at a glance without opening notation
+software at all.
+
 Whenever at least one analysis was requested, a **"📋 Methods-section
 description"** expander appears alongside the result — a ready-to-copy
 paragraph (with `music21`/CRIM citations already in it) describing
@@ -143,6 +150,10 @@ above is the one to share.
    can describe the same passage via overlapping sliding windows — so
    this tool deduplicates them into one label per passage before writing
    anything to the score.
+7. The **strip plot** reads the `Progress` column every one of CRIM's
+   three analyses already computes on its own (offset divided by the
+   piece's last note offset, 0-1) — no separate calculation needed, just
+   collecting a column CRIM already gives back.
 
 ## Notes
 

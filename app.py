@@ -27,13 +27,17 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import music21 as m21
+import pandas as pd
 import requests
 import streamlit as st
 
 # so `from annotate_cadences import ...` finds the file regardless of the
 # directory `streamlit run` was launched from
 sys.path.insert(0, str(Path(__file__).parent))
-from annotate_cadences import annotate_score, annotate_presentation_types, annotate_homorhythm
+from annotate_cadences import (
+    annotate_score, annotate_presentation_types, annotate_homorhythm,
+    CADENCE_COLOR, PRESENTATION_COLOR, HOMORHYTHM_COLOR,
+)
 from crim_export_cadences import export_cadences_with_partmap  # noqa: F401 (kept for reference)
 import crim_intervals as ci
 
@@ -489,6 +493,25 @@ def _safe_cadences(piece):
         )
 
 
+def _append_timeline(stats, progress_values, label, color):
+    """Appends one row per detected event to stats['timeline'] -- the
+    data behind the strip-plot visualization rendered in show_result().
+    Every one of CRIM's three analyses (cadences/presentationTypes/
+    homorhythm) independently computes its own 'Progress' column the
+    same way -- offset divided by the piece's last note offset, giving
+    0-1 position through the piece (confirmed directly in all three
+    methods' source before relying on it) -- so this is just collecting
+    that column, tagged with which analysis it came from and that
+    analysis's own notehead color (CADENCE_COLOR/PRESENTATION_COLOR/
+    HOMORHYTHM_COLOR), so the plot's colors match the annotated score's
+    colors exactly. Shared by cadences/ptypes/homorhythm in both
+    run_pipeline() and _annotate_crim_piece() rather than duplicated six
+    times across the two functions."""
+    stats.setdefault('timeline', []).extend(
+        {'Progress': p, 'Type': label, 'color': color} for p in progress_values
+    )
+
+
 def run_pipeline(score, source_label, include_cadences=True, include_ptypes=False, include_homorhythm=False):
     """Shared by both input modes below: given a parsed music21 Score,
     optionally runs each of CRIM's three structural analyses on it and
@@ -547,6 +570,7 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
             return None, None, error
         if not cadences.empty:
             annotated_score, stats = annotate_score(score, cadences)
+            _append_timeline(stats, cadences['Progress'], 'Cadence', CADENCE_COLOR)
         else:
             stats = {'labeled': 0, 'missed_label': 0, 'colored': 0}
 
@@ -562,6 +586,7 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
             )
             stats['ptypes_labeled'] = ptype_stats['labeled']
             stats['ptypes_colored'] = ptype_stats['colored']
+            _append_timeline(stats, ptypes['Progress'], 'Points of Imitation', PRESENTATION_COLOR)
 
     if include_homorhythm:
         try:
@@ -575,6 +600,7 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
             )
             stats['hr_labeled'] = hr_stats['labeled']
             stats['hr_colored'] = hr_stats['colored']
+            _append_timeline(stats, hr['Progress'], 'Homorhythm', HOMORHYTHM_COLOR)
 
     return annotated_score, stats, None
 
@@ -698,6 +724,15 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
             "analysis was selected, or none of the selected analyses found "
             "anything in this piece. The file below is the unmodified score."
         )
+
+    # One row per detected event across whichever analyses ran -- see
+    # _append_timeline(). Only present when `annotated` is True (nothing
+    # is ever appended for an empty/unrequested analysis), so no separate
+    # guard is needed beyond `if timeline`.
+    timeline = stats.get('timeline')
+    if timeline:
+        st.caption("Where these occur across the piece (progress from start to end):")
+        st.scatter_chart(pd.DataFrame(timeline), x='Progress', y='Type', color='color', height=200)
 
     methods_blurb = _build_methods_blurb(include_cadences, include_ptypes, include_homorhythm)
     if methods_blurb:
@@ -904,6 +939,7 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
             return None, None, error
         if not cadences.empty:
             annotated_score, stats = annotate_score(piece.score, cadences)
+            _append_timeline(stats, cadences['Progress'], 'Cadence', CADENCE_COLOR)
         else:
             stats = {'labeled': 0, 'missed_label': 0, 'colored': 0}
     if include_ptypes:
@@ -918,6 +954,7 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
             )
             stats['ptypes_labeled'] = ptype_stats['labeled']
             stats['ptypes_colored'] = ptype_stats['colored']
+            _append_timeline(stats, ptypes['Progress'], 'Points of Imitation', PRESENTATION_COLOR)
     if include_homorhythm:
         try:
             hr = piece.homorhythm()
@@ -930,6 +967,7 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
             )
             stats['hr_labeled'] = hr_stats['labeled']
             stats['hr_colored'] = hr_stats['colored']
+            _append_timeline(stats, hr['Progress'], 'Homorhythm', HOMORHYTHM_COLOR)
     return annotated_score, stats, None
 
 
