@@ -78,6 +78,13 @@ collection actually ships) without any CRIM analysis at all. The
 download button and file name are honest about which case you're in
 ("Download annotated MusicXML" vs. plain "Download MusicXML").
 
+Whenever at least one analysis was requested, a **"📋 Methods-section
+description"** expander appears alongside the result — a ready-to-copy
+paragraph (with `music21`/CRIM citations already in it) describing
+exactly which analyses were run, for pasting straight into a paper's
+Methods section. It only mentions the ones actually checked, so it never
+overclaims what a given download represents.
+
 In-app expanders explain what the cadence labels mean and how the
 detector actually works, in case any of it isn't self-explanatory at a
 glance.

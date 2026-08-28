@@ -594,7 +594,54 @@ def score_to_download_bytes(score):
         tmp_path.unlink(missing_ok=True)
 
 
-def show_result(annotated_score, stats, filename_stem):
+# One sentence per analysis, written to read naturally whether one or all
+# three are strung together -- see _build_methods_blurb(). Citation style
+# (name + year/project, no full bibliography) deliberately matches what
+# the rest of this app already uses elsewhere (README, the cadence-
+# mechanism expander), not a separate convention invented just for this.
+_METHODS_BLURB_MUSIC21 = "Scores were parsed with music21 (Cuthbert & Ariza, 2010)."
+_METHODS_BLURB_CADENCES = (
+    "Cadences were identified using CRIM Intervals' cadences() method (Morgan & "
+    "Freedman, CRIM Project), which detects cadential voice functions (Cantizans, "
+    "Tenorizans, Bassizans, etc.) via pairwise contrapuntal interval analysis "
+    "rather than harmonic labeling."
+)
+_METHODS_BLURB_PTYPES = (
+    "Points of imitation were identified using CRIM Intervals' presentationTypes() "
+    "method, which finds melodic entries imitated across voices and classifies "
+    "each instance as a Point of Entry, Imitative Duo, or Fuga based on the time "
+    "intervals between successive entries."
+)
+_METHODS_BLURB_HOMORHYTHM = (
+    "Homorhythmic passages were identified using CRIM Intervals' homorhythm() "
+    "method, which finds passages where two or more voices share both rhythm and "
+    "lyrics."
+)
+
+
+def _build_methods_blurb(include_cadences, include_ptypes, include_homorhythm):
+    """A copy-pasteable methods-section paragraph describing exactly
+    which analyses were actually requested for this download -- not
+    which ones found anything, since "we ran cadence detection and it
+    found none" is still a real, citable methodological fact. Returns
+    None if nothing was requested at all (a plain download has no
+    methods to describe). Deliberately takes the three include_* flags
+    directly rather than trying to infer them from `stats` -- ptypes/
+    homorhythm only add keys to `stats` when they find something, so
+    "requested but empty" and "never requested" are indistinguishable
+    from stats alone; the caller already has the real flags in scope.
+    """
+    sentences = [s for s, on in [
+        (_METHODS_BLURB_CADENCES, include_cadences),
+        (_METHODS_BLURB_PTYPES, include_ptypes),
+        (_METHODS_BLURB_HOMORHYTHM, include_homorhythm),
+    ] if on]
+    if not sentences:
+        return None
+    return ' '.join([_METHODS_BLURB_MUSIC21] + sentences)
+
+
+def show_result(annotated_score, stats, filename_stem, include_cadences=False, include_ptypes=False, include_homorhythm=False):
     """Reports whatever run_pipeline()/_annotate_crim_piece() actually
     did (cadences/ptypes/homorhythm are all optional now -- see
     run_pipeline's docstring) and offers the resulting file for
@@ -603,7 +650,8 @@ def show_result(annotated_score, stats, filename_stem):
     either way, just unmodified in that case, so a download is always
     offered; the filename/button text are the only things that change,
     honestly reflecting whether the file actually has anything written
-    onto it.
+    onto it. include_cadences/ptypes/homorhythm are only used to build
+    the methods-section blurb below -- see _build_methods_blurb().
     """
     if 'labeled' in stats:
         st.success(
@@ -648,6 +696,12 @@ def show_result(annotated_score, stats, filename_stem):
             "analysis was selected, or none of the selected analyses found "
             "anything in this piece. The file below is the unmodified score."
         )
+
+    methods_blurb = _build_methods_blurb(include_cadences, include_ptypes, include_homorhythm)
+    if methods_blurb:
+        with st.expander("📋 Methods-section description (for a paper)"):
+            st.caption("Only mentions whichever analyses were actually requested above -- copy it as-is.")
+            st.code(methods_blurb, language=None)
 
     xml_bytes = score_to_download_bytes(annotated_score)
     st.download_button(
@@ -1166,7 +1220,10 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
         if error:
             st.error(error)
         else:
-            show_result(annotated_score, stats, filename_stem)
+            show_result(
+                annotated_score, stats, filename_stem, include_cadences=include_cadences,
+                include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
+            )
 
 
 
@@ -1234,7 +1291,10 @@ with tab_upload:
         if error:
             st.error(error)
         else:
-            show_result(annotated_score, stats, Path(uploaded.name).stem)
+            show_result(
+                annotated_score, stats, Path(uploaded.name).stem, include_cadences=include_cadences_upload,
+                include_ptypes=include_ptypes_upload, include_homorhythm=include_homorhythm_upload,
+            )
 
 with tab_corpus:
     composer_name = st.selectbox("Composer", sorted(CORPUS_COMPOSERS.keys()))
