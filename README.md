@@ -19,12 +19,12 @@ collection-aggregation side grew into something worth naming on its own.
 Built as a side tool for a physics thesis on network-science analysis of
 Palestrina's polyphony — the app itself has no dependency on that project.
 
-**[Open the live app](https://annotated-score-through-crim-cadence-detector-fdphigcb95z2rtfq.streamlit.app/)**
+**[Open the live app](https://renaissance-score-workbench.streamlit.app/)**
 — no install needed, just a browser. First load after a quiet spell can
 take 30-60s while it wakes up (Streamlit Community Cloud's free tier
 sleeps idle apps); after that it's fast.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://annotated-score-through-crim-cadence-detector-fdphigcb95z2rtfq.streamlit.app/)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://renaissance-score-workbench.streamlit.app/)
 
 ## Use it
 
