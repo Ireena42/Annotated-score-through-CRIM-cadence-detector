@@ -31,7 +31,7 @@ import streamlit as st
 # so `from annotate_cadences import ...` finds the file regardless of the
 # directory `streamlit run` was launched from
 sys.path.insert(0, str(Path(__file__).parent))
-from annotate_cadences import annotate_score, annotate_presentation_types
+from annotate_cadences import annotate_score, annotate_presentation_types, annotate_homorhythm
 from crim_export_cadences import export_cadences_with_partmap  # noqa: F401 (kept for reference)
 import crim_intervals as ci
 
@@ -41,8 +41,9 @@ st.caption(
     "Renaissance polyphony is scattered across dozens of separate archives "
     "online -- this app gathers ~4,300 pieces from 7 of them into one "
     "searchable place, then hands you back a real annotated score: "
-    "cadences (and, optionally, points of imitation) marked directly on "
-    "the notation, ready to open in MuseScore or Finale."
+    "cadences (and, optionally, points of imitation and homorhythmic "
+    "passages) marked directly on the notation, ready to open in "
+    "MuseScore or Finale."
 )
 
 
@@ -461,7 +462,7 @@ def fetch_lassus_psalms_pieces():
     return _dedupe_labels(raw_labels)
 
 
-def run_pipeline(score, source_label, include_ptypes=False):
+def run_pipeline(score, source_label, include_ptypes=False, include_homorhythm=False):
     """Shared by both input modes below: given a parsed music21 Score,
     run CRIM cadence detection (voice_detail=True, for the PartMap this
     tool relies on -- see crim_export_cadences.py's docstring) directly
@@ -474,6 +475,14 @@ def run_pipeline(score, source_label, include_ptypes=False):
     folded into the same dict under 'ptypes_labeled'/'ptypes_colored',
     only when this flag is set, so callers that never asked for it don't
     need to know the keys exist.
+
+    include_homorhythm=True likewise runs homorhythm() (chordal, shared-
+    text-declamation passages) and marks those too (see
+    annotate_homorhythm), folding stats in under 'hr_labeled'/'hr_colored'.
+    Unlike cadences()/presentationTypes(), homorhythm() returns a bare
+    None (not an empty DataFrame) when nothing is found -- checked
+    directly in its own source before relying on this -- so that's
+    checked for explicitly rather than assumed away.
     """
     # ci.ImportedPiece normally comes from ci.importScore(path_or_text),
     # which re-parses from scratch internally -- but it also accepts an
@@ -482,7 +491,7 @@ def run_pipeline(score, source_label, include_ptypes=False):
     piece = ci.main_objs.ImportedPiece(score, source_label)
     cadences = piece.cadences(voice_detail=True, include_final=True)
 
-    if cadences.empty and not include_ptypes:
+    if cadences.empty and not include_ptypes and not include_homorhythm:
         return None, None
 
     if cadences.empty:
@@ -498,6 +507,15 @@ def run_pipeline(score, source_label, include_ptypes=False):
             )
             stats['ptypes_labeled'] = ptype_stats['labeled']
             stats['ptypes_colored'] = ptype_stats['colored']
+
+    if include_homorhythm:
+        hr = piece.homorhythm()
+        if hr is not None and not hr.empty:
+            annotated_score, hr_stats = annotate_homorhythm(
+                annotated_score, hr, piece._getPartNames()
+            )
+            stats['hr_labeled'] = hr_stats['labeled']
+            stats['hr_colored'] = hr_stats['colored']
 
     return annotated_score, stats
 
@@ -534,6 +552,11 @@ def show_result(annotated_score, stats, out_filename):
         st.success(
             f"{stats['ptypes_labeled']} point(s) of imitation found -- "
             f"{stats['ptypes_colored']} entry notes colored (blue)."
+        )
+    if 'hr_labeled' in stats:
+        st.success(
+            f"{stats['hr_labeled']} homorhythmic passage(s) found -- "
+            f"{stats['hr_colored']} notes colored (green)."
         )
     xml_bytes = score_to_download_bytes(annotated_score)
     st.download_button(
@@ -673,14 +696,44 @@ reads cleanly above the system regardless of which voice enters first.
         """
     )
 
-def _annotate_crim_piece(mei_url, include_ptypes=False):
+with st.expander("What do the homorhythm labels mean?"):
+    st.markdown(
+        """
+A third, separate feature -- turn it on with the "Also mark homorhythmic
+passages" checkbox next to Annotate. It runs CRIM's `homorhythm()`,
+which finds **passages where two or more voices move together in the
+same rhythm while singing the same words** -- a chordal, declamatory
+texture, as opposed to the independent, staggered melodic lines that
+cadences and points of imitation are both built around. This is the
+other main way this repertoire varies its texture: strict counterpoint
+punctuated by moments where the voices briefly line up and declaim text
+together, often at a structurally important line of the text.
+
+**How it finds them:** it looks at short runs of notes (4 by default) in
+every voice at once, two ways in parallel -- matching **rhythm**
+(each voice's own sequence of note durations) and matching **lyrics**
+(each voice singing the same syllables at the same time) -- and keeps
+only the passages where both line up across two or more voices that are
+actually sounding (not resting). By default it requires *every* active
+voice to match, not just some of them, for a passage to count.
+
+**What actually appears on the score:** every note belonging to a
+matching passage is colored **green** (cadences are red, points of
+imitation are blue, so all three survive on one file together), and one
+`Homorhythm` text label marks the start of each passage, placed above
+the top staff, higher than the cadence and points-of-imitation labels so
+none of the three ever overlap even when they coincide.
+        """
+    )
+
+def _annotate_crim_piece(mei_url, include_ptypes=False, include_homorhythm=False):
     """Shared by the CRIM tab and Browse: import + metadata-fix + cadence-
     detect + annotate for one CRIM MEI piece. Returns (annotated_score,
     stats, import_failed) -- annotated_score/stats are None if import
     failed OR if the piece had zero detected cadences (caller
-    distinguishes the two via import_failed). include_ptypes=True adds
-    points-of-imitation marking too -- see run_pipeline's docstring for
-    what that adds to `stats`."""
+    distinguishes the two via import_failed). include_ptypes/
+    include_homorhythm=True add points-of-imitation/homorhythm marking
+    too -- see run_pipeline's docstring for what those add to `stats`."""
     piece = ci.importScore(mei_url)
     if piece is None:
         return None, None, True
@@ -693,7 +746,7 @@ def _annotate_crim_piece(mei_url, include_ptypes=False):
     piece.score.metadata.title = piece.metadata.get('title') or piece.score.metadata.title
     piece.score.metadata.composer = piece.metadata.get('composer') or piece.score.metadata.composer
     cadences = piece.cadences(voice_detail=True, include_final=True)
-    if cadences.empty and not include_ptypes:
+    if cadences.empty and not include_ptypes and not include_homorhythm:
         return None, None, False
     if cadences.empty:
         annotated_score, stats = piece.score, {'labeled': 0, 'missed_label': 0, 'colored': 0}
@@ -707,10 +760,18 @@ def _annotate_crim_piece(mei_url, include_ptypes=False):
             )
             stats['ptypes_labeled'] = ptype_stats['labeled']
             stats['ptypes_colored'] = ptype_stats['colored']
+    if include_homorhythm:
+        hr = piece.homorhythm()
+        if hr is not None and not hr.empty:
+            annotated_score, hr_stats = annotate_homorhythm(
+                annotated_score, hr, piece._getPartNames()
+            )
+            stats['hr_labeled'] = hr_stats['labeled']
+            stats['hr_colored'] = hr_stats['colored']
     return annotated_score, stats, False
 
 
-def _annotate_kern_from_url(raw_url, source_label, include_ptypes=False):
+def _annotate_kern_from_url(raw_url, source_label, include_ptypes=False, include_homorhythm=False):
     """Shared by every GitHub-hosted Humdrum kern tab (JRP, 1520s, Tasso,
     SEILS, Lassus Psalms): fetch the raw file, parse, run the pipeline.
     Humdrum **kern auto-detects fine from raw text content, same as
@@ -718,7 +779,7 @@ def _annotate_kern_from_url(raw_url, source_label, include_ptypes=False):
     app -- verified directly before relying on it."""
     kern_text = requests.get(raw_url, timeout=20).text
     score = m21.converter.parse(kern_text)
-    return run_pipeline(score, source_label, include_ptypes=include_ptypes)
+    return run_pipeline(score, source_label, include_ptypes=include_ptypes, include_homorhythm=include_homorhythm)
 
 
 # Base raw-content URLs for the five kern-backed collections, shared by
@@ -900,7 +961,7 @@ def _browse_piece_filename_stem(collection, native_ref):
     return Path(native_ref).stem
 
 
-def annotate_by_collection(collection, native_ref, include_ptypes=False):
+def annotate_by_collection(collection, native_ref, include_ptypes=False, include_homorhythm=False):
     """Dispatches to whichever collection's own annotate path applies --
     reuses the exact same functions each dedicated tab already calls, so
     Browse's Annotate button behaves identically to picking the same
@@ -909,16 +970,20 @@ def annotate_by_collection(collection, native_ref, include_ptypes=False):
     if collection == 'music21':
         corpus_key, piece_id = native_ref
         score = m21.corpus.parse(f"{corpus_key}/{piece_id}")
-        annotated_score, stats = run_pipeline(score, piece_id, include_ptypes=include_ptypes)
+        annotated_score, stats = run_pipeline(
+            score, piece_id, include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
+        )
         return annotated_score, stats, None
     if collection == 'crim':
         annotated_score, stats, import_failed = _annotate_crim_piece(
-            native_ref['mei_links'][0], include_ptypes=include_ptypes
+            native_ref['mei_links'][0], include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
         )
         error = "CRIM couldn't import this piece (bad MEI file or network issue)." if import_failed else None
         return annotated_score, stats, error
     raw_url = KERN_COLLECTION_BASE_URLS[collection] + native_ref
-    annotated_score, stats = _annotate_kern_from_url(raw_url, Path(native_ref).stem, include_ptypes=include_ptypes)
+    annotated_score, stats = _annotate_kern_from_url(
+        raw_url, Path(native_ref).stem, include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
+    )
     return annotated_score, stats, None
 
 
@@ -940,6 +1005,9 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
     include_ptypes = st.checkbox(
         "Also mark points of imitation", key=f"ptypes_{key_prefix}",
     )
+    include_homorhythm = st.checkbox(
+        "Also mark homorhythmic passages", key=f"hr_{key_prefix}",
+    )
     col1, col2 = st.columns(2)
     if col1.button("Preview", key=f"preview_{key_prefix}"):
         with st.spinner("Checking..."):
@@ -952,7 +1020,7 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
     if col2.button("Annotate", key=f"annotate_{key_prefix}"):
         with st.spinner(f"Downloading and parsing {piece_label}..."):
             annotated_score, stats, error = annotate_by_collection(
-                collection, native_ref, include_ptypes=include_ptypes
+                collection, native_ref, include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
             )
         if error:
             st.error(error)
@@ -962,9 +1030,19 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
             show_result(annotated_score, stats, f"{filename_stem}_annotated.xml")
 
 
-tab_browse, tab_corpus, tab_crim, tab_jrp, tab_1520s, tab_tasso, tab_smaller, tab_upload = st.tabs([
-    "🔍 Browse all", "music21 corpus", "CRIM Project corpus", "Josquin Research Project",
-    "1520s Project", "Tasso in Music Project", "More collections", "Upload your own file",
+
+# "Upload your own file" is 2nd, right after Browse -- NOT last, where it
+# used to sit: as the 8th of 8 tabs it fell past the visible tab-bar width
+# on a typical window, needing a scroll/arrow-click to even see it exists
+# (checked directly by resizing the running app). Browse and Upload are
+# also the two source-agnostic entry points (search everything vs. bring
+# your own file), so pairing them first is a reasonable grouping on its
+# own merits, not just a width hack. The upload icon mirrors Browse's own
+# leading emoji so both "generic" tabs read as a visually distinct pair
+# at a glance, before reading any label text.
+tab_browse, tab_upload, tab_corpus, tab_crim, tab_jrp, tab_1520s, tab_tasso, tab_smaller = st.tabs([
+    "🔍 Browse all", "📤 Upload your own file", "music21 corpus", "CRIM Project corpus",
+    "Josquin Research Project", "1520s Project", "Tasso in Music Project", "More collections",
 ])
 
 with tab_browse:
@@ -990,6 +1068,26 @@ with tab_browse:
             _, collection, native_ref = next(m for m in shown if m[0] == browse_label)
             stem = _browse_piece_filename_stem(collection, native_ref)
             render_preview_and_annotate(collection, native_ref, browse_label, stem, key_prefix='browse')
+
+with tab_upload:
+    st.caption("Accepted formats: MusicXML (.xml/.musicxml) or MEI (.mei).")
+    uploaded = st.file_uploader("Score file", type=['xml', 'musicxml', 'mei'])
+    if uploaded is not None and st.button("Annotate", key="annotate_upload"):
+        with st.spinner("Parsing upload and detecting cadences..."):
+            # Decoding to text and handing the STRING (not a file path) to
+            # music21/CRIM is the same pattern crim_intervals' own code
+            # documents for "user-supplied piece in streamlit" (see this
+            # file's module docstring) -- it skips the on-disk extension
+            # check entirely and lets converter.parse() sniff the format
+            # from the content itself.
+            text = uploaded.getvalue().decode('utf-8')
+            score = m21.converter.parse(text)
+            annotated_score, stats = run_pipeline(score, uploaded.name)
+        if annotated_score is None:
+            st.warning("No cadences were detected in this piece.")
+        else:
+            stem = Path(uploaded.name).stem
+            show_result(annotated_score, stats, f"{stem}_annotated.xml")
 
 with tab_corpus:
     composer_name = st.selectbox("Composer", sorted(CORPUS_COMPOSERS.keys()))
@@ -1061,23 +1159,3 @@ with tab_smaller:
     small_label = st.selectbox("Piece", sorted(small_pieces.keys()), key="small_piece")
     path = small_pieces[small_label]
     render_preview_and_annotate(collection_key, path, small_label, Path(path).stem)
-
-with tab_upload:
-    st.caption("Accepted formats: MusicXML (.xml/.musicxml) or MEI (.mei).")
-    uploaded = st.file_uploader("Score file", type=['xml', 'musicxml', 'mei'])
-    if uploaded is not None and st.button("Annotate", key="annotate_upload"):
-        with st.spinner("Parsing upload and detecting cadences..."):
-            # Decoding to text and handing the STRING (not a file path) to
-            # music21/CRIM is the same pattern crim_intervals' own code
-            # documents for "user-supplied piece in streamlit" (see this
-            # file's module docstring) -- it skips the on-disk extension
-            # check entirely and lets converter.parse() sniff the format
-            # from the content itself.
-            text = uploaded.getvalue().decode('utf-8')
-            score = m21.converter.parse(text)
-            annotated_score, stats = run_pipeline(score, uploaded.name)
-        if annotated_score is None:
-            st.warning("No cadences were detected in this piece.")
-        else:
-            stem = Path(uploaded.name).stem
-            show_result(annotated_score, stats, f"{stem}_annotated.xml")

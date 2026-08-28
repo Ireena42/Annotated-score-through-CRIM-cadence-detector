@@ -212,6 +212,76 @@ def annotate_presentation_types(score, ptypes, part_names):
     return score, {'labeled': n_labeled, 'missed_label': n_missed_label, 'colored': n_colored}
 
 
+HOMORHYTHM_COLOR = '#22AA55'  # green -- third color, distinct from cadence red and imitation blue
+
+
+def annotate_homorhythm(score, hr, part_names, min_gap=4.0):
+    """Marks each homorhythmic (chordal, shared-text-declamation) passage
+    on the score: colors every note in every voice listed in that row's
+    'hr_voices', and labels one point per passage -- placed higher than
+    both cadence (y=20) and presentation-type (y=40) labels so all three
+    features can coexist without overlapping text.
+
+    score: a music21 Score (mutated in place AND returned).
+    hr: a DataFrame like crim_intervals' piece.homorhythm() output --
+        MultiIndex (Measure, Beat, Offset), a 'hr_voices' column (list of
+        part-name strings, same naming convention as presentationTypes'
+        'Voices' -- confirmed directly, including a real piece where a
+        part is literally named '[Superius]' with brackets in the source
+        data itself, not a formatting artifact).
+    part_names: the ordered list from ImportedPiece._getPartNames() for
+        this same score -- see annotate_presentation_types for why this
+        is passed in rather than reimplemented.
+    min_gap: homorhythm() returns raw overlapping n-gram matches, NOT
+        pre-merged into distinct passages the way presentationTypes()
+        already is (checked directly in its source -- no such
+        consolidation step exists there) -- consecutive rows can be as
+        little as 2 offset-units apart, all describing the same
+        underlying passage through a sliding window. Every matching note
+        still gets colored (so the passage's full extent is visible), but
+        a new text label is only added when a row's offset is more than
+        `min_gap` past the last labeled one, collapsing what would
+        otherwise be a label every beat or two into one per passage.
+        Default (4.0) matches homorhythm()'s own default ngram_length.
+
+    Returns (score, stats) where stats = {'labeled', 'missed_label', 'colored'}.
+    """
+    parts = list(score.parts)
+    name_to_index = {name: i for i, name in enumerate(part_names)}
+    measure_indices = [_measure_index(p) for p in parts]
+
+    n_labeled, n_missed_label, n_colored = 0, 0, 0
+    last_labeled_offset = None
+    for (measure_no, beat, offset), row in hr.iterrows():
+        measure_no, beat = int(measure_no), float(beat)
+        any_colored = False
+        for voice_name in row['hr_voices']:
+            idx = name_to_index.get(voice_name)
+            if idx is None or idx >= len(parts):
+                continue
+            note_obj = find_note_at_beat(measure_indices[idx].get(measure_no), beat)
+            if note_obj is not None:
+                note_obj.style.color = HOMORHYTHM_COLOR
+                n_colored += 1
+                any_colored = True
+
+        is_new_passage = last_labeled_offset is None or offset - last_labeled_offset > min_gap
+        if any_colored and is_new_passage:
+            target_measure = measure_indices[0].get(measure_no)
+            if target_measure is not None:
+                ts = target_measure.getContextByClass('TimeSignature')
+                te = expressions.TextExpression('Homorhythm')
+                te.style.absoluteY = 60  # above cadence (20) and imitation (40) labels
+                te.style.color = HOMORHYTHM_COLOR
+                target_measure.insert(ts.getOffsetFromBeat(beat), te)
+                n_labeled += 1
+            else:
+                n_missed_label += 1
+            last_labeled_offset = offset
+
+    return score, {'labeled': n_labeled, 'missed_label': n_missed_label, 'colored': n_colored}
+
+
 def annotate_piece(xml_path, cadences_csv, out_path):
     """CLI entry point: reads everything from disk, calls annotate_score(),
     writes the result back to disk. Kept as a thin wrapper around

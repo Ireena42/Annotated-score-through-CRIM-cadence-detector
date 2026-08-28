@@ -3,10 +3,11 @@
 Renaissance polyphony is scattered across dozens of separate archives
 online. This app gathers **~4,300 pieces from 7 of them** into one
 searchable place, then hands you back a real annotated score: cadences
-(e.g. `Authentic → G`) and, optionally, points of imitation, marked
-**directly onto the score itself** with text labels and colored
-noteheads — so you can open the result in MuseScore, Finale, or any
-notation software and see exactly where and how each happens.
+(e.g. `Authentic → G`) and, optionally, points of imitation and
+homorhythmic passages, marked **directly onto the score itself** with
+text labels and colored noteheads — so you can open the result in
+MuseScore, Finale, or any notation software and see exactly where and
+how each happens.
 
 Cadence detection is done by [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals)
 (Morgan & Freedman, CRIM Project), which analyzes contrapuntal voice
@@ -50,14 +51,21 @@ Or pick a piece from one collection directly:
   repository
 - **More collections** — SEILS (Italian secular songs, ca. 1600) and
   Lassus's Geistliche Psalmen, two smaller collections sharing one tab
-- **upload your own file** — MusicXML (`.xml`/`.musicxml`) or MEI (`.mei`)
 
-Every collection also has a checkbox: **"Also mark points of imitation
-(PEN/ID/FUGA)"** — CRIM's `presentationTypes()`, which finds where a
-melodic subject enters in one voice and is imitated by others (a Point
-of Entry, Imitative Duo, or Fuga), marked on the same score in blue
-alongside the cadences in red. Off by default (it's extra computation on
-top of cadence detection); check it before hitting Annotate to include it.
+Or use **📤 Upload your own file**, right next to Browse, to bring your
+own score: MusicXML (`.xml`/`.musicxml`) or MEI (`.mei`).
+
+Every collection also has two checkboxes, both off by default (extra
+computation on top of cadence detection) — check whichever you want
+before hitting Annotate:
+- **"Also mark points of imitation"** — CRIM's `presentationTypes()`,
+  which finds where a melodic subject enters in one voice and is
+  imitated by others (a Point of Entry, Imitative Duo, or Fuga), marked
+  on the same score in blue alongside the cadences in red.
+- **"Also mark homorhythmic passages"** — CRIM's `homorhythm()`, which
+  finds passages where two or more voices move together in the same
+  rhythm while singing the same words (a chordal, declamatory texture),
+  marked in green.
 
 Click **Annotate**, then download the resulting `.xml`. In-app expanders
 explain what the cadence labels mean and how the detector actually
@@ -99,6 +107,13 @@ above is the one to share.
    (e.g. `Part-2`) are CRIM's own disambiguated part-naming convention,
    not a fixed staff-position number like cadences use — reused directly
    from `ImportedPiece._getPartNames()` rather than reimplemented.
+6. The **homorhythm checkbox** runs CRIM's `homorhythm()` and colors
+   every note of every matching passage in green, labeling the start of
+   each one. `homorhythm()`'s raw output isn't pre-consolidated into
+   distinct passages the way `presentationTypes()` is — consecutive rows
+   can describe the same passage via overlapping sliding windows — so
+   this tool deduplicates them into one label per passage before writing
+   anything to the score.
 
 ## Notes
 
