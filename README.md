@@ -27,12 +27,12 @@ being the single headline feature among several. Built as a side tool
 for a physics thesis on network-science analysis of
 Palestrina's polyphony — the app itself has no dependency on that project.
 
-**[Open the live app](https://renaissance-score-workbench.streamlit.app/)**
+**[Open the live app](https://renaissance-polyphony-research-toolkit.streamlit.app/)**
 — no install needed, just a browser. First load after a quiet spell can
 take 30-60s while it wakes up (Streamlit Community Cloud's free tier
 sleeps idle apps); after that it's fast.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://renaissance-score-workbench.streamlit.app/)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://renaissance-polyphony-research-toolkit.streamlit.app/)
 
 ## Use it
 
@@ -64,15 +64,20 @@ Handy for "give me every Josquin piece across all 7 collections to
 analyze myself" — search "Josquin", download the CSV (or, narrowed
 further, the ZIP).
 
-Or pick a piece from one collection directly:
+Or pick a piece from one collection directly. Every tab below filters by
+**Composer** (each collection has its own clean, internally-consistent
+composer data — that's *not* CRIM-exclusive, unlike genre below — the
+filter is just absent wherever a collection genuinely has only one
+composer, e.g. Lassus's Geistliche Psalmen):
 - **music21 corpus** — Palestrina (~1300 pieces) or Monteverdi, picked by
   composer then a real title (e.g. "Missa Ad coenam Agni: Agnus I"), not
   an internal file id
 - **CRIM Project corpus** — 359 pieces: Lassus's parody masses plus the
   motets/chansons/madrigals they're modeled on, live from crimproject.org.
-  Filterable by **genre** (Motet/Madrigal/Mass movement/Chanson/...) —
-  the only one of the 7 collections where genre exists as real per-piece
-  data, so the filter lives here rather than on Browse.
+  Also filterable by **genre** (Motet/Madrigal/Mass movement/Chanson/...)
+  — the only one of the 7 collections where genre exists as real
+  per-piece structured data at all, which is why that particular filter
+  lives here and nowhere else (not on Browse, not on any other tab).
 - **Josquin Research Project** — ~1340 pieces, 21 Franco-Flemish
   composers (Josquin, Ockeghem, Obrecht, la Rue, and more), live from
   their public GitHub repository
@@ -91,11 +96,11 @@ Every collection has three independent checkboxes before hitting
 **Analyze**/**Download** (see above for which label you'll actually see):
 - **"Annotate cadences"** — CRIM's `cadences()`, marked in red. On by
   default, since it's this app's original and still-primary feature.
-- **"Also mark points of imitation"** — CRIM's `presentationTypes()`,
+- **"Mark points of imitation"** — CRIM's `presentationTypes()`,
   which finds where a melodic subject enters in one voice and is
   imitated by others (a Point of Entry, Imitative Duo, or Fuga), marked
   in blue. Off by default.
-- **"Also mark homorhythmic passages"** — CRIM's `homorhythm()`, which
+- **"Mark homorhythmic passages"** — CRIM's `homorhythm()`, which
   finds passages where two or more voices move together in the same
   rhythm while singing the same words (a chordal, declamatory texture),
   marked in green. Off by default.

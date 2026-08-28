@@ -199,6 +199,46 @@ def _dedupe_labels(raw_labels):
     return result
 
 
+def _composer_from_collection_label(label):
+    """Pulls the composer back out of a label built in this collection's
+    own 'Composer — Rest' convention -- JRP/1520s/Tasso/SEILS (via
+    _catalog_piece_label/_tasso_piece_label/fetch_seils_pieces) all use
+    it. Safe to reuse HERE, within one collection's own tab -- unlike
+    Browse's cross-collection composer filter (tried and reverted, see
+    build_browse_index's docstring): that problem was specifically about
+    mixing DIFFERENT collections' own naming conventions in one dropdown
+    (CRIM's "Josquin Des Prez" vs JRP's "Josquin des Prez" showing up as
+    separate values for the same person). A single collection's own
+    labels are internally consistent by construction -- there's nothing
+    to reconcile within just JRP, or just 1520s, on their own."""
+    composer, sep, _ = label.partition(' — ')
+    return composer if sep else 'Unknown'
+
+
+def _composer_filter_widget(pieces_by_label, key):
+    """Renders a "Composer" multiselect scoped to one collection's own
+    {label: native_ref} dict and returns it filtered accordingly --
+    unchanged if nothing is selected, or if there's only one composer to
+    begin with (a single-option filter is never worth showing -- e.g.
+    Lassus's Geistliche Psalmen, a genuinely single-composer collection).
+    Composer is parsed straight from each label, see
+    _composer_from_collection_label -- these are collections that don't
+    have genre as structured data (see the CRIM tab's own genre filter
+    for the one collection that does), but they all do have a clean,
+    internally-consistent composer per piece, which is a different kind
+    of metadata than genre and happens to be available more broadly."""
+    composers = sorted({_composer_from_collection_label(label) for label in pieces_by_label})
+    if len(composers) <= 1:
+        return pieces_by_label
+    selected = st.multiselect("Composer", composers, key=key)
+    if not selected:
+        return pieces_by_label
+    return {
+        label: ref for label, ref in pieces_by_label.items()
+        if _composer_from_collection_label(label) in selected
+    }
+
+
 @st.cache_data(ttl=3600, show_spinner=False)
 def fetch_crim_pieces():
     """The CRIM Project's full piece list, live from their public API --
@@ -838,8 +878,8 @@ to pair with, ever.)
 with st.expander("What do the points-of-imitation labels mean?"):
     st.markdown(
         """
-This is a separate feature from cadences -- turn it on with the "Also
-mark points of imitation" checkbox next to Annotate. It runs CRIM's
+This is a separate feature from cadences -- turn it on with the "Mark
+points of imitation" checkbox next to Analyze/Download. It runs CRIM's
 `presentationTypes()`, which finds **where a melodic idea (a "soggetto")
 enters in one voice and is then imitated by others** -- the other
 hallmark structural feature of this repertoire, alongside cadences.
@@ -886,8 +926,8 @@ reads cleanly above the system regardless of which voice enters first.
 with st.expander("What do the homorhythm labels mean?"):
     st.markdown(
         """
-A third, separate feature -- turn it on with the "Also mark homorhythmic
-passages" checkbox next to Annotate. It runs CRIM's `homorhythm()`,
+A third, separate feature -- turn it on with the "Mark homorhythmic
+passages" checkbox next to Analyze/Download. It runs CRIM's `homorhythm()`,
 which finds **passages where two or more voices move together in the
 same rhythm while singing the same words** -- a chordal, declamatory
 texture, as opposed to the independent, staggered melodic lines that
@@ -1357,10 +1397,10 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
         "Annotate cadences", value=True, key=f"cadences_{key_prefix}",
     )
     include_ptypes = st.checkbox(
-        "Also mark points of imitation", key=f"ptypes_{key_prefix}",
+        "Mark points of imitation", key=f"ptypes_{key_prefix}",
     )
     include_homorhythm = st.checkbox(
-        "Also mark homorhythmic passages", key=f"hr_{key_prefix}",
+        "Mark homorhythmic passages", key=f"hr_{key_prefix}",
     )
     # Label reflects what this button will actually do, not just what it
     # hands back at the end -- with at least one box checked, clicking it
@@ -1513,8 +1553,8 @@ with tab_upload:
     st.caption("Accepted formats: MusicXML (.xml/.musicxml) or MEI (.mei).")
     uploaded = st.file_uploader("Score file", type=['xml', 'musicxml', 'mei'])
     include_cadences_upload = st.checkbox("Annotate cadences", value=True, key="cadences_upload")
-    include_ptypes_upload = st.checkbox("Also mark points of imitation", key="ptypes_upload")
-    include_homorhythm_upload = st.checkbox("Also mark homorhythmic passages", key="hr_upload")
+    include_ptypes_upload = st.checkbox("Mark points of imitation", key="ptypes_upload")
+    include_homorhythm_upload = st.checkbox("Mark homorhythmic passages", key="hr_upload")
     # Same reasoning as render_preview_and_annotate's action_label -- see
     # that comment for why this isn't just always "Download".
     action_label_upload = "Analyze" if (include_cadences_upload or include_ptypes_upload or include_homorhythm_upload) else "Download"
@@ -1562,9 +1602,21 @@ with tab_crim:
     # that actually carries genre metadata, so it's a real, always-populated
     # facet in this tab specifically, rather than a mostly-empty one bolted
     # onto a cross-collection search (see build_browse_index's docstring).
-    genre_filter = st.multiselect(
-        "Filter by genre", sorted({p['genre']['name'] for p in crim_pieces}), key="crim_genre_filter",
+    # Composer is *also* real, structured per-piece data here (p['composer']
+    # ['name']) -- unlike genre, composer filtering isn't CRIM-exclusive
+    # (JRP/1520s/Tasso/SEILS below all get their own version too, since
+    # each of those has clean composer data within its own collection --
+    # see _composer_filter_widget), it's genre specifically that's unique
+    # to CRIM's own data model.
+    filter_col1, filter_col2 = st.columns(2)
+    composer_filter = filter_col1.multiselect(
+        "Composer", sorted({p['composer']['name'] for p in crim_pieces}), key="crim_composer_filter",
     )
+    genre_filter = filter_col2.multiselect(
+        "Genre", sorted({p['genre']['name'] for p in crim_pieces}), key="crim_genre_filter",
+    )
+    if composer_filter:
+        crim_pieces = [p for p in crim_pieces if p['composer']['name'] in composer_filter]
     if genre_filter:
         crim_pieces = [p for p in crim_pieces if p['genre']['name'] in genre_filter]
 
@@ -1575,7 +1627,7 @@ with tab_crim:
         for p in crim_pieces
     }
     if not crim_options:
-        st.info("No pieces match that genre filter.")
+        st.info("No pieces match that filter.")
     else:
         crim_label = st.selectbox("Piece", sorted(crim_options.keys()))
         selected = crim_options[crim_label]
@@ -1588,9 +1640,13 @@ with tab_jrp:
         "composers), fetched live from their public GitHub repository."
     )
     jrp_pieces = fetch_jrp_pieces()
-    jrp_label = st.selectbox("Piece", sorted(jrp_pieces.keys()), key="jrp_piece")
-    path = jrp_pieces[jrp_label]
-    render_preview_and_annotate('jrp', path, jrp_label, Path(path).stem)
+    jrp_pieces = _composer_filter_widget(jrp_pieces, key="jrp_composer_filter")
+    if not jrp_pieces:
+        st.info("No pieces match that composer filter.")
+    else:
+        jrp_label = st.selectbox("Piece", sorted(jrp_pieces.keys()), key="jrp_piece")
+        path = jrp_pieces[jrp_label]
+        render_preview_and_annotate('jrp', path, jrp_label, Path(path).stem)
 
 with tab_1520s:
     st.caption(
@@ -1599,9 +1655,13 @@ with tab_1520s:
         "works), fetched live from their public GitHub repository."
     )
     p1520_pieces = fetch_1520s_pieces()
-    p1520_label = st.selectbox("Piece", sorted(p1520_pieces.keys()), key="p1520_piece")
-    path = p1520_pieces[p1520_label]
-    render_preview_and_annotate('1520s', path, p1520_label, Path(path).stem)
+    p1520_pieces = _composer_filter_widget(p1520_pieces, key="p1520_composer_filter")
+    if not p1520_pieces:
+        st.info("No pieces match that composer filter.")
+    else:
+        p1520_label = st.selectbox("Piece", sorted(p1520_pieces.keys()), key="p1520_piece")
+        path = p1520_pieces[p1520_label]
+        render_preview_and_annotate('1520s', path, p1520_label, Path(path).stem)
 
 with tab_tasso:
     st.caption(
@@ -1610,9 +1670,13 @@ with tab_tasso:
         "their public GitHub repository."
     )
     tasso_pieces = fetch_tasso_pieces()
-    tasso_label = st.selectbox("Piece", sorted(tasso_pieces.keys()), key="tasso_piece")
-    path = tasso_pieces[tasso_label]
-    render_preview_and_annotate('tasso', path, tasso_label, Path(path).stem)
+    tasso_pieces = _composer_filter_widget(tasso_pieces, key="tasso_composer_filter")
+    if not tasso_pieces:
+        st.info("No pieces match that composer filter.")
+    else:
+        tasso_label = st.selectbox("Piece", sorted(tasso_pieces.keys()), key="tasso_piece")
+        path = tasso_pieces[tasso_label]
+        render_preview_and_annotate('tasso', path, tasso_label, Path(path).stem)
 
 with tab_smaller:
     st.caption("Two smaller collections, not big enough on their own to earn a full tab.")
@@ -1623,6 +1687,16 @@ with tab_smaller:
     collection_name = st.selectbox("Collection", sorted(SMALLER_COLLECTIONS.keys()))
     collection_key, fetch_fn = SMALLER_COLLECTIONS[collection_name]
     small_pieces = fetch_fn()
-    small_label = st.selectbox("Piece", sorted(small_pieces.keys()), key="small_piece")
-    path = small_pieces[small_label]
-    render_preview_and_annotate(collection_key, path, small_label, Path(path).stem)
+    # Lassus's Geistliche Psalmen has no composer prefix in its own labels at
+    # all (see fetch_lassus_psalms_pieces -- single-composer collection, no
+    # 'Composer — Title' convention to parse); _composer_filter_widget
+    # already skips showing itself when everything resolves to one
+    # composer, so this correctly shows nothing for that collection and a
+    # real filter for SEILS, with no special-casing needed here.
+    small_pieces = _composer_filter_widget(small_pieces, key="small_composer_filter")
+    if not small_pieces:
+        st.info("No pieces match that composer filter.")
+    else:
+        small_label = st.selectbox("Piece", sorted(small_pieces.keys()), key="small_piece")
+        path = small_pieces[small_label]
+        render_preview_and_annotate(collection_key, path, small_label, Path(path).stem)
