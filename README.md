@@ -1,4 +1,4 @@
-# Renaissance Score Workbench
+# Renaissance Polyphony Research Toolkit
 
 Renaissance polyphony is scattered across dozens of separate archives
 online. This app gathers **~4,300 pieces from 7 of them** into one
@@ -17,9 +17,11 @@ tool adds what CRIM's own output doesn't give you on its own: the
 results written back into a real, readable score file, plotted across
 the piece, or exported as data ready for your own analysis.
 
-Started as a single-purpose "Cadence Annotator"; renamed once the
-collection-aggregation side grew into something worth naming on its own.
-Built as a side tool for a physics thesis on network-science analysis of
+Started as a single-purpose "Cadence Annotator," then "Renaissance Score
+Workbench" once the collection-aggregation side grew into something
+worth naming on its own; renamed again once cadence annotation stopped
+being the single headline feature among several. Built as a side tool
+for a physics thesis on network-science analysis of
 Palestrina's polyphony — the app itself has no dependency on that project.
 
 **[Open the live app](https://renaissance-score-workbench.streamlit.app/)**

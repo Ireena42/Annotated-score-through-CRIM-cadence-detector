@@ -1,13 +1,16 @@
 """
-RENAISSANCE SCORE WORKBENCH -- a small Streamlit web app that aggregates
-~4,300 pieces across 7 Renaissance-polyphony sources (a music21-bundled
-corpus, CRIM Project, Josquin Research Project, 1520s Project, Tasso in
-Music Project, SEILS, Lassus's Geistliche Psalmen) into one browsable,
-searchable place, then runs CRIM Intervals cadence detection and writes
-the result back onto the score itself. Started as a single-purpose
-"Cadence Annotator" (see git history/earlier commit messages for that
-phase); renamed once the collection-aggregation side of the app grew
-into something worth naming on its own.
+RENAISSANCE POLYPHONY RESEARCH TOOLKIT -- a small Streamlit web app that
+aggregates ~4,300 pieces across 7 Renaissance-polyphony sources (a
+music21-bundled corpus, CRIM Project, Josquin Research Project, 1520s
+Project, Tasso in Music Project, SEILS, Lassus's Geistliche Psalmen)
+into one browsable, searchable place, then runs CRIM Intervals'
+structural analyses (cadences, points of imitation, homorhythm) and
+writes the results back onto the score itself, plots them across the
+piece, or exports them as data. Started as a single-purpose "Cadence
+Annotator" (see git history/earlier commit messages for that phase),
+then "Renaissance Score Workbench" once the collection-aggregation side
+grew into something worth naming on its own; renamed again once cadence
+annotation stopped being the single headline feature among several.
 
 Everything below runs in a single process, in the `crim` conda env (same
 env that runs crim_export_cadences.py / annotate_cadences.py on the
@@ -41,8 +44,8 @@ from annotate_cadences import (
 from crim_export_cadences import export_cadences_with_partmap  # noqa: F401 (kept for reference)
 import crim_intervals as ci
 
-st.set_page_config(page_title="Renaissance Score Workbench", layout="centered")
-st.title("Renaissance Score Workbench")
+st.set_page_config(page_title="Renaissance Polyphony Research Toolkit", layout="centered")
+st.title("Renaissance Polyphony Research Toolkit")
 st.caption(
     "Renaissance polyphony is scattered across dozens of separate archives "
     "online -- this app gathers ~4,300 pieces from 7 of them into one "
