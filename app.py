@@ -1264,6 +1264,48 @@ def annotate_by_collection(collection, native_ref, include_cadences=True, includ
     )
 
 
+# Hard cap on Browse's "download all matches as ZIP" -- benchmarked directly
+# against 8 real JRP pieces (fetch + music21 parse + MusicXML conversion, no
+# CRIM at all): 2.6s-7.8s each, 5.25s average. 30 pieces keeps the whole
+# operation under ~3 minutes; past that, sitting through a single Streamlit
+# progress bar is a bad way to wait, and the CSV export (instant, any size)
+# is the better fit for a bigger result set anyway -- not a silent truncation,
+# the UI refuses outright and says why (see tab_browse below).
+BULK_ZIP_MAX_MATCHES = 30
+
+
+def _bulk_zip_bytes(matches, progress_callback=None):
+    """Fetches + parses + converts every match to MusicXML -- no CRIM
+    analysis at all (the same "all three flags off" path already used
+    for single-piece unannotated downloads, see run_pipeline's
+    docstring) -- and zips them into one in-memory archive. Returns
+    (zip_bytes, failed) where `failed` is a list of (label, reason) for
+    any piece that couldn't be fetched/parsed -- skipped rather than
+    aborting the whole batch, but reported explicitly rather than
+    silently missing from the zip. progress_callback(index, total,
+    label), if given, is called right before each piece starts."""
+    buf = io.BytesIO()
+    failed = []
+    with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for i, (label, collection, native_ref) in enumerate(matches):
+            if progress_callback:
+                progress_callback(i, len(matches), label)
+            try:
+                score, _stats, error = annotate_by_collection(
+                    collection, native_ref, include_cadences=False,
+                    include_ptypes=False, include_homorhythm=False,
+                )
+                if error:
+                    raise RuntimeError(error)
+                xml_bytes = score_to_download_bytes(score)
+            except Exception as e:
+                failed.append((label, str(e)))
+                continue
+            stem = _browse_piece_filename_stem(collection, native_ref)
+            zf.writestr(f'{stem}.xml', xml_bytes)
+    return buf.getvalue(), failed
+
+
 def render_preview_and_annotate(collection, native_ref, piece_label, filename_stem, key_prefix=None):
     """Two-column Preview/Download buttons -- shared by every dedicated
     collection tab AND Browse (same layout, same underlying calls), so a
@@ -1346,7 +1388,9 @@ with tab_browse:
     st.caption(
         "Search all ~4,300 pieces across every collection in this app at once, "
         "preview a piece's voice count and whether it has encoded text/lyrics "
-        "before committing to the full analysis, then annotate it directly."
+        "before committing to the full analysis, then annotate it directly -- "
+        "or download every match at once, as a CSV manifest (any size) or a "
+        "ZIP of raw MusicXML scores (up to 30 at a time)."
     )
     query = st.text_input("Search by composer or title", key="browse_query")
 
@@ -1371,6 +1415,41 @@ with tab_browse:
                      "composer, and a source URL or music21 corpus path for each, ready to "
                      "load with pandas and fetch/parse in your own script.",
             )
+
+            if len(matches) > BULK_ZIP_MAX_MATCHES:
+                st.caption(
+                    f"📦 Bulk ZIP download works for up to {BULK_ZIP_MAX_MATCHES} matches at once "
+                    f"(this search has {len(matches)}) -- narrow the search to enable it, or use "
+                    "the CSV above for the full list."
+                )
+            elif st.button(f"📦 Build a ZIP of all {len(matches)} score(s) (MusicXML)", key="browse_zip_build"):
+                progress_bar = st.progress(0.0)
+                status = st.empty()
+
+                def _update_zip_progress(i, total, label):
+                    progress_bar.progress(i / total)
+                    status.caption(f"Fetching {i + 1}/{total}: {label}")
+
+                with st.spinner("Building ZIP -- fetching, parsing, and converting each "
+                                 "piece to MusicXML, no analysis run on any of them..."):
+                    zip_bytes, failed = _bulk_zip_bytes(matches, progress_callback=_update_zip_progress)
+                progress_bar.progress(1.0)
+                status.empty()
+
+                if failed:
+                    detail = "; ".join(f"{label} ({reason})" for label, reason in failed[:5])
+                    st.warning(
+                        f"{len(failed)} of {len(matches)} piece(s) couldn't be included and were "
+                        f"skipped: {detail}" + (", ..." if len(failed) > 5 else "")
+                    )
+                st.download_button(
+                    f"Download ZIP ({len(matches) - len(failed)} score(s))",
+                    data=zip_bytes,
+                    file_name="browse_results.zip",
+                    mime="application/zip",
+                    key="browse_zip_download",
+                )
+
             browse_label = st.selectbox("Pick one", [m[0] for m in shown], key="browse_pick")
             _, collection, native_ref = next(m for m in shown if m[0] == browse_label)
             stem = _browse_piece_filename_stem(collection, native_ref)

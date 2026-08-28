@@ -38,13 +38,24 @@ once by composer or title. Pick a match, hit **Preview** to see
 its voice count and whether it has encoded text/lyrics before committing
 to anything heavier, or go straight to **Download**.
 
-Every search also gets a **"📄 Download all N match(es) as CSV"**
-button — a manifest of *every* match (not capped to the 50 shown in the
-picker below it): collection, composer, the display label, and a
-source URL or `music21` corpus path for each, meant to be loaded with
-`pandas` and fetched/parsed directly in your own script, no dependency
-on this app at all. Handy for "give me every Josquin piece across all
-7 collections to analyze myself" — search "Josquin", download the CSV.
+Every search also gets two bulk downloads, covering *every* match, not
+just the 50 shown in the picker below them:
+- **"📄 Download all N match(es) as CSV"** — a manifest (collection,
+  composer, the display label, and a source URL or `music21` corpus
+  path for each) meant to be loaded with `pandas` and fetched/parsed
+  directly in your own script, no dependency on this app at all. Any
+  number of matches, always available.
+- **"📦 Build a ZIP of all N score(s) (MusicXML)"** — actually fetches,
+  parses, and converts every match to a real MusicXML file and zips
+  them, no CRIM analysis run on any of them. Capped at 30 matches at a
+  time (benchmarked directly at ~5s/piece — past 30 it's a bad wait for
+  a single click, and the CSV is a better fit for a bigger set anyway).
+  A piece that fails to fetch is skipped and reported by name, not
+  silently dropped from the count.
+
+Handy for "give me every Josquin piece across all 7 collections to
+analyze myself" — search "Josquin", download the CSV (or, narrowed
+further, the ZIP).
 
 Or pick a piece from one collection directly:
 - **music21 corpus** — Palestrina (~1300 pieces) or Monteverdi, picked by
