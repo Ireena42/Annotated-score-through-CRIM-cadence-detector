@@ -33,7 +33,7 @@ sleeps idle apps); after that it's fast.
 **🔍 Browse all** — search all ~4,300 pieces across every collection at
 once by composer or title. Pick a match, hit **Preview** to see
 its voice count and whether it has encoded text/lyrics before committing
-to anything heavier, or go straight to **Annotate**.
+to anything heavier, or go straight to **Download**.
 
 Or pick a piece from one collection directly:
 - **music21 corpus** — Palestrina (~1300 pieces) or Monteverdi, picked by
@@ -59,7 +59,7 @@ Or use **📤 Upload your own file**, right next to Browse, to bring your
 own score: MusicXML (`.xml`/`.musicxml`) or MEI (`.mei`).
 
 Every collection has three independent checkboxes before hitting
-**Annotate**:
+**Download**:
 - **"Annotate cadences"** — CRIM's `cadences()`, marked in red. On by
   default, since it's this app's original and still-primary feature.
 - **"Also mark points of imitation"** — CRIM's `presentationTypes()`,
@@ -71,7 +71,7 @@ Every collection has three independent checkboxes before hitting
   rhythm while singing the same words (a chordal, declamatory texture),
   marked in green. Off by default.
 
-Uncheck all three and hit Annotate anyway to just get the piece back
+Uncheck all three and hit Download anyway to just get the piece back
 unmodified — useful if all you want is this app's aggregated access to
 a piece (in real MusicXML, converted from whatever format its home
 collection actually ships) without any CRIM analysis at all. The

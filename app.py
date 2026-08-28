@@ -1087,7 +1087,7 @@ def _browse_piece_filename_stem(collection, native_ref):
 def annotate_by_collection(collection, native_ref, include_cadences=True, include_ptypes=False, include_homorhythm=False):
     """Dispatches to whichever collection's own annotate path applies --
     reuses the exact same functions each dedicated tab already calls, so
-    Browse's Annotate button behaves identically to picking the same
+    Browse's Download button behaves identically to picking the same
     piece from its own tab, not a separate reimplementation. Returns
     (annotated_score, stats, error_message)."""
     if collection == 'music21':
@@ -1110,7 +1110,7 @@ def annotate_by_collection(collection, native_ref, include_cadences=True, includ
 
 
 def render_preview_and_annotate(collection, native_ref, piece_label, filename_stem, key_prefix=None):
-    """Two-column Preview/Annotate buttons -- shared by every dedicated
+    """Two-column Preview/Download buttons -- shared by every dedicated
     collection tab AND Browse (same layout, same underlying calls), so a
     given piece behaves identically no matter which tab you reach it
     from. Built on preview_piece()/annotate_by_collection(), not a
@@ -1146,7 +1146,7 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
         st.write(f"**Has encoded text/lyrics:** {has_text_display}")
         if note:
             st.caption(note)
-    if col2.button("Annotate", key=f"annotate_{key_prefix}"):
+    if col2.button("Download", key=f"annotate_{key_prefix}"):
         with st.spinner(f"Downloading and parsing {piece_label}..."):
             try:
                 annotated_score, stats, error = annotate_by_collection(
@@ -1214,7 +1214,7 @@ with tab_upload:
     include_cadences_upload = st.checkbox("Annotate cadences", value=True, key="cadences_upload")
     include_ptypes_upload = st.checkbox("Also mark points of imitation", key="ptypes_upload")
     include_homorhythm_upload = st.checkbox("Also mark homorhythmic passages", key="hr_upload")
-    if uploaded is not None and st.button("Annotate", key="annotate_upload"):
+    if uploaded is not None and st.button("Download", key="annotate_upload"):
         with st.spinner("Parsing upload..."):
             # Decoding to text and handing the STRING (not a file path) to
             # music21/CRIM is the same pattern crim_intervals' own code
