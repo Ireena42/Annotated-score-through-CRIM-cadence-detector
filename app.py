@@ -20,6 +20,7 @@ Streamlit, not a bug; it's why there's no explicit event-loop code below.
 import html
 import re
 import sys
+import zipfile
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
@@ -678,6 +679,59 @@ def build_browse_index():
     return rows
 
 
+def _local_corpus_file_path(corpus_key, piece_id):
+    """The actual on-disk file for one already-known piece in a
+    music21-bundled composer's corpus, matched by stem. Prefers a real
+    score file over a same-stem non-score companion: checked directly
+    and found monteverdi ships 49 real '.mxl' scores plus 48 '.rntxt'
+    roman-numeral-analysis text files sharing stems with them (the same
+    duplication already handled for labels in list_pieces_for_composer)
+    -- .rntxt has no note/lyric content at all, so it's actively wrong
+    to read for this, not just redundant."""
+    candidates = [p for p in m21.corpus.getComposer(corpus_key) if p.stem == piece_id]
+    real_scores = [p for p in candidates if p.suffix != '.rntxt']
+    return real_scores[0] if real_scores else (candidates[0] if candidates else None)
+
+
+def _local_file_stats(file_path):
+    """(voices, has_text) for a local music21-corpus file, read directly
+    from raw file content rather than either a full music21 parse OR
+    music21's own metadata bundle -- the bundle was tried first and
+    rejected: checked directly and found it only indexes 5 of
+    Monteverdi's 49 real '.mxl' scores, silently falling back to the
+    same-stem '.rntxt' (roman-numeral-analysis text, not a real
+    multi-voice score) for the other 44 -- which reports 1 voice
+    regardless of the piece's real voice count, confirmed on
+    'madrigal.3.1' (bundle said 1, real parse said 5). Reading the
+    actual score file directly sidesteps that gap entirely.
+
+    Palestrina ships plain '.krn' (voices = '**kern' tokens on the
+    spine-declaration line, has-text = whether a '**text' spine is also
+    there -- same convention already used for the five GitHub kern
+    collections). Monteverdi ships '.mxl' (a zip containing real
+    MusicXML -- voices = '<score-part ' tag count, has-text = whether
+    '<lyric' appears -- both checked directly against real files, not
+    assumed from the format spec)."""
+    if file_path is None:
+        return None, None
+    if file_path.suffix == '.krn':
+        text = file_path.read_text(encoding='utf-8', errors='replace')
+        spine_line = next((line for line in text.split('\n') if line.startswith('**')), '')
+        return spine_line.count('**kern') or None, '**text' in spine_line
+    if file_path.suffix == '.mxl':
+        try:
+            with zipfile.ZipFile(file_path) as z:
+                inner_name = next(n for n in z.namelist() if n.endswith('.xml') and 'META-INF' not in n)
+                xml_text = z.read(inner_name).decode('utf-8', errors='replace')
+        except Exception:
+            return None, None
+        return xml_text.count('<score-part ') or None, '<lyric' in xml_text
+    if file_path.suffix == '.xml':
+        text = file_path.read_text(encoding='utf-8', errors='replace')
+        return text.count('<score-part ') or None, '<lyric' in text
+    return None, None  # an unanticipated format -- honestly unknown, not guessed
+
+
 def preview_piece(collection, native_ref):
     """Returns (voices, has_text, note) for one piece WITHOUT running the
     full annotate pipeline -- voices/has_text are None where not cheaply
@@ -686,12 +740,13 @@ def preview_piece(collection, native_ref):
     - CRIM: voice count is already free in the piece-list JSON
       ('number_of_voices'); has-text needs one MEI fetch, checked via a
       raw '<verse'/'<syl' tag search rather than a full MEI parse.
-    - music21 corpus (Palestrina/Monteverdi): voice count is free from
-      the metadata bundle ('numberOfParts') -- no fetch at all needed,
-      since these are already-bundled local files. Has-text is NOT
-      checked here: doing so needs a full score parse (much slower than
-      the metadata-only lookup for voices), so it's left as an explicit
-      "not checked" note instead of silently omitted.
+    - music21 corpus (Palestrina/Monteverdi): both voices and has-text
+      are read directly from the local file (see _local_file_stats) --
+      NOT from the metadata bundle's 'numberOfParts', which was tried
+      first and found unreliable (see that function's docstring: only
+      5 of Monteverdi's 49 real scores are actually indexed in the
+      bundle). No network involved either way, since these ship inside
+      the music21 package itself.
     - The five kern collections: one raw-file fetch (files are tiny, a
       few KB to tens of KB, confirmed earlier in this session), then
       voice count from counting '**kern' tokens on the spine-declaration
@@ -711,14 +766,9 @@ def preview_piece(collection, native_ref):
 
     if collection == 'music21':
         corpus_key, piece_id = native_ref
-        bundle = _metadata_bundle()
-        voices = None
-        for entry in bundle.search(corpus_key, field='composer'):
-            md = entry.metadata
-            if md.sourcePath and Path(md.sourcePath).stem == piece_id:
-                voices = md.numberOfParts
-                break
-        return voices, None, "Text-encoding not checked here (would need a full score parse, not just metadata)."
+        file_path = _local_corpus_file_path(corpus_key, piece_id)
+        voices, has_text = _local_file_stats(file_path)
+        return voices, has_text, None
 
     try:
         text = requests.get(KERN_COLLECTION_BASE_URLS[collection] + native_ref, timeout=20).text
