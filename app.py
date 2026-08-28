@@ -31,7 +31,7 @@ import streamlit as st
 # so `from annotate_cadences import ...` finds the file regardless of the
 # directory `streamlit run` was launched from
 sys.path.insert(0, str(Path(__file__).parent))
-from annotate_cadences import annotate_score
+from annotate_cadences import annotate_score, annotate_presentation_types
 from crim_export_cadences import export_cadences_with_partmap  # noqa: F401 (kept for reference)
 import crim_intervals as ci
 
@@ -460,12 +460,19 @@ def fetch_lassus_psalms_pieces():
     return _dedupe_labels(raw_labels)
 
 
-def run_pipeline(score, source_label):
+def run_pipeline(score, source_label, include_ptypes=False):
     """Shared by both input modes below: given a parsed music21 Score,
     run CRIM cadence detection (voice_detail=True, for the PartMap this
     tool relies on -- see crim_export_cadences.py's docstring) directly
     on it, then hand off to annotate_score() for the actual labeling/
     coloring. Returns the annotated Score plus a stats dict.
+
+    include_ptypes=True additionally runs presentationTypes() (points of
+    imitation -- PEN/ID/FUGA) and marks those on the same score too, in a
+    different color (see annotate_presentation_types); its stats are
+    folded into the same dict under 'ptypes_labeled'/'ptypes_colored',
+    only when this flag is set, so callers that never asked for it don't
+    need to know the keys exist.
     """
     # ci.ImportedPiece normally comes from ci.importScore(path_or_text),
     # which re-parses from scratch internally -- but it also accepts an
@@ -474,10 +481,23 @@ def run_pipeline(score, source_label):
     piece = ci.main_objs.ImportedPiece(score, source_label)
     cadences = piece.cadences(voice_detail=True, include_final=True)
 
-    if cadences.empty:
+    if cadences.empty and not include_ptypes:
         return None, None
 
-    annotated_score, stats = annotate_score(score, cadences)
+    if cadences.empty:
+        annotated_score, stats = score, {'labeled': 0, 'missed_label': 0, 'colored': 0}
+    else:
+        annotated_score, stats = annotate_score(score, cadences)
+
+    if include_ptypes:
+        ptypes = piece.presentationTypes()
+        if not ptypes.empty:
+            annotated_score, ptype_stats = annotate_presentation_types(
+                annotated_score, ptypes, piece._getPartNames()
+            )
+            stats['ptypes_labeled'] = ptype_stats['labeled']
+            stats['ptypes_colored'] = ptype_stats['colored']
+
     return annotated_score, stats
 
 
@@ -508,6 +528,11 @@ def show_result(annotated_score, stats, out_filename):
             f"{stats['missed_label']} cadence(s) couldn't be labeled (no matching "
             "measure found on the top staff) -- rare, usually means a metadata "
             "irregularity in that specific cadence's measure/beat."
+        )
+    if 'ptypes_labeled' in stats:
+        st.success(
+            f"{stats['ptypes_labeled']} point(s) of imitation found -- "
+            f"{stats['ptypes_colored']} entry notes colored (blue)."
         )
     xml_bytes = score_to_download_bytes(annotated_score)
     st.download_button(
@@ -599,12 +624,14 @@ to pair with, ever.)
         """
     )
 
-def _annotate_crim_piece(mei_url):
+def _annotate_crim_piece(mei_url, include_ptypes=False):
     """Shared by the CRIM tab and Browse: import + metadata-fix + cadence-
     detect + annotate for one CRIM MEI piece. Returns (annotated_score,
     stats, import_failed) -- annotated_score/stats are None if import
     failed OR if the piece had zero detected cadences (caller
-    distinguishes the two via import_failed)."""
+    distinguishes the two via import_failed). include_ptypes=True adds
+    points-of-imitation marking too -- see run_pipeline's docstring for
+    what that adds to `stats`."""
     piece = ci.importScore(mei_url)
     if piece is None:
         return None, None, True
@@ -617,13 +644,24 @@ def _annotate_crim_piece(mei_url):
     piece.score.metadata.title = piece.metadata.get('title') or piece.score.metadata.title
     piece.score.metadata.composer = piece.metadata.get('composer') or piece.score.metadata.composer
     cadences = piece.cadences(voice_detail=True, include_final=True)
-    if cadences.empty:
+    if cadences.empty and not include_ptypes:
         return None, None, False
-    annotated_score, stats = annotate_score(piece.score, cadences)
+    if cadences.empty:
+        annotated_score, stats = piece.score, {'labeled': 0, 'missed_label': 0, 'colored': 0}
+    else:
+        annotated_score, stats = annotate_score(piece.score, cadences)
+    if include_ptypes:
+        ptypes = piece.presentationTypes()
+        if not ptypes.empty:
+            annotated_score, ptype_stats = annotate_presentation_types(
+                annotated_score, ptypes, piece._getPartNames()
+            )
+            stats['ptypes_labeled'] = ptype_stats['labeled']
+            stats['ptypes_colored'] = ptype_stats['colored']
     return annotated_score, stats, False
 
 
-def _annotate_kern_from_url(raw_url, source_label):
+def _annotate_kern_from_url(raw_url, source_label, include_ptypes=False):
     """Shared by every GitHub-hosted Humdrum kern tab (JRP, 1520s, Tasso,
     SEILS, Lassus Psalms): fetch the raw file, parse, run the pipeline.
     Humdrum **kern auto-detects fine from raw text content, same as
@@ -631,7 +669,7 @@ def _annotate_kern_from_url(raw_url, source_label):
     app -- verified directly before relying on it."""
     kern_text = requests.get(raw_url, timeout=20).text
     score = m21.converter.parse(kern_text)
-    return run_pipeline(score, source_label)
+    return run_pipeline(score, source_label, include_ptypes=include_ptypes)
 
 
 # Base raw-content URLs for the five kern-backed collections, shared by
@@ -813,7 +851,7 @@ def _browse_piece_filename_stem(collection, native_ref):
     return Path(native_ref).stem
 
 
-def annotate_by_collection(collection, native_ref):
+def annotate_by_collection(collection, native_ref, include_ptypes=False):
     """Dispatches to whichever collection's own annotate path applies --
     reuses the exact same functions each dedicated tab already calls, so
     Browse's Annotate button behaves identically to picking the same
@@ -822,25 +860,39 @@ def annotate_by_collection(collection, native_ref):
     if collection == 'music21':
         corpus_key, piece_id = native_ref
         score = m21.corpus.parse(f"{corpus_key}/{piece_id}")
-        annotated_score, stats = run_pipeline(score, piece_id)
+        annotated_score, stats = run_pipeline(score, piece_id, include_ptypes=include_ptypes)
         return annotated_score, stats, None
     if collection == 'crim':
-        annotated_score, stats, import_failed = _annotate_crim_piece(native_ref['mei_links'][0])
+        annotated_score, stats, import_failed = _annotate_crim_piece(
+            native_ref['mei_links'][0], include_ptypes=include_ptypes
+        )
         error = "CRIM couldn't import this piece (bad MEI file or network issue)." if import_failed else None
         return annotated_score, stats, error
     raw_url = KERN_COLLECTION_BASE_URLS[collection] + native_ref
-    annotated_score, stats = _annotate_kern_from_url(raw_url, Path(native_ref).stem)
+    annotated_score, stats = _annotate_kern_from_url(raw_url, Path(native_ref).stem, include_ptypes=include_ptypes)
     return annotated_score, stats, None
 
 
-def render_preview_and_annotate(collection, native_ref, piece_label, filename_stem):
+def render_preview_and_annotate(collection, native_ref, piece_label, filename_stem, key_prefix=None):
     """Two-column Preview/Annotate buttons -- shared by every dedicated
     collection tab AND Browse (same layout, same underlying calls), so a
     given piece behaves identically no matter which tab you reach it
     from. Built on preview_piece()/annotate_by_collection(), not a
-    separate per-tab reimplementation."""
+    separate per-tab reimplementation.
+
+    key_prefix defaults to `collection`, but Browse passes 'browse'
+    explicitly: since every tab's widgets are mounted simultaneously
+    (Streamlit doesn't scope keys by which tab is visually active --
+    confirmed directly earlier in this project), reusing e.g. 'crim' as
+    the key from BOTH the CRIM tab and Browse (when a CRIM piece is
+    selected there) would collide -- two different widgets can't share
+    one key in the same script run."""
+    key_prefix = key_prefix or collection
+    include_ptypes = st.checkbox(
+        "Also mark points of imitation (PEN/ID/FUGA)", key=f"ptypes_{key_prefix}",
+    )
     col1, col2 = st.columns(2)
-    if col1.button("Preview", key=f"preview_{collection}"):
+    if col1.button("Preview", key=f"preview_{key_prefix}"):
         with st.spinner("Checking..."):
             voices, has_text, note = preview_piece(collection, native_ref)
         st.write(f"**Voices:** {voices if voices is not None else 'unknown'}")
@@ -848,9 +900,11 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
         st.write(f"**Has encoded text/lyrics:** {has_text_display}")
         if note:
             st.caption(note)
-    if col2.button("Annotate", key=f"annotate_{collection}"):
+    if col2.button("Annotate", key=f"annotate_{key_prefix}"):
         with st.spinner(f"Downloading and parsing {piece_label}..."):
-            annotated_score, stats, error = annotate_by_collection(collection, native_ref)
+            annotated_score, stats, error = annotate_by_collection(
+                collection, native_ref, include_ptypes=include_ptypes
+            )
         if error:
             st.error(error)
         elif annotated_score is None:
@@ -885,26 +939,8 @@ with tab_browse:
             st.caption(f"{len(matches)} match(es)" + (" -- showing first 50" if len(matches) > 50 else ""))
             browse_label = st.selectbox("Pick one", [m[0] for m in shown], key="browse_pick")
             _, collection, native_ref = next(m for m in shown if m[0] == browse_label)
-
-            col1, col2 = st.columns(2)
-            if col1.button("Preview", key="browse_preview"):
-                with st.spinner("Checking..."):
-                    voices, has_text, note = preview_piece(collection, native_ref)
-                st.write(f"**Voices:** {voices if voices is not None else 'unknown'}")
-                has_text_display = 'yes' if has_text else ('no' if has_text is False else 'unknown')
-                st.write(f"**Has encoded text/lyrics:** {has_text_display}")
-                if note:
-                    st.caption(note)
-            if col2.button("Annotate", key="browse_annotate"):
-                with st.spinner(f"Downloading and parsing {browse_label}..."):
-                    annotated_score, stats, error = annotate_by_collection(collection, native_ref)
-                if error:
-                    st.error(error)
-                elif annotated_score is None:
-                    st.warning("No cadences were detected in this piece.")
-                else:
-                    stem = _browse_piece_filename_stem(collection, native_ref)
-                    show_result(annotated_score, stats, f"{stem}_annotated.xml")
+            stem = _browse_piece_filename_stem(collection, native_ref)
+            render_preview_and_annotate(collection, native_ref, browse_label, stem, key_prefix='browse')
 
 with tab_corpus:
     composer_name = st.selectbox("Composer", sorted(CORPUS_COMPOSERS.keys()))

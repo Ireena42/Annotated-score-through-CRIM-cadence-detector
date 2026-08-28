@@ -51,9 +51,16 @@ Or pick a piece from one collection directly:
   Lassus's Geistliche Psalmen, two smaller collections sharing one tab
 - **upload your own file** — MusicXML (`.xml`/`.musicxml`) or MEI (`.mei`)
 
-Click **Annotate**, then download the resulting `.xml`. Two in-app
-expanders explain what the cadence labels mean and how the detector
-actually works, in case any of it isn't self-explanatory at a glance.
+Every collection also has a checkbox: **"Also mark points of imitation
+(PEN/ID/FUGA)"** — CRIM's `presentationTypes()`, which finds where a
+melodic subject enters in one voice and is imitated by others (a Point
+of Entry, Imitative Duo, or Fuga), marked on the same score in blue
+alongside the cadences in red. Off by default (it's extra computation on
+top of cadence detection); check it before hitting Annotate to include it.
+
+Click **Annotate**, then download the resulting `.xml`. In-app expanders
+explain what the cadence labels mean and how the detector actually
+works, in case any of it isn't self-explanatory at a glance.
 
 ## Run it locally
 
@@ -85,6 +92,12 @@ above is the one to share.
    for CRIM/music21; a single small-file fetch for the five kern-backed
    collections) to preview voice count and text/lyric encoding without
    running the full pipeline first.
+5. The **points-of-imitation checkbox** runs CRIM's `presentationTypes()`
+   and marks each entry note in blue, labeling the first entry of each
+   instance with its type (PEN/ID/FUGA). Voice names in that output
+   (e.g. `Part-2`) are CRIM's own disambiguated part-naming convention,
+   not a fixed staff-position number like cadences use — reused directly
+   from `ImportedPiece._getPartNames()` rather than reimplemented.
 
 ## Notes
 

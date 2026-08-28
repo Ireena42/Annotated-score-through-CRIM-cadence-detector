@@ -133,6 +133,65 @@ def annotate_score(score, cadences):
     return score, {'labeled': n_labeled, 'missed_label': n_missed_label, 'colored': n_colored}
 
 
+PRESENTATION_COLOR = '#2266CC'  # distinct from cadence red, so both survive on one score
+
+
+def annotate_presentation_types(score, ptypes, part_names):
+    """Marks each point-of-imitation entry directly on the score: colors
+    the note where each voice's entry begins, and labels the FIRST entry
+    of each instance with its Presentation_Type (e.g. 'FUGA', 'ID') --
+    placed on the top staff, same visual-consistency reasoning as
+    cadence labels above (always reads above the system, regardless of
+    which voice actually enters first).
+
+    score: a music21 Score (mutated in place AND returned).
+    ptypes: a DataFrame like crim_intervals' piece.presentationTypes()
+        output -- 'Measures_Beats' (list of 'measure/beat' strings) and
+        'Voices' (list of part-name strings, same length/order) per row.
+    part_names: the ordered list from ImportedPiece._getPartNames() for
+        this same score, passed in explicitly rather than recomputed
+        here -- this is CRIM's own already-verified voice-naming
+        convention (duplicate part names disambiguated as 'Part-2',
+        'Part-3', ... in part order), not something worth
+        reimplementing independently and risking drift from the real
+        rule (confirmed directly against a real piece before relying
+        on it, not assumed from the docstring alone).
+
+    Returns (score, stats) where stats = {'labeled', 'missed_label', 'colored'}.
+    """
+    parts = list(score.parts)
+    name_to_index = {name: i for i, name in enumerate(part_names)}
+    measure_indices = [_measure_index(p) for p in parts]
+
+    n_labeled, n_missed_label, n_colored = 0, 0, 0
+    for _, row in ptypes.iterrows():
+        first_labeled = False
+        for measure_beat, voice_name in zip(row['Measures_Beats'], row['Voices']):
+            measure_str, beat_str = measure_beat.split('/')
+            measure_no, beat = int(float(measure_str)), float(beat_str)
+            idx = name_to_index.get(voice_name)
+            if idx is None or idx >= len(parts):
+                continue
+            note_obj = find_note_at_beat(measure_indices[idx].get(measure_no), beat)
+            if note_obj is not None:
+                note_obj.style.color = PRESENTATION_COLOR
+                n_colored += 1
+            if not first_labeled:
+                target_measure = measure_indices[0].get(measure_no)
+                if target_measure is not None:
+                    ts = target_measure.getContextByClass('TimeSignature')
+                    te = expressions.TextExpression(row['Presentation_Type'])
+                    te.style.absoluteY = 40  # above cadence labels (20), to reduce collision
+                    te.style.color = PRESENTATION_COLOR
+                    target_measure.insert(ts.getOffsetFromBeat(beat), te)
+                    n_labeled += 1
+                first_labeled = True
+        if not first_labeled:
+            n_missed_label += 1
+
+    return score, {'labeled': n_labeled, 'missed_label': n_missed_label, 'colored': n_colored}
+
+
 def annotate_piece(xml_path, cadences_csv, out_path):
     """CLI entry point: reads everything from disk, calls annotate_score(),
     writes the result back to disk. Kept as a thin wrapper around
