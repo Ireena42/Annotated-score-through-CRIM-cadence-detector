@@ -121,8 +121,15 @@ def annotate_score(score, cadences):
         # the label off a role-voice note, still missed cases where no
         # voice's attack lined up with floating-point beat equality).
         target_measure = measure_indices[0].get(measure_no)
-        if target_measure is not None:
-            ts = target_measure.getContextByClass('TimeSignature')
+        # getContextByClass can genuinely come back None -- confirmed
+        # directly: re-exporting a score to MusicXML and re-importing it
+        # (exactly what this app's own Download -> re-Upload cycle does)
+        # can leave a measure with no TimeSignature discoverable via
+        # context, even though the original parse had one. Treated the
+        # same as "no matching measure" (n_missed_label) rather than
+        # crashing the whole annotation over one unplaceable label.
+        ts = target_measure.getContextByClass('TimeSignature') if target_measure is not None else None
+        if ts is not None:
             te = expressions.TextExpression(cadence_label(row))
             te.style.absoluteY = 20  # nudge clear of the staff/notes
             target_measure.insert(ts.getOffsetFromBeat(beat), te)
@@ -195,8 +202,15 @@ def annotate_presentation_types(score, ptypes, part_names):
                 n_colored += 1
             if not first_labeled:
                 target_measure = measure_indices[0].get(measure_no)
-                if target_measure is not None:
-                    ts = target_measure.getContextByClass('TimeSignature')
+                # ts can genuinely be None -- see annotate_score's comment
+                # on the same pattern. Unlike a cadence (one shot), an
+                # imitation instance has several entries to try: if THIS
+                # entry's measure has no TimeSignature context, don't set
+                # first_labeled yet, so the next voice's entry gets a shot
+                # at being the one that's labeled instead of giving up on
+                # the whole instance over one unplaceable measure.
+                ts = target_measure.getContextByClass('TimeSignature') if target_measure is not None else None
+                if ts is not None:
                     label_text = PRESENTATION_TYPE_LABELS.get(
                         row['Presentation_Type'], row['Presentation_Type']
                     )
@@ -205,7 +219,7 @@ def annotate_presentation_types(score, ptypes, part_names):
                     te.style.color = PRESENTATION_COLOR
                     target_measure.insert(ts.getOffsetFromBeat(beat), te)
                     n_labeled += 1
-                first_labeled = True
+                    first_labeled = True
         if not first_labeled:
             n_missed_label += 1
 
@@ -268,8 +282,11 @@ def annotate_homorhythm(score, hr, part_names, min_gap=4.0):
         is_new_passage = last_labeled_offset is None or offset - last_labeled_offset > min_gap
         if any_colored and is_new_passage:
             target_measure = measure_indices[0].get(measure_no)
-            if target_measure is not None:
-                ts = target_measure.getContextByClass('TimeSignature')
+            # ts can genuinely be None -- see annotate_score's comment on
+            # the same pattern (a re-exported/re-imported score can leave
+            # a measure with no TimeSignature discoverable via context).
+            ts = target_measure.getContextByClass('TimeSignature') if target_measure is not None else None
+            if ts is not None:
                 te = expressions.TextExpression('Homorhythm')
                 te.style.absoluteY = 60  # above cadence (20) and imitation (40) labels
                 te.style.color = HOMORHYTHM_COLOR

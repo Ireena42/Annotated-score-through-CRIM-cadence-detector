@@ -164,7 +164,14 @@ above is the one to share.
    structure at the cadence's precise beat. Measure lookups are indexed
    once per part rather than re-scanned per cadence — a real bottleneck
    on larger pieces before that fix (benchmarked: 13.2s → 2.3s on a
-   123-measure/6-voice piece).
+   123-measure/6-voice piece). A measure's `TimeSignature` (needed to
+   convert "beat" into an exact insertion offset) is looked up via
+   context rather than assumed local to that measure — re-exporting a
+   score to MusicXML and re-importing it (e.g. downloading a piece from
+   this app and re-uploading it) can leave that context unresolvable for
+   a specific measure even when the original parse had it; when that
+   happens the label is skipped and counted as "missed" instead of
+   crashing the whole annotation.
 4. **Browse all** reuses every collection's own piece list (built once,
    cached) plus a lightweight per-piece check (already-available metadata
    for CRIM/music21; a single small-file fetch for the five kern-backed
