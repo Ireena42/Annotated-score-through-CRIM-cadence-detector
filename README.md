@@ -1,10 +1,11 @@
-# Cadence Annotator
+# Renaissance Score Workbench
 
-A small Streamlit app that detects cadences in a Renaissance polyphonic
-score and writes them **directly onto the score itself** — a text label
-(e.g. `Authentic → G`) plus colored noteheads at every cadential voice —
-so you can open the result in MuseScore, Finale, or any notation software
-and see exactly where and how each cadence happens.
+A small Streamlit app that aggregates **~4,300 Renaissance polyphony
+pieces across 7 sources** into one searchable place, then detects
+cadences and writes them **directly onto the score itself** — a text
+label (e.g. `Authentic → G`) plus colored noteheads at every cadential
+voice — so you can open the result in MuseScore, Finale, or any notation
+software and see exactly where and how each cadence happens.
 
 Cadence detection is done by [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals)
 (Morgan & Freedman, CRIM Project), which analyzes contrapuntal voice
@@ -13,6 +14,8 @@ just harmonic labeling — built for exactly this repertoire. This tool adds
 the missing last step: writing those results back into a real, readable
 score file instead of only a table or an interactive chart.
 
+Started as a single-purpose "Cadence Annotator"; renamed once the
+collection-aggregation side grew into something worth naming on its own.
 Built as a side tool for a physics thesis on network-science analysis of
 Palestrina's polyphony — the app itself has no dependency on that project.
 
@@ -25,7 +28,12 @@ sleeps idle apps); after that it's fast.
 
 ## Use it
 
-Seven ways to give it a piece:
+**🔍 Browse all** — search all ~4,300 pieces across every collection at
+once by composer or title. Pick a match, hit **Preview** to see its voice
+count and whether it has encoded text/lyrics before committing to
+anything heavier, or go straight to **Annotate**.
+
+Or pick a piece from one collection directly:
 - **music21 corpus** — Palestrina (~1300 pieces) or Monteverdi, picked by
   composer then a real title (e.g. "Missa Ad coenam Agni: Agnus I"), not
   an internal file id
@@ -68,15 +76,23 @@ above is the one to share.
    Bassizans, ...) at each cadence.
 3. `annotate_cadences.py` uses `PartMap` to find the exact notes involved
    and colors them, and inserts a text label into the score's measure
-   structure at the cadence's precise beat.
+   structure at the cadence's precise beat. Measure lookups are indexed
+   once per part rather than re-scanned per cadence — a real bottleneck
+   on larger pieces before that fix (benchmarked: 13.2s → 2.3s on a
+   123-measure/6-voice piece).
+4. **Browse all** reuses every collection's own piece list (built once,
+   cached) plus a lightweight per-piece check (already-available metadata
+   for CRIM/music21; a single small-file fetch for the five kern-backed
+   collections) to preview voice count and text/lyric encoding without
+   running the full pipeline first.
 
 ## Notes
 
 - Humdrum (`.krn`) upload isn't offered in the "upload your own file" tab
   — CRIM's own reference app only demonstrates MEI/MusicXML uploads from
   text, so that's the tested, reliable set here too. (The five
-  GitHub-backed tabs — JRP, 1520s, Tasso, SEILS, Lassus Psalms — all
-  handle `.krn` internally via their own known-good fetch, which is
+  GitHub-backed collections — JRP, 1520s, Tasso, SEILS, Lassus Psalms —
+  all handle `.krn` internally via their own known-good fetch, which is
   different from a user-supplied upload.)
 - Nothing you upload is stored server-side; it only exists for the
   duration of your browser session.

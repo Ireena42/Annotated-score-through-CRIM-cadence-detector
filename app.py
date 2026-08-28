@@ -1,8 +1,13 @@
 """
-CADENCE ANNOTATOR -- a small Streamlit web app wrapping the same pipeline
-as annotate_piece_pipeline.py, but with a point-and-click UI so colleagues
-without a Python/conda setup can use it from a browser tab (once it's
-deployed somewhere -- see DEPLOY.md in this folder for that step).
+RENAISSANCE SCORE WORKBENCH -- a small Streamlit web app that aggregates
+~4,300 pieces across 7 Renaissance-polyphony sources (a music21-bundled
+corpus, CRIM Project, Josquin Research Project, 1520s Project, Tasso in
+Music Project, SEILS, Lassus's Geistliche Psalmen) into one browsable,
+searchable place, then runs CRIM Intervals cadence detection and writes
+the result back onto the score itself. Started as a single-purpose
+"Cadence Annotator" (see git history/earlier commit messages for that
+phase); renamed once the collection-aggregation side of the app grew
+into something worth naming on its own.
 
 Everything below runs in a single process, in the `crim` conda env (same
 env that runs crim_export_cadences.py / annotate_cadences.py on the
@@ -29,12 +34,13 @@ from annotate_cadences import annotate_score
 from crim_export_cadences import export_cadences_with_partmap  # noqa: F401 (kept for reference)
 import crim_intervals as ci
 
-st.set_page_config(page_title="Cadence Annotator", layout="centered")
-st.title("Cadence Annotator")
+st.set_page_config(page_title="Renaissance Score Workbench", layout="centered")
+st.title("Renaissance Score Workbench")
 st.caption(
-    "Runs CRIM Intervals cadence detection and writes the result back onto "
-    "the score itself -- a text label + colored notes at every cadence -- "
-    "so you can open the output directly in MuseScore or Finale."
+    "Browse ~4,300 Renaissance polyphony pieces across 7 sources, then run "
+    "CRIM Intervals cadence detection and write the result back onto the "
+    "score itself -- a text label + colored notes at every cadence -- so "
+    "you can open the output directly in MuseScore or Finale."
 )
 
 
@@ -592,6 +598,30 @@ to pair with, ever.)
         """
     )
 
+def _annotate_crim_piece(mei_url):
+    """Shared by the CRIM tab and Browse: import + metadata-fix + cadence-
+    detect + annotate for one CRIM MEI piece. Returns (annotated_score,
+    stats, import_failed) -- annotated_score/stats are None if import
+    failed OR if the piece had zero detected cadences (caller
+    distinguishes the two via import_failed)."""
+    piece = ci.importScore(mei_url)
+    if piece is None:
+        return None, None, True
+    # ci.importScore extracts title/composer from the MEI header into
+    # piece.metadata (its own plain dict) -- but NOT into piece.score.
+    # metadata (the actual music21 Metadata object Score.write() reads
+    # from), so left alone the exported file ends up with no real title/
+    # composer and music21's writer falls back to generic placeholder
+    # text ("Music21 Fragment"/"Music21" -- confirmed directly).
+    piece.score.metadata.title = piece.metadata.get('title') or piece.score.metadata.title
+    piece.score.metadata.composer = piece.metadata.get('composer') or piece.score.metadata.composer
+    cadences = piece.cadences(voice_detail=True, include_final=True)
+    if cadences.empty:
+        return None, None, False
+    annotated_score, stats = annotate_score(piece.score, cadences)
+    return annotated_score, stats, False
+
+
 def _annotate_kern_from_url(raw_url, source_label):
     """Shared by every GitHub-hosted Humdrum kern tab (JRP, 1520s, Tasso,
     SEILS, Lassus Psalms): fetch the raw file, parse, run the pipeline.
@@ -603,10 +633,180 @@ def _annotate_kern_from_url(raw_url, source_label):
     return run_pipeline(score, source_label)
 
 
-tab_corpus, tab_crim, tab_jrp, tab_1520s, tab_tasso, tab_smaller, tab_upload = st.tabs([
-    "music21 corpus", "CRIM Project corpus", "Josquin Research Project",
+# Base raw-content URLs for the five kern-backed collections, shared by
+# _annotate_kern_from_url call sites and by Browse's preview/annotate paths.
+KERN_COLLECTION_BASE_URLS = {
+    'jrp': 'https://raw.githubusercontent.com/josquin-research-project/jrp-scores/main/',
+    '1520s': 'https://raw.githubusercontent.com/benory/1520s-project-scores/main/',
+    'tasso': 'https://raw.githubusercontent.com/TassoInMusicProject/tasso-scores/master/',
+    'seils': 'https://raw.githubusercontent.com/SEILSdataset/SEILSdataset/master/',
+    'lassus_psalms': 'https://raw.githubusercontent.com/WolfgangDrescher/lassus-geistliche-psalmen/master/',
+}
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def build_browse_index():
+    """One flat list of (display_label, collection, native_ref) spanning
+    all 7 collections (~4,300 pieces) -- built by tagging each
+    collection's own already-built {label: id} dict with a '[Collection]'
+    prefix, NOT by restructuring any of them into a new shared schema
+    (every existing per-collection tab's code is untouched by this).
+    native_ref is exactly whatever that collection's own fetcher already
+    uses as a dict value: (corpus_key, piece_id) for music21, the full
+    piece dict for CRIM, a repo path string for the five kern collections.
+    First call is slow-ish (calls every collection's own fetcher, several
+    of which are themselves slow on a cold cache -- the metadata bundle
+    alone takes ~7s to load the first time) but each of those is already
+    @st.cache_data(ttl=3600) on its own, and this function is too, so
+    that cost is paid once per hour, shared across every user hitting
+    this server process, not once per visitor.
+    """
+    rows = []
+    for composer_name, corpus_key in CORPUS_COMPOSERS.items():
+        for label, piece_id in list_pieces_for_composer(corpus_key).items():
+            rows.append((f'[{composer_name}] {label}', 'music21', (corpus_key, piece_id)))
+    for p in fetch_crim_pieces():
+        label = f"{p['composer']['name']} — {p['full_title']} [{p['genre']['name']}]"
+        rows.append((f'[CRIM] {label}', 'crim', p))
+    for key, fetch_fn, prefix in [
+        ('jrp', fetch_jrp_pieces, 'JRP'), ('1520s', fetch_1520s_pieces, '1520s'),
+        ('tasso', fetch_tasso_pieces, 'Tasso'), ('seils', fetch_seils_pieces, 'SEILS'),
+        ('lassus_psalms', fetch_lassus_psalms_pieces, 'Lassus Psalms'),
+    ]:
+        for label, path in fetch_fn().items():
+            rows.append((f'[{prefix}] {label}', key, path))
+    return rows
+
+
+def preview_piece(collection, native_ref):
+    """Returns (voices, has_text, note) for one piece WITHOUT running the
+    full annotate pipeline -- voices/has_text are None where not cheaply
+    determinable. Every branch was checked against real data before
+    writing it, not assumed uniform across all 7 sources:
+    - CRIM: voice count is already free in the piece-list JSON
+      ('number_of_voices'); has-text needs one MEI fetch, checked via a
+      raw '<verse'/'<syl' tag search rather than a full MEI parse.
+    - music21 corpus (Palestrina/Monteverdi): voice count is free from
+      the metadata bundle ('numberOfParts') -- no fetch at all needed,
+      since these are already-bundled local files. Has-text is NOT
+      checked here: doing so needs a full score parse (much slower than
+      the metadata-only lookup for voices), so it's left as an explicit
+      "not checked" note instead of silently omitted.
+    - The five kern collections: one raw-file fetch (files are tiny, a
+      few KB to tens of KB, confirmed earlier in this session), then
+      voice count from counting '**kern' tokens on the spine-declaration
+      line, and has-text from whether a '**text' spine is present on
+      that same line -- both checked directly against real files from
+      all five collections before relying on this.
+    """
+    if collection == 'crim':
+        p = native_ref
+        voices = p.get('number_of_voices')
+        try:
+            mei_text = requests.get(p['mei_links'][0], timeout=20).text
+            has_text = ('<verse' in mei_text) or ('<syl' in mei_text)
+        except Exception:
+            has_text = None
+        return voices, has_text, None
+
+    if collection == 'music21':
+        corpus_key, piece_id = native_ref
+        bundle = _metadata_bundle()
+        voices = None
+        for entry in bundle.search(corpus_key, field='composer'):
+            md = entry.metadata
+            if md.sourcePath and Path(md.sourcePath).stem == piece_id:
+                voices = md.numberOfParts
+                break
+        return voices, None, "Text-encoding not checked here (would need a full score parse, not just metadata)."
+
+    try:
+        text = requests.get(KERN_COLLECTION_BASE_URLS[collection] + native_ref, timeout=20).text
+    except Exception:
+        return None, None, "Couldn't fetch this file to preview it."
+    spine_line = next((line for line in text.split('\n') if line.startswith('**')), '')
+    voices = spine_line.count('**kern') or None
+    has_text = '**text' in spine_line
+    return voices, has_text, None
+
+
+def _browse_piece_filename_stem(collection, native_ref):
+    """The stem used for the downloaded annotated file's name -- differs
+    by collection because native_ref's shape differs (see
+    build_browse_index's docstring)."""
+    if collection == 'music21':
+        return native_ref[1]
+    if collection == 'crim':
+        return native_ref['piece_id']
+    return Path(native_ref).stem
+
+
+def annotate_by_collection(collection, native_ref):
+    """Dispatches to whichever collection's own annotate path applies --
+    reuses the exact same functions each dedicated tab already calls, so
+    Browse's Annotate button behaves identically to picking the same
+    piece from its own tab, not a separate reimplementation. Returns
+    (annotated_score, stats, error_message)."""
+    if collection == 'music21':
+        corpus_key, piece_id = native_ref
+        score = m21.corpus.parse(f"{corpus_key}/{piece_id}")
+        annotated_score, stats = run_pipeline(score, piece_id)
+        return annotated_score, stats, None
+    if collection == 'crim':
+        annotated_score, stats, import_failed = _annotate_crim_piece(native_ref['mei_links'][0])
+        error = "CRIM couldn't import this piece (bad MEI file or network issue)." if import_failed else None
+        return annotated_score, stats, error
+    raw_url = KERN_COLLECTION_BASE_URLS[collection] + native_ref
+    annotated_score, stats = _annotate_kern_from_url(raw_url, Path(native_ref).stem)
+    return annotated_score, stats, None
+
+
+tab_browse, tab_corpus, tab_crim, tab_jrp, tab_1520s, tab_tasso, tab_smaller, tab_upload = st.tabs([
+    "🔍 Browse all", "music21 corpus", "CRIM Project corpus", "Josquin Research Project",
     "1520s Project", "Tasso in Music Project", "More collections", "Upload your own file",
 ])
+
+with tab_browse:
+    st.caption(
+        "Search all ~4,300 pieces across every collection in this app at once, "
+        "preview a piece's voice count and whether it has encoded text/lyrics "
+        "before committing to the full analysis, then annotate it directly."
+    )
+    query = st.text_input("Search by composer or title", key="browse_query")
+
+    if query:
+        with st.spinner("Searching (first search after a quiet spell indexes all "
+                         "collections, can take up to ~15s -- instant after that)..."):
+            index = build_browse_index()
+        matches = [row for row in index if query.lower() in row[0].lower()]
+
+        if not matches:
+            st.info("No matches.")
+        else:
+            shown = matches[:50]
+            st.caption(f"{len(matches)} match(es)" + (" -- showing first 50" if len(matches) > 50 else ""))
+            browse_label = st.selectbox("Pick one", [m[0] for m in shown], key="browse_pick")
+            _, collection, native_ref = next(m for m in shown if m[0] == browse_label)
+
+            col1, col2 = st.columns(2)
+            if col1.button("Preview", key="browse_preview"):
+                with st.spinner("Checking..."):
+                    voices, has_text, note = preview_piece(collection, native_ref)
+                st.write(f"**Voices:** {voices if voices is not None else 'unknown'}")
+                has_text_display = 'yes' if has_text else ('no' if has_text is False else 'unknown')
+                st.write(f"**Has encoded text/lyrics:** {has_text_display}")
+                if note:
+                    st.caption(note)
+            if col2.button("Annotate", key="browse_annotate"):
+                with st.spinner(f"Downloading and parsing {browse_label}..."):
+                    annotated_score, stats, error = annotate_by_collection(collection, native_ref)
+                if error:
+                    st.error(error)
+                elif annotated_score is None:
+                    st.warning("No cadences were detected in this piece.")
+                else:
+                    stem = _browse_piece_filename_stem(collection, native_ref)
+                    show_result(annotated_score, stats, f"{stem}_annotated.xml")
 
 with tab_corpus:
     composer_name = st.selectbox("Composer", sorted(CORPUS_COMPOSERS.keys()))
@@ -640,32 +840,8 @@ with tab_crim:
     crim_label = st.selectbox("Piece", sorted(crim_options.keys()))
     if st.button("Annotate", key="annotate_crim"):
         selected = crim_options[crim_label]
-        mei_url = selected['mei_links'][0]
-        annotated_score, stats, import_failed = None, None, False
         with st.spinner(f"Downloading and parsing {selected['piece_id']} from CRIM..."):
-            # ci.importScore accepts a URL directly (per its own docstring) and
-            # returns an ImportedPiece already wrapping the parsed music21
-            # Score -- no need to separately fetch+parse ourselves here, unlike
-            # the other two tabs where we build the Score first.
-            piece = ci.importScore(mei_url)
-            if piece is None:
-                import_failed = True
-            else:
-                # ci.importScore extracts title/composer from the MEI header
-                # into piece.metadata (its own plain dict) -- but NOT into
-                # piece.score.metadata (the actual music21 Metadata object
-                # Score.write() reads from), so left alone the exported file
-                # ends up with no real title/composer and music21's writer
-                # falls back to generic placeholder text ("Music21 Fragment"/
-                # "Music21" -- confirmed directly: piece.score.metadata.title
-                # was None even though piece.metadata['title'] had the real
-                # value). Copy them across before anything gets written out.
-                piece.score.metadata.title = piece.metadata.get('title') or piece.score.metadata.title
-                piece.score.metadata.composer = piece.metadata.get('composer') or piece.score.metadata.composer
-
-                cadences = piece.cadences(voice_detail=True, include_final=True)
-                if not cadences.empty:
-                    annotated_score, stats = annotate_score(piece.score, cadences)
+            annotated_score, stats, import_failed = _annotate_crim_piece(selected['mei_links'][0])
 
         if import_failed:
             st.error("CRIM couldn't import this piece (bad MEI file or network issue).")
