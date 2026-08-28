@@ -229,26 +229,32 @@ def _composer_from_collection_label(label):
 
 
 def _composer_filter_widget(pieces_by_label, key):
-    """Renders a "Composer" multiselect scoped to one collection's own
-    {label: native_ref} dict and returns it filtered accordingly --
-    unchanged if nothing is selected, or if there's only one composer to
-    begin with (a single-option filter is never worth showing -- e.g.
-    Lassus's Geistliche Psalmen, a genuinely single-composer collection).
-    Composer is parsed straight from each label, see
-    _composer_from_collection_label -- these are collections that don't
-    have genre as structured data (see the CRIM tab's own genre filter
-    for the one collection that does), but they all do have a clean,
-    internally-consistent composer per piece, which is a different kind
-    of metadata than genre and happens to be available more broadly."""
+    """Renders a "Composer" selectbox (one composer at a time, with an
+    "All composers" default -- same interaction as the music21 tab's own
+    Composer picker, not a multiselect: picking several composers at
+    once mixed different people's pieces into one alphabetized list,
+    which wasn't actually useful and broke consistency with the one
+    Composer picker this app already had) scoped to one collection's own
+    {label: native_ref} dict, and returns it filtered accordingly --
+    unchanged if "All composers" stays selected, or if there's only one
+    composer to begin with (a filter offering just one real choice is
+    never worth showing -- e.g. Lassus's Geistliche Psalmen, a genuinely
+    single-composer collection). Composer is parsed straight from each
+    label, see _composer_from_collection_label -- these are collections
+    that don't have genre as structured data (see the CRIM tab's own
+    genre filter for the one collection that does), but they all do have
+    a clean, internally-consistent composer per piece, which is a
+    different kind of metadata than genre and happens to be available
+    more broadly."""
     composers = sorted({_composer_from_collection_label(label) for label in pieces_by_label})
     if len(composers) <= 1:
         return pieces_by_label
-    selected = st.multiselect("Composer", composers, key=key)
-    if not selected:
+    selected = st.selectbox("Composer", ["All composers"] + composers, key=key)
+    if selected == "All composers":
         return pieces_by_label
     return {
         label: ref for label, ref in pieces_by_label.items()
-        if _composer_from_collection_label(label) in selected
+        if _composer_from_collection_label(label) == selected
     }
 
 
@@ -1703,17 +1709,24 @@ with tab_crim:
     # each of those has clean composer data within its own collection --
     # see _composer_filter_widget), it's genre specifically that's unique
     # to CRIM's own data model.
+    # Single-select with an "All ..." default -- same interaction as the
+    # music21 tab's own Composer picker, not a multiselect: picking several
+    # composers or genres at once just mixed different things into one
+    # alphabetized list without actually being useful, and broke consistency
+    # with the one picker this app already had.
     filter_col1, filter_col2 = st.columns(2)
-    composer_filter = filter_col1.multiselect(
-        "Composer", sorted({p['composer']['name'] for p in crim_pieces}), key="crim_composer_filter",
+    composer_choice = filter_col1.selectbox(
+        "Composer", ["All composers"] + sorted({p['composer']['name'] for p in crim_pieces}),
+        key="crim_composer_filter",
     )
-    genre_filter = filter_col2.multiselect(
-        "Genre", sorted({p['genre']['name'] for p in crim_pieces}), key="crim_genre_filter",
+    genre_choice = filter_col2.selectbox(
+        "Genre", ["All genres"] + sorted({p['genre']['name'] for p in crim_pieces}),
+        key="crim_genre_filter",
     )
-    if composer_filter:
-        crim_pieces = [p for p in crim_pieces if p['composer']['name'] in composer_filter]
-    if genre_filter:
-        crim_pieces = [p for p in crim_pieces if p['genre']['name'] in genre_filter]
+    if composer_choice != "All composers":
+        crim_pieces = [p for p in crim_pieces if p['composer']['name'] == composer_choice]
+    if genre_choice != "All genres":
+        crim_pieces = [p for p in crim_pieces if p['genre']['name'] == genre_choice]
 
     # label -> full piece dict, so selecting a label gets us straight back to
     # its mei_links entry without a second lookup pass

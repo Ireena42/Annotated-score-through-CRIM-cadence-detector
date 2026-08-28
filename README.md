@@ -71,10 +71,11 @@ small per-collection piece-count CSV — useful for scoping a study before
 you've decided what to search for.
 
 Or pick a piece from one collection directly. Every tab below filters by
-**Composer** (each collection has its own clean, internally-consistent
-composer data — that's *not* CRIM-exclusive, unlike genre below — the
-filter is just absent wherever a collection genuinely has only one
-composer, e.g. Lassus's Geistliche Psalmen):
+**Composer**, one at a time with an "All composers" default (each
+collection has its own clean, internally-consistent composer data —
+that's *not* CRIM-exclusive, unlike genre below — the filter is just
+absent wherever a collection genuinely has only one composer, e.g.
+Lassus's Geistliche Psalmen):
 - **music21 corpus** — Palestrina (~1300 pieces) or Monteverdi, picked by
   composer then a real title (e.g. "Missa Ad coenam Agni: Agnus I"), not
   an internal file id
