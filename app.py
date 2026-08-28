@@ -1,5 +1,5 @@
 """
-RENAISSANCE POLYPHONY ANALYSIS TOOLKIT -- a small Streamlit web app that
+RENAISSANCE POLYPHONY RESEARCH TOOLKIT -- a small Streamlit web app that
 aggregates ~4,300 pieces across 7 Renaissance-polyphony sources (a
 music21-bundled corpus, CRIM Project, Josquin Research Project, 1520s
 Project, Tasso in Music Project, SEILS, Lassus's Geistliche Psalmen)
@@ -44,8 +44,8 @@ from annotate_cadences import (
 from crim_export_cadences import export_cadences_with_partmap  # noqa: F401 (kept for reference)
 import crim_intervals as ci
 
-st.set_page_config(page_title="Renaissance Polyphony Analysis Toolkit", layout="centered")
-st.title("Renaissance Polyphony Analysis Toolkit")
+st.set_page_config(page_title="Renaissance Polyphony Research Toolkit", layout="centered")
+st.title("Renaissance Polyphony Research Toolkit")
 st.caption(
     "The machine-readable scores computational analysis of Renaissance "
     "polyphony actually needs -- not scans, not recordings -- are scattered "
@@ -1295,6 +1295,12 @@ def annotate_by_collection(collection, native_ref, include_cadences=True, includ
 # the UI refuses outright and says why (see tab_browse below).
 BULK_ZIP_MAX_MATCHES = 30
 
+# How many of Browse's matches populate the "Pick one" selectbox -- purely a
+# UI-rendering concern (Streamlit itself handles large dropdowns fine with
+# typeahead filtering), NOT a data limit: the CSV/ZIP exports always cover
+# every match regardless of this cap, and this only bounds the picker widget.
+BROWSE_PICKER_MAX_SHOWN = 200
+
 
 def _bulk_zip_bytes(matches, progress_callback=None):
     """Fetches + parses + converts every match to MusicXML -- no CRIM
@@ -1429,13 +1435,24 @@ with tab_browse:
         with st.spinner("Searching (first search after a quiet spell indexes all "
                          "collections, can take up to ~15s -- instant after that)..."):
             index = build_browse_index()
-        matches = [row for row in index if query.lower() in row[0].lower()]
+        # Every space-separated word in the query must appear somewhere in
+        # the label, in any order -- not one single substring match. "josquin
+        # missa" used to match nothing at all (no label literally contains
+        # that exact phrase); as two separate terms it correctly matches
+        # every Josquin mass movement (confirmed directly: 0 -> 164 real
+        # matches). A single-word query (e.g. "agnus", no composer) behaves
+        # exactly as before -- this only adds power for multi-word queries.
+        terms = query.lower().split()
+        matches = [row for row in index if all(term in row[0].lower() for term in terms)]
 
         if not matches:
             st.info("No matches.")
         else:
-            shown = matches[:50]
-            st.caption(f"{len(matches)} match(es)" + (" -- showing first 50" if len(matches) > 50 else ""))
+            shown = matches[:BROWSE_PICKER_MAX_SHOWN]
+            st.caption(
+                f"{len(matches)} match(es)"
+                + (f" -- showing first {BROWSE_PICKER_MAX_SHOWN}" if len(matches) > BROWSE_PICKER_MAX_SHOWN else "")
+            )
             st.download_button(
                 f"📄 Download all {len(matches)} match(es) as CSV",
                 data=_matches_to_csv_bytes(matches),
