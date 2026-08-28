@@ -711,7 +711,21 @@ def _local_file_stats(file_path):
     collections). Monteverdi ships '.mxl' (a zip containing real
     MusicXML -- voices = '<score-part ' tag count, has-text = whether
     '<lyric' appears -- both checked directly against real files, not
-    assumed from the format spec)."""
+    assumed from the format spec).
+
+    Encoding caveat that cost a real, high-impact bug before this fix:
+    checked all 49 of Monteverdi's real '.mxl' files directly and found
+    37 of them (76%!) are internally UTF-16, not UTF-8 (Sibelius/Dolet
+    export) -- blindly decoding as UTF-8 doesn't raise an error, it just
+    silently garbles the text (errors='replace' masks it further), so
+    '<score-part '/'<lyric' never match and everything quietly reports
+    as unknown/no. Caught via a real example in testing ('A un Giro sol
+    de' Belli Occhi Lucenti' showing 'Voices: unknown' where a real
+    5-voice madrigal should show 5) -- not something the earlier
+    2-sample spot check happened to hit, since both of those samples
+    were coincidentally UTF-8. Fixed by detecting the UTF-16 BOM
+    (b'\\xff\\xfe' or b'\\xfe\\xff') in the raw bytes before choosing a
+    codec, rather than assuming UTF-8 uniformly."""
     if file_path is None:
         return None, None
     if file_path.suffix == '.krn':
@@ -722,12 +736,20 @@ def _local_file_stats(file_path):
         try:
             with zipfile.ZipFile(file_path) as z:
                 inner_name = next(n for n in z.namelist() if n.endswith('.xml') and 'META-INF' not in n)
-                xml_text = z.read(inner_name).decode('utf-8', errors='replace')
+                raw = z.read(inner_name)
+            if raw.startswith(b'\xff\xfe') or raw.startswith(b'\xfe\xff'):
+                xml_text = raw.decode('utf-16')
+            else:
+                xml_text = raw.decode('utf-8', errors='replace')
         except Exception:
             return None, None
         return xml_text.count('<score-part ') or None, '<lyric' in xml_text
     if file_path.suffix == '.xml':
-        text = file_path.read_text(encoding='utf-8', errors='replace')
+        raw = file_path.read_bytes()
+        if raw.startswith(b'\xff\xfe') or raw.startswith(b'\xfe\xff'):
+            text = raw.decode('utf-16')
+        else:
+            text = raw.decode('utf-8', errors='replace')
         return text.count('<score-part ') or None, '<lyric' in text
     return None, None  # an unanticipated format -- honestly unknown, not guessed
 
@@ -811,6 +833,32 @@ def annotate_by_collection(collection, native_ref):
     return annotated_score, stats, None
 
 
+def render_preview_and_annotate(collection, native_ref, piece_label, filename_stem):
+    """Two-column Preview/Annotate buttons -- shared by every dedicated
+    collection tab AND Browse (same layout, same underlying calls), so a
+    given piece behaves identically no matter which tab you reach it
+    from. Built on preview_piece()/annotate_by_collection(), not a
+    separate per-tab reimplementation."""
+    col1, col2 = st.columns(2)
+    if col1.button("Preview", key=f"preview_{collection}"):
+        with st.spinner("Checking..."):
+            voices, has_text, note = preview_piece(collection, native_ref)
+        st.write(f"**Voices:** {voices if voices is not None else 'unknown'}")
+        has_text_display = 'yes' if has_text else ('no' if has_text is False else 'unknown')
+        st.write(f"**Has encoded text/lyrics:** {has_text_display}")
+        if note:
+            st.caption(note)
+    if col2.button("Annotate", key=f"annotate_{collection}"):
+        with st.spinner(f"Downloading and parsing {piece_label}..."):
+            annotated_score, stats, error = annotate_by_collection(collection, native_ref)
+        if error:
+            st.error(error)
+        elif annotated_score is None:
+            st.warning("No cadences were detected in this piece.")
+        else:
+            show_result(annotated_score, stats, f"{filename_stem}_annotated.xml")
+
+
 tab_browse, tab_corpus, tab_crim, tab_jrp, tab_1520s, tab_tasso, tab_smaller, tab_upload = st.tabs([
     "🔍 Browse all", "music21 corpus", "CRIM Project corpus", "Josquin Research Project",
     "1520s Project", "Tasso in Music Project", "More collections", "Upload your own file",
@@ -864,15 +912,7 @@ with tab_corpus:
     piece_options = list_pieces_for_composer(corpus_key)
     piece_label = st.selectbox("Piece", sorted(piece_options.keys()))
     piece_id = piece_options[piece_label]
-    if st.button("Annotate", key="annotate_corpus"):
-        with st.spinner(f"Parsing {piece_label} and detecting cadences..."):
-            score = m21.corpus.parse(f"{corpus_key}/{piece_id}")
-            annotated_score, stats = run_pipeline(score, piece_id)
-        if annotated_score is None:
-            st.warning("No cadences were detected in this piece (too short, or not "
-                       "polyphonic enough for CRIM's cadence model to find anything).")
-        else:
-            show_result(annotated_score, stats, f"{piece_id}_annotated.xml")
+    render_preview_and_annotate('music21', (corpus_key, piece_id), piece_label, piece_id)
 
 with tab_crim:
     st.caption(
@@ -888,17 +928,8 @@ with tab_crim:
         for p in crim_pieces
     }
     crim_label = st.selectbox("Piece", sorted(crim_options.keys()))
-    if st.button("Annotate", key="annotate_crim"):
-        selected = crim_options[crim_label]
-        with st.spinner(f"Downloading and parsing {selected['piece_id']} from CRIM..."):
-            annotated_score, stats, import_failed = _annotate_crim_piece(selected['mei_links'][0])
-
-        if import_failed:
-            st.error("CRIM couldn't import this piece (bad MEI file or network issue).")
-        elif annotated_score is None:
-            st.warning("No cadences were detected in this piece.")
-        else:
-            show_result(annotated_score, stats, f"{selected['piece_id']}_annotated.xml")
+    selected = crim_options[crim_label]
+    render_preview_and_annotate('crim', selected, crim_label, selected['piece_id'])
 
 with tab_jrp:
     st.caption(
@@ -908,15 +939,8 @@ with tab_jrp:
     )
     jrp_pieces = fetch_jrp_pieces()
     jrp_label = st.selectbox("Piece", sorted(jrp_pieces.keys()), key="jrp_piece")
-    if st.button("Annotate", key="annotate_jrp"):
-        path = jrp_pieces[jrp_label]
-        raw_url = f"https://raw.githubusercontent.com/josquin-research-project/jrp-scores/main/{path}"
-        with st.spinner(f"Downloading and parsing {jrp_label}..."):
-            annotated_score, stats = _annotate_kern_from_url(raw_url, Path(path).stem)
-        if annotated_score is None:
-            st.warning("No cadences were detected in this piece.")
-        else:
-            show_result(annotated_score, stats, f"{Path(path).stem}_annotated.xml")
+    path = jrp_pieces[jrp_label]
+    render_preview_and_annotate('jrp', path, jrp_label, Path(path).stem)
 
 with tab_1520s:
     st.caption(
@@ -926,15 +950,8 @@ with tab_1520s:
     )
     p1520_pieces = fetch_1520s_pieces()
     p1520_label = st.selectbox("Piece", sorted(p1520_pieces.keys()), key="p1520_piece")
-    if st.button("Annotate", key="annotate_1520s"):
-        path = p1520_pieces[p1520_label]
-        raw_url = f"https://raw.githubusercontent.com/benory/1520s-project-scores/main/{path}"
-        with st.spinner(f"Downloading and parsing {p1520_label}..."):
-            annotated_score, stats = _annotate_kern_from_url(raw_url, Path(path).stem)
-        if annotated_score is None:
-            st.warning("No cadences were detected in this piece.")
-        else:
-            show_result(annotated_score, stats, f"{Path(path).stem}_annotated.xml")
+    path = p1520_pieces[p1520_label]
+    render_preview_and_annotate('1520s', path, p1520_label, Path(path).stem)
 
 with tab_tasso:
     st.caption(
@@ -944,40 +961,21 @@ with tab_tasso:
     )
     tasso_pieces = fetch_tasso_pieces()
     tasso_label = st.selectbox("Piece", sorted(tasso_pieces.keys()), key="tasso_piece")
-    if st.button("Annotate", key="annotate_tasso"):
-        path = tasso_pieces[tasso_label]
-        raw_url = f"https://raw.githubusercontent.com/TassoInMusicProject/tasso-scores/master/{path}"
-        with st.spinner(f"Downloading and parsing {tasso_label}..."):
-            annotated_score, stats = _annotate_kern_from_url(raw_url, Path(path).stem)
-        if annotated_score is None:
-            st.warning("No cadences were detected in this piece.")
-        else:
-            show_result(annotated_score, stats, f"{Path(path).stem}_annotated.xml")
+    path = tasso_pieces[tasso_label]
+    render_preview_and_annotate('tasso', path, tasso_label, Path(path).stem)
 
 with tab_smaller:
     st.caption("Two smaller collections, not big enough on their own to earn a full tab.")
     SMALLER_COLLECTIONS = {
-        "SEILS (30 Italian secular songs, ca. 1600)": (
-            fetch_seils_pieces, "https://raw.githubusercontent.com/SEILSdataset/SEILSdataset/master/"
-        ),
-        "Lassus -- Geistliche Psalmen (50 psalm settings)": (
-            fetch_lassus_psalms_pieces,
-            "https://raw.githubusercontent.com/WolfgangDrescher/lassus-geistliche-psalmen/master/",
-        ),
+        "SEILS (30 Italian secular songs, ca. 1600)": ('seils', fetch_seils_pieces),
+        "Lassus -- Geistliche Psalmen (50 psalm settings)": ('lassus_psalms', fetch_lassus_psalms_pieces),
     }
     collection_name = st.selectbox("Collection", sorted(SMALLER_COLLECTIONS.keys()))
-    fetch_fn, base_url = SMALLER_COLLECTIONS[collection_name]
+    collection_key, fetch_fn = SMALLER_COLLECTIONS[collection_name]
     small_pieces = fetch_fn()
     small_label = st.selectbox("Piece", sorted(small_pieces.keys()), key="small_piece")
-    if st.button("Annotate", key="annotate_small"):
-        path = small_pieces[small_label]
-        raw_url = base_url + path
-        with st.spinner(f"Downloading and parsing {small_label}..."):
-            annotated_score, stats = _annotate_kern_from_url(raw_url, Path(path).stem)
-        if annotated_score is None:
-            st.warning("No cadences were detected in this piece.")
-        else:
-            show_result(annotated_score, stats, f"{Path(path).stem}_annotated.xml")
+    path = small_pieces[small_label]
+    render_preview_and_annotate(collection_key, path, small_label, Path(path).stem)
 
 with tab_upload:
     st.caption("Accepted formats: MusicXML (.xml/.musicxml) or MEI (.mei).")
