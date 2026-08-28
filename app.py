@@ -26,6 +26,7 @@ import io
 import re
 import sys
 import zipfile
+from collections import Counter
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
@@ -806,6 +807,45 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
     )
 
 
+with st.expander("ℹ️ Credits & data sources"):
+    st.markdown(
+        """
+**None of the structural analysis here is this app's own work.** Every
+cadence, point of imitation, and homorhythmic passage this tool marks
+comes from calling [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals)'s
+own `cadences()`, `presentationTypes()`, and `homorhythm()` methods
+directly -- built by Richard Freedman (Haverford College) and the
+[CRIM Project](https://crimproject.org/) team, licensed
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). This
+app is an independent, unaffiliated project built on top of that
+library -- it isn't CRIM's own official web app (that's
+[crimintervals.streamlit.app](https://crimintervals.streamlit.app/), a
+separate tool by the CRIM team themselves). Scores are parsed with
+[music21](https://www.music21.org/) (Cuthbert & Ariza;
+[BSD-3-Clause](https://github.com/cuthbertLab/music21/blob/master/LICENSE)).
+
+**The 7 data sources**, with the terms each one actually publishes:
+- **music21-bundled corpus** (Palestrina, Monteverdi) -- ships inside music21 itself
+- **[CRIM Project](https://crimproject.org/)** -- see CRIM Intervals' license above
+- **[Josquin Research Project](https://github.com/josquin-research-project/jrp-scores)** --
+  [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
+- **[The 1520s Project](https://github.com/benory/1520s-project-scores)** --
+  [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
+- **[Tasso in Music Project](https://github.com/TassoInMusicProject/tasso-scores)** --
+  no license file published as of this writing
+- **[SEILS](https://github.com/SEILSdataset/SEILSdataset)** --
+  [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+- **[Lassus's Geistliche Psalmen](https://github.com/WolfgangDrescher/lassus-geistliche-psalmen)** --
+  no license file published as of this writing
+
+This app itself is free, non-commercial, and unaffiliated with any of
+the projects above -- consistent with every non-commercial term listed.
+If you're citing or reusing results from a specific piece, cite that
+piece's own source collection (linked above), not just this app. Full
+source code: [github.com/IreenaK/Renaissance-score-workbench](https://github.com/IreenaK/Renaissance-score-workbench).
+        """
+    )
+
 with st.expander("What do the cadence labels mean?"):
     st.markdown(
         """
@@ -1050,6 +1090,17 @@ KERN_COLLECTION_BASE_URLS = {
     'tasso': 'https://raw.githubusercontent.com/TassoInMusicProject/tasso-scores/master/',
     'seils': 'https://raw.githubusercontent.com/SEILSdataset/SEILSdataset/master/',
     'lassus_psalms': 'https://raw.githubusercontent.com/WolfgangDrescher/lassus-geistliche-psalmen/master/',
+}
+
+# Human-readable names for the raw `collection` key -- used only for the
+# corpus-overview CSV's display_name column below, purely a readability
+# nicety on a data export. NOT reintroducing a Collection filter widget
+# (that was tried and reverted earlier for being redundant with the
+# per-collection tabs) -- a CSV column is a different, lower-stakes use.
+COLLECTION_DISPLAY_NAMES = {
+    'music21': 'music21 corpus', 'crim': 'CRIM Project',
+    'jrp': 'Josquin Research Project', '1520s': '1520s Project',
+    'tasso': 'Tasso in Music Project', 'seils': 'SEILS', 'lassus_psalms': 'Lassus Psalms',
 }
 
 
@@ -1488,6 +1539,38 @@ with tab_browse:
              'title -- every word you type has to appear somewhere in the result, but not next to '
              'each other or in that order, so "josquin missa" finds every Josquin mass movement.',
     )
+
+    with st.expander("📦 Download the entire corpus, no search needed (all 7 collections)"):
+        st.caption(
+            "Every piece this app knows about, across all 7 collections, as one CSV -- same "
+            "columns as a search result's own CSV export (collection, composer, label, source "
+            "URL / music21 corpus path) -- plus a small per-collection piece-count table. "
+            "Building this indexes every collection live the first time (~15s cold, instant "
+            "after -- same hourly cache Search and every collection tab already share)."
+        )
+        if st.button("Build the full corpus index", key="browse_full_index_build"):
+            with st.spinner("Indexing all 7 collections..."):
+                full_index = build_browse_index()
+            st.download_button(
+                f"📄 Download all {len(full_index)} pieces as CSV",
+                data=_matches_to_csv_bytes(full_index),
+                file_name="full_corpus.csv",
+                mime="text/csv",
+                key="browse_full_csv_download",
+            )
+            counts = Counter(row[1] for row in full_index)
+            overview_buf = io.StringIO()
+            writer = csv.writer(overview_buf)
+            writer.writerow(['collection', 'display_name', 'piece_count'])
+            for key in sorted(counts, key=lambda k: -counts[k]):
+                writer.writerow([key, COLLECTION_DISPLAY_NAMES.get(key, key), counts[key]])
+            st.download_button(
+                "📊 Download per-collection piece counts as CSV",
+                data=overview_buf.getvalue().encode('utf-8'),
+                file_name="corpus_overview.csv",
+                mime="text/csv",
+                key="browse_overview_csv_download",
+            )
 
     if query:
         with st.spinner("Searching (first search after a quiet spell indexes all "

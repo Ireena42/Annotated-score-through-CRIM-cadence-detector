@@ -64,6 +64,12 @@ Handy for "give me every Josquin piece across all 7 collections to
 analyze myself" — search "Josquin", download the CSV (or, narrowed
 further, the ZIP).
 
+No search at all needed for the **whole** corpus: a **"📦 Download the
+entire corpus"** expander sits right below the search box, with the
+same CSV manifest (all ~4,300 pieces, all 7 collections at once) plus a
+small per-collection piece-count CSV — useful for scoping a study before
+you've decided what to search for.
+
 Or pick a piece from one collection directly. Every tab below filters by
 **Composer** (each collection has its own clean, internally-consistent
 composer data — that's *not* CRIM-exclusive, unlike genre below — the
@@ -186,6 +192,10 @@ above is the one to share.
    collecting a column CRIM already gives back.
 
 ## Credits & licensing
+
+*(The same content is also in the app itself, in the "ℹ️ Credits & data
+sources" expander at the top — most people using the deployed app will
+never open this README, so attribution lives in both places.)*
 
 **None of the structural analysis is this app's own work.** Every
 cadence, point of imitation, and homorhythmic passage this tool marks
