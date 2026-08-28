@@ -47,11 +47,11 @@ import crim_intervals as ci
 st.set_page_config(page_title="Renaissance Polyphony Research Toolkit", layout="centered")
 st.title("Renaissance Polyphony Research Toolkit")
 st.caption(
-    "The machine-readable scores computational analysis of Renaissance "
-    "polyphony actually needs -- not scans, not recordings -- are scattered "
-    "across dozens of separate archives online. This app gathers ~4,300 of "
-    "them from 7 sources into one searchable, analysis-ready place. Run "
-    "CRIM's structural analyses (cadences, points of imitation, homorhythmic "
+    "This app works with symbolic notation of Renaissance polyphony -- "
+    "MusicXML, Humdrum kern, MEI, not audio or MIDI -- scattered across "
+    "dozens of separate archives online. It gathers ~4,300 such pieces from "
+    "7 sources into one searchable, analysis-ready place. Run CRIM's "
+    "structural analyses (cadences, points of imitation, homorhythmic "
     "passages), see where they fall across the piece, and take the results "
     "further -- an annotated score for MuseScore/Finale, a raw file for your "
     "own code, or a dataset across a whole search."
@@ -1429,7 +1429,13 @@ with tab_browse:
         "or download every match at once, as a CSV manifest (any size) or a "
         "ZIP of raw MusicXML scores (up to 30 at a time)."
     )
-    query = st.text_input("Search by composer or title", key="browse_query")
+    query = st.text_input(
+        'Search (every word must match, in any order -- e.g. "josquin missa")',
+        key="browse_query",
+        help='Matches composer names, titles, and words like "missa" or "agnus" that show up in a '
+             'title -- every word you type has to appear somewhere in the result, but not next to '
+             'each other or in that order, so "josquin missa" finds every Josquin mass movement.',
+    )
 
     if query:
         with st.spinner("Searching (first search after a quiet spell indexes all "

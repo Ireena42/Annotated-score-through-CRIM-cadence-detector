@@ -1,16 +1,17 @@
-# Renaissance Polyphony Analysis Toolkit
+# Renaissance Polyphony Research Toolkit
 
-The machine-readable scores computational analysis of Renaissance
-polyphony actually needs — not scans, not recordings — are scattered
-across dozens of separate archives online. This app gathers
-**~4,300 of them from 7 sources** into one searchable, analysis-ready
-place. Run [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals)'s
-structural analyses — cadences (e.g. `Authentic → G`), points of
-imitation, and homorhythmic passages — on any piece, see where they
-fall across its structure, and take the results further: an annotated
-score marked **directly onto the notation itself** (ready for MuseScore,
-Finale, or any notation software), a raw score for your own code, or a
-CSV dataset across a whole search.
+This app works with **symbolic notation** of Renaissance polyphony —
+MusicXML, Humdrum `**kern`, MEI, not audio or MIDI — the representation
+[CRIM Intervals](https://github.com/HCDigitalScholarship/intervals) needs
+for its structural analyses. Encoded this way, the repertoire is
+scattered across dozens of separate archives online; this app gathers
+**~4,300 such pieces from 7 of them** into one searchable, analysis-ready
+place. Run cadences (e.g. `Authentic → G`), points of imitation, and
+homorhythmic passages on any piece, see where they fall across its
+structure, and take the results further: an annotated score marked
+**directly onto the notation itself** (ready for MuseScore, Finale, or
+any notation software), a raw score for your own code, or a CSV dataset
+across a whole search.
 
 CRIM Intervals (Morgan & Freedman, CRIM Project) analyzes contrapuntal
 voice functions (Cantizans, Tenorizans, Bassizans, Altizans, etc.) rather
