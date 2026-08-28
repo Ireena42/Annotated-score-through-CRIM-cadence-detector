@@ -462,6 +462,31 @@ def fetch_lassus_psalms_pieces():
     return _dedupe_labels(raw_labels)
 
 
+def _safe_cadences(piece):
+    """piece.cadences(voice_detail=True, include_final=True), guarded
+    against a real crim_intervals bug -- confirmed directly by reading its
+    cvfs() source and reproducing it against two actual pieces
+    (monteverdi/madrigal.4.3, monteverdi/madrigal.4.18) before writing
+    this, not assumed from the traceback alone: when a piece produces
+    literally zero cadence-pattern-ngram hits anywhere in the whole
+    piece, cvfs() does `df[['LowerVoice', 'UpperVoice']] = voices` with
+    `voices` an empty list on a 0-row DataFrame, which pandas refuses
+    ("Columns must be same length as key") -- not a network/data issue,
+    a real gap in the library's own empty-result handling, so there's
+    nothing to fix on our end beyond not letting it take the whole app
+    down. Returns (cadences_df_or_None, error_message_or_None).
+    """
+    try:
+        return piece.cadences(voice_detail=True, include_final=True), None
+    except Exception as e:
+        return None, (
+            "Cadence detection failed for this piece -- a real bug in crim_intervals "
+            f"itself (confirmed: {type(e).__name__}: {e}), not something wrong with "
+            "your upload. It happens on pieces where crim_intervals finds zero "
+            "cadence-like voice-pair patterns anywhere in the piece."
+        )
+
+
 def run_pipeline(score, source_label, include_ptypes=False, include_homorhythm=False):
     """Shared by both input modes below: given a parsed music21 Score,
     run CRIM cadence detection (voice_detail=True, for the PartMap this
@@ -483,16 +508,25 @@ def run_pipeline(score, source_label, include_ptypes=False, include_homorhythm=F
     None (not an empty DataFrame) when nothing is found -- checked
     directly in its own source before relying on this -- so that's
     checked for explicitly rather than assumed away.
+
+    Returns (annotated_score, stats, error) -- error is None unless
+    cadence detection itself failed (see _safe_cadences); ptypes/
+    homorhythm are individually guarded too (a crash in either just
+    skips that one optional feature -- see the 'ptypes_failed'/
+    'hr_failed' stats keys -- rather than losing the whole annotation
+    when cadence detection itself succeeded fine).
     """
     # ci.ImportedPiece normally comes from ci.importScore(path_or_text),
     # which re-parses from scratch internally -- but it also accepts an
     # already-built music21 Score directly via its own constructor, which
     # avoids parsing the same piece twice (once for us, once for CRIM).
     piece = ci.main_objs.ImportedPiece(score, source_label)
-    cadences = piece.cadences(voice_detail=True, include_final=True)
+    cadences, error = _safe_cadences(piece)
+    if error:
+        return None, None, error
 
     if cadences.empty and not include_ptypes and not include_homorhythm:
-        return None, None
+        return None, None, None
 
     if cadences.empty:
         annotated_score, stats = score, {'labeled': 0, 'missed_label': 0, 'colored': 0}
@@ -500,8 +534,12 @@ def run_pipeline(score, source_label, include_ptypes=False, include_homorhythm=F
         annotated_score, stats = annotate_score(score, cadences)
 
     if include_ptypes:
-        ptypes = piece.presentationTypes()
-        if not ptypes.empty:
+        try:
+            ptypes = piece.presentationTypes()
+        except Exception:
+            ptypes = None
+            stats['ptypes_failed'] = True
+        if ptypes is not None and not ptypes.empty:
             annotated_score, ptype_stats = annotate_presentation_types(
                 annotated_score, ptypes, piece._getPartNames()
             )
@@ -509,7 +547,11 @@ def run_pipeline(score, source_label, include_ptypes=False, include_homorhythm=F
             stats['ptypes_colored'] = ptype_stats['colored']
 
     if include_homorhythm:
-        hr = piece.homorhythm()
+        try:
+            hr = piece.homorhythm()
+        except Exception:
+            hr = None
+            stats['hr_failed'] = True
         if hr is not None and not hr.empty:
             annotated_score, hr_stats = annotate_homorhythm(
                 annotated_score, hr, piece._getPartNames()
@@ -517,7 +559,7 @@ def run_pipeline(score, source_label, include_ptypes=False, include_homorhythm=F
             stats['hr_labeled'] = hr_stats['labeled']
             stats['hr_colored'] = hr_stats['colored']
 
-    return annotated_score, stats
+    return annotated_score, stats, None
 
 
 def score_to_download_bytes(score):
@@ -557,6 +599,16 @@ def show_result(annotated_score, stats, out_filename):
         st.success(
             f"{stats['hr_labeled']} homorhythmic passage(s) found -- "
             f"{stats['hr_colored']} notes colored (green)."
+        )
+    if stats.get('ptypes_failed'):
+        st.info(
+            "Points-of-imitation detection hit an internal error on this piece and "
+            "was skipped -- the cadence annotation above is unaffected."
+        )
+    if stats.get('hr_failed'):
+        st.info(
+            "Homorhythm detection hit an internal error on this piece and was "
+            "skipped -- the cadence annotation above is unaffected."
         )
     xml_bytes = score_to_download_bytes(annotated_score)
     st.download_button(
@@ -729,14 +781,14 @@ none of the three ever overlap even when they coincide.
 def _annotate_crim_piece(mei_url, include_ptypes=False, include_homorhythm=False):
     """Shared by the CRIM tab and Browse: import + metadata-fix + cadence-
     detect + annotate for one CRIM MEI piece. Returns (annotated_score,
-    stats, import_failed) -- annotated_score/stats are None if import
-    failed OR if the piece had zero detected cadences (caller
-    distinguishes the two via import_failed). include_ptypes/
-    include_homorhythm=True add points-of-imitation/homorhythm marking
-    too -- see run_pipeline's docstring for what those add to `stats`."""
+    stats, error) -- error is None on success, or a message string if
+    CRIM's own import failed, or if cadence detection itself failed (see
+    _safe_cadences). include_ptypes/include_homorhythm=True add points-
+    of-imitation/homorhythm marking too -- see run_pipeline's docstring
+    for what those add to `stats`."""
     piece = ci.importScore(mei_url)
     if piece is None:
-        return None, None, True
+        return None, None, "CRIM couldn't import this piece (bad MEI file or network issue)."
     # ci.importScore extracts title/composer from the MEI header into
     # piece.metadata (its own plain dict) -- but NOT into piece.score.
     # metadata (the actual music21 Metadata object Score.write() reads
@@ -745,30 +797,40 @@ def _annotate_crim_piece(mei_url, include_ptypes=False, include_homorhythm=False
     # text ("Music21 Fragment"/"Music21" -- confirmed directly).
     piece.score.metadata.title = piece.metadata.get('title') or piece.score.metadata.title
     piece.score.metadata.composer = piece.metadata.get('composer') or piece.score.metadata.composer
-    cadences = piece.cadences(voice_detail=True, include_final=True)
+    cadences, error = _safe_cadences(piece)
+    if error:
+        return None, None, error
     if cadences.empty and not include_ptypes and not include_homorhythm:
-        return None, None, False
+        return None, None, None
     if cadences.empty:
         annotated_score, stats = piece.score, {'labeled': 0, 'missed_label': 0, 'colored': 0}
     else:
         annotated_score, stats = annotate_score(piece.score, cadences)
     if include_ptypes:
-        ptypes = piece.presentationTypes()
-        if not ptypes.empty:
+        try:
+            ptypes = piece.presentationTypes()
+        except Exception:
+            ptypes = None
+            stats['ptypes_failed'] = True
+        if ptypes is not None and not ptypes.empty:
             annotated_score, ptype_stats = annotate_presentation_types(
                 annotated_score, ptypes, piece._getPartNames()
             )
             stats['ptypes_labeled'] = ptype_stats['labeled']
             stats['ptypes_colored'] = ptype_stats['colored']
     if include_homorhythm:
-        hr = piece.homorhythm()
+        try:
+            hr = piece.homorhythm()
+        except Exception:
+            hr = None
+            stats['hr_failed'] = True
         if hr is not None and not hr.empty:
             annotated_score, hr_stats = annotate_homorhythm(
                 annotated_score, hr, piece._getPartNames()
             )
             stats['hr_labeled'] = hr_stats['labeled']
             stats['hr_colored'] = hr_stats['colored']
-    return annotated_score, stats, False
+    return annotated_score, stats, None
 
 
 def _annotate_kern_from_url(raw_url, source_label, include_ptypes=False, include_homorhythm=False):
@@ -970,21 +1032,17 @@ def annotate_by_collection(collection, native_ref, include_ptypes=False, include
     if collection == 'music21':
         corpus_key, piece_id = native_ref
         score = m21.corpus.parse(f"{corpus_key}/{piece_id}")
-        annotated_score, stats = run_pipeline(
+        return run_pipeline(
             score, piece_id, include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
         )
-        return annotated_score, stats, None
     if collection == 'crim':
-        annotated_score, stats, import_failed = _annotate_crim_piece(
+        return _annotate_crim_piece(
             native_ref['mei_links'][0], include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
         )
-        error = "CRIM couldn't import this piece (bad MEI file or network issue)." if import_failed else None
-        return annotated_score, stats, error
     raw_url = KERN_COLLECTION_BASE_URLS[collection] + native_ref
-    annotated_score, stats = _annotate_kern_from_url(
+    return _annotate_kern_from_url(
         raw_url, Path(native_ref).stem, include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
     )
-    return annotated_score, stats, None
 
 
 def render_preview_and_annotate(collection, native_ref, piece_label, filename_stem, key_prefix=None):
@@ -1019,9 +1077,20 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
             st.caption(note)
     if col2.button("Annotate", key=f"annotate_{key_prefix}"):
         with st.spinner(f"Downloading and parsing {piece_label}..."):
-            annotated_score, stats, error = annotate_by_collection(
-                collection, native_ref, include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
-            )
+            try:
+                annotated_score, stats, error = annotate_by_collection(
+                    collection, native_ref, include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
+                )
+            except Exception as e:
+                # A safety net, not the primary fix -- _safe_cadences already
+                # catches the one specific crim_intervals bug found so far
+                # (see its docstring). This is a backstop for anything else
+                # (a different library edge case, a network hiccup mid-parse)
+                # that would otherwise crash the whole app instead of just
+                # failing this one piece -- confirmed necessary directly: a
+                # real user hit exactly this kind of uncaught crash before
+                # this fix existed.
+                annotated_score, stats, error = None, None, f"Unexpected error analyzing this piece: {e}"
         if error:
             st.error(error)
         elif annotated_score is None:
@@ -1082,8 +1151,13 @@ with tab_upload:
             # from the content itself.
             text = uploaded.getvalue().decode('utf-8')
             score = m21.converter.parse(text)
-            annotated_score, stats = run_pipeline(score, uploaded.name)
-        if annotated_score is None:
+            try:
+                annotated_score, stats, error = run_pipeline(score, uploaded.name)
+            except Exception as e:
+                annotated_score, stats, error = None, None, f"Unexpected error analyzing this piece: {e}"
+        if error:
+            st.error(error)
+        elif annotated_score is None:
             st.warning("No cadences were detected in this piece.")
         else:
             stem = Path(uploaded.name).stem
