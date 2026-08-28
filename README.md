@@ -31,11 +31,10 @@ sleeps idle apps); after that it's fast.
 ## Use it
 
 **🔍 Browse all** — search all ~4,300 pieces across every collection at
-once by composer or title, and narrow further with three filters:
-**Collection**, **Composer**, and **Genre** (genre is CRIM-only — it's
-the one collection that carries that metadata). Filters work with or
-without a text search, so "every Palestrina piece" or "every CRIM motet"
-is a valid Browse query on its own. Pick a match, hit **Preview** to see
+once by composer or title, optionally narrowed by **Genre** (CRIM-only —
+it's the one collection that carries that metadata). The genre filter
+works with or without a text search, so "every CRIM motet" is a valid
+Browse query on its own. Pick a match, hit **Preview** to see
 its voice count and whether it has encoded text/lyrics before committing
 to anything heavier, or go straight to **Annotate**.
 
@@ -129,7 +128,3 @@ above is the one to share.
   different from a user-supplied upload.)
 - Nothing you upload is stored server-side; it only exists for the
   duration of your browser session.
-- The Browse **Composer** filter is not normalized across collections —
-  e.g. CRIM lists "Josquin Des Prez" and JRP lists "Josquin des Prez" as
-  two separate filter values for the same composer, since each
-  collection's own naming convention is preserved rather than guessed at.
