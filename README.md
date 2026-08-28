@@ -1,8 +1,10 @@
-# Renaissance Polyphony Research Toolkit
+# Renaissance Polyphony Analysis Toolkit
 
-Renaissance polyphony is scattered across dozens of separate archives
-online. This app gathers **~4,300 pieces from 7 of them** into one
-searchable, analysis-ready place. Run [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals)'s
+The machine-readable scores computational analysis of Renaissance
+polyphony actually needs — not scans, not recordings — are scattered
+across dozens of separate archives online. This app gathers
+**~4,300 of them from 7 sources** into one searchable, analysis-ready
+place. Run [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals)'s
 structural analyses — cadences (e.g. `Authentic → G`), points of
 imitation, and homorhythmic passages — on any piece, see where they
 fall across its structure, and take the results further: an annotated
@@ -36,7 +38,11 @@ sleeps idle apps); after that it's fast.
 **🔍 Browse all** — search all ~4,300 pieces across every collection at
 once by composer or title. Pick a match, hit **Preview** to see
 its voice count and whether it has encoded text/lyrics before committing
-to anything heavier, or go straight to **Download**.
+to anything heavier, or go straight to the button next to it — labeled
+**Analyze** when at least one analysis checkbox below is checked (it
+runs the checked analyses and shows the results before the file), or
+plain **Download** when none are (nothing runs, you just get the piece
+back).
 
 Every search also gets two bulk downloads, covering *every* match, not
 just the 50 shown in the picker below them:
@@ -81,7 +87,7 @@ Or use **📤 Upload your own file**, right next to Browse, to bring your
 own score: MusicXML (`.xml`/`.musicxml`) or MEI (`.mei`).
 
 Every collection has three independent checkboxes before hitting
-**Download**:
+**Analyze**/**Download** (see above for which label you'll actually see):
 - **"Annotate cadences"** — CRIM's `cadences()`, marked in red. On by
   default, since it's this app's original and still-primary feature.
 - **"Also mark points of imitation"** — CRIM's `presentationTypes()`,
@@ -150,7 +156,11 @@ above is the one to share.
    cached) plus a lightweight per-piece check (already-available metadata
    for CRIM/music21; a single small-file fetch for the five kern-backed
    collections) to preview voice count and text/lyric encoding without
-   running the full pipeline first.
+   running the full pipeline first. Every collection's piece list is
+   re-fetched live from its source at most once an hour (`@st.cache_data
+   (ttl=3600)`) -- if e.g. the Josquin Research Project adds pieces to
+   their repo, this app picks them up on its own within the hour, no
+   code change or manual refresh needed.
 5. The **points-of-imitation checkbox** runs CRIM's `presentationTypes()`
    and marks each entry note in blue, labeling the first entry of each
    instance with its type (PEN/ID/FUGA). Voice names in that output

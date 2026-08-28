@@ -1,5 +1,5 @@
 """
-RENAISSANCE POLYPHONY RESEARCH TOOLKIT -- a small Streamlit web app that
+RENAISSANCE POLYPHONY ANALYSIS TOOLKIT -- a small Streamlit web app that
 aggregates ~4,300 pieces across 7 Renaissance-polyphony sources (a
 music21-bundled corpus, CRIM Project, Josquin Research Project, 1520s
 Project, Tasso in Music Project, SEILS, Lassus's Geistliche Psalmen)
@@ -44,16 +44,17 @@ from annotate_cadences import (
 from crim_export_cadences import export_cadences_with_partmap  # noqa: F401 (kept for reference)
 import crim_intervals as ci
 
-st.set_page_config(page_title="Renaissance Polyphony Research Toolkit", layout="centered")
-st.title("Renaissance Polyphony Research Toolkit")
+st.set_page_config(page_title="Renaissance Polyphony Analysis Toolkit", layout="centered")
+st.title("Renaissance Polyphony Analysis Toolkit")
 st.caption(
-    "Renaissance polyphony is scattered across dozens of separate archives "
-    "online -- this app gathers ~4,300 pieces from 7 of them into one "
-    "searchable, analysis-ready place. Run CRIM's structural analyses "
-    "(cadences, points of imitation, homorhythmic passages), see where they "
-    "fall across the piece, and take the results further -- an annotated "
-    "score for MuseScore/Finale, a raw file for your own code, or a dataset "
-    "across a whole search."
+    "The machine-readable scores computational analysis of Renaissance "
+    "polyphony actually needs -- not scans, not recordings -- are scattered "
+    "across dozens of separate archives online. This app gathers ~4,300 of "
+    "them from 7 sources into one searchable, analysis-ready place. Run "
+    "CRIM's structural analyses (cadences, points of imitation, homorhythmic "
+    "passages), see where they fall across the piece, and take the results "
+    "further -- an annotated score for MuseScore/Finale, a raw file for your "
+    "own code, or a dataset across a whole search."
 )
 
 
@@ -1355,6 +1356,15 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
     include_homorhythm = st.checkbox(
         "Also mark homorhythmic passages", key=f"hr_{key_prefix}",
     )
+    # Label reflects what this button will actually do, not just what it
+    # hands back at the end -- with at least one box checked, clicking it
+    # runs real analysis and shows results (the strip plot, stats, methods
+    # blurb) before the file; "Analyze" says that up front instead of
+    # reading as a plain file-download that quietly does more. With
+    # nothing checked, it genuinely is just a download -- no analysis
+    # runs at all -- so it keeps that label instead.
+    action_label = "Analyze" if (include_cadences or include_ptypes or include_homorhythm) else "Download"
+
     col1, col2 = st.columns(2)
     if col1.button("Preview", key=f"preview_{key_prefix}"):
         with st.spinner("Checking..."):
@@ -1364,7 +1374,7 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
         st.write(f"**Has encoded text/lyrics:** {has_text_display}")
         if note:
             st.caption(note)
-    if col2.button("Download", key=f"annotate_{key_prefix}"):
+    if col2.button(action_label, key=f"annotate_{key_prefix}"):
         with st.spinner(f"Downloading and parsing {piece_label}..."):
             try:
                 annotated_score, stats, error = annotate_by_collection(
@@ -1482,7 +1492,10 @@ with tab_upload:
     include_cadences_upload = st.checkbox("Annotate cadences", value=True, key="cadences_upload")
     include_ptypes_upload = st.checkbox("Also mark points of imitation", key="ptypes_upload")
     include_homorhythm_upload = st.checkbox("Also mark homorhythmic passages", key="hr_upload")
-    if uploaded is not None and st.button("Download", key="annotate_upload"):
+    # Same reasoning as render_preview_and_annotate's action_label -- see
+    # that comment for why this isn't just always "Download".
+    action_label_upload = "Analyze" if (include_cadences_upload or include_ptypes_upload or include_homorhythm_upload) else "Download"
+    if uploaded is not None and st.button(action_label_upload, key="annotate_upload"):
         with st.spinner("Parsing upload..."):
             # Decoding to text and handing the STRING (not a file path) to
             # music21/CRIM is the same pattern crim_intervals' own code
