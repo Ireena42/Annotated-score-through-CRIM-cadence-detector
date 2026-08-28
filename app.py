@@ -49,7 +49,7 @@ st.title("Renaissance Polyphony Research Toolkit")
 st.caption(
     "This app works with symbolic notation of Renaissance polyphony -- "
     "MusicXML, Humdrum kern, MEI, not audio or MIDI -- scattered across "
-    "dozens of separate archives online. It gathers ~4,300 such pieces from "
+    "several separate archives online. It gathers ~4,300 such pieces from "
     "7 sources into one searchable, analysis-ready place. Run CRIM's "
     "structural analyses (cadences, points of imitation, homorhythmic "
     "passages), see where they fall across the piece, and take the results "
@@ -210,9 +210,21 @@ def _composer_from_collection_label(label):
     (CRIM's "Josquin Des Prez" vs JRP's "Josquin des Prez" showing up as
     separate values for the same person). A single collection's own
     labels are internally consistent by construction -- there's nothing
-    to reconcile within just JRP, or just 1520s, on their own."""
+    to reconcile within just JRP, or just 1520s, on their own.
+
+    A trailing '(YYYY)' is stripped -- Tasso's own composer convention
+    bakes the specific print/publication year into this field (see
+    _tasso_piece_label), which is a real fact about that one piece, not
+    part of the composer's identity: left in, it fragmented what should
+    be one filter entry into many near-duplicates (confirmed directly:
+    "Bellasio (1578)"/"Bellasio (1590)"/"Bellasio (1591)" are the same
+    person, and stripping the year collapsed Tasso's composer count from
+    229 down to 149 real composers). Harmless no-op for every other
+    collection, since none of them ever produce that suffix."""
     composer, sep, _ = label.partition(' — ')
-    return composer if sep else 'Unknown'
+    if not sep:
+        return 'Unknown'
+    return re.sub(r'\s*\(\d{4}\)$', '', composer)
 
 
 def _composer_filter_widget(pieces_by_label, key):

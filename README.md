@@ -4,7 +4,7 @@ This app works with **symbolic notation** of Renaissance polyphony —
 MusicXML, Humdrum `**kern`, MEI, not audio or MIDI — the representation
 [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals) needs
 for its structural analyses. Encoded this way, the repertoire is
-scattered across dozens of separate archives online; this app gathers
+scattered across several separate archives online; this app gathers
 **~4,300 such pieces from 7 of them** into one searchable, analysis-ready
 place. Run cadences (e.g. `Authentic → G`), points of imitation, and
 homorhythmic passages on any piece, see where they fall across its
@@ -184,6 +184,51 @@ above is the one to share.
    three analyses already computes on its own (offset divided by the
    piece's last note offset, 0-1) — no separate calculation needed, just
    collecting a column CRIM already gives back.
+
+## Credits & licensing
+
+**None of the structural analysis is this app's own work.** Every
+cadence, point of imitation, and homorhythmic passage this tool marks
+comes from calling [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals)'s
+own `cadences()`, `presentationTypes()`, and `homorhythm()` methods
+directly — this app's contribution is aggregating the 7 sources below,
+and writing CRIM's results back onto real notation, plotting them, and
+exporting them as data. CRIM Intervals was built by Richard Freedman
+(Haverford College) and the CRIM Project (crimproject.org) team, and is
+licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+This app is an independent, unaffiliated project built on top of that
+library — it isn't CRIM's own official web app (that's
+[crimintervals.streamlit.app](https://crimintervals.streamlit.app/), a
+separate tool by the CRIM team themselves). Scores are parsed with
+[music21](https://www.music21.org/) (Cuthbert & Ariza, MIT;
+[BSD-3-Clause](https://github.com/cuthbertLab/music21/blob/master/LICENSE)).
+
+The 7 data sources, with the actual terms each one publishes (checked
+directly against each repo's own license file, not assumed):
+- **music21-bundled corpus** (Palestrina, Monteverdi) — ships inside
+  music21 itself; see music21's own corpus documentation for terms.
+- **[CRIM Project](https://crimproject.org/)** — see CRIM Intervals'
+  license above; the same project publishes this corpus.
+- **[Josquin Research Project](https://github.com/josquin-research-project/jrp-scores)** —
+  [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
+  (attribution required, non-commercial use only).
+- **[The 1520s Project](https://github.com/benory/1520s-project-scores)** —
+  [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
+  (attribution required, non-commercial use only).
+- **[Tasso in Music Project](https://github.com/TassoInMusicProject/tasso-scores)** —
+  no license file published in the repo as of this writing; credited
+  here, terms not otherwise specified by the project.
+- **[SEILS](https://github.com/SEILSdataset/SEILSdataset)** —
+  [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+  (attribution required, non-commercial use only, share-alike).
+- **[Lassus's Geistliche Psalmen](https://github.com/WolfgangDrescher/lassus-geistliche-psalmen)** —
+  no license file published in the repo as of this writing; credited
+  here, terms not otherwise specified by the project.
+
+This app is a free, non-commercial side project with no ads or
+monetization, consistent with every non-commercial term above. If
+you're citing or reusing results from a specific piece, cite that
+piece's own source collection (linked above), not just this app.
 
 ## Notes
 
