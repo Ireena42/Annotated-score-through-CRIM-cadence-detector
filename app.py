@@ -17,7 +17,9 @@ interaction (button click, dropdown change, etc.) -- that's normal for
 Streamlit, not a bug; it's why there's no explicit event-loop code below.
 
 """
+import csv
 import html
+import io
 import re
 import sys
 import zipfile
@@ -1138,6 +1140,63 @@ def _browse_piece_filename_stem(collection, native_ref):
     return Path(native_ref).stem
 
 
+def _browse_row_to_csv_dict(label, collection, native_ref):
+    """One CSV row for Browse's "download search results as CSV" export
+    -- source_url/music21_corpus_path are meant to be directly usable in
+    someone's own Python script (plain requests.get()/converter.parse()
+    for source_url; m21.corpus.parse() for music21_corpus_path) without
+    touching this app at all -- the actual point of a manifest export.
+    Reuses the exact same collection-dispatch shape as
+    annotate_by_collection(), just building a URL/path instead of
+    fetching+annotating.
+
+    composer is parsed back out of `label` -- safe since it's this app's
+    own generated string (see build_browse_index), not third-party data.
+    Two different conventions to undo depending on collection: music21
+    labels are '[ComposerName] Title' (composer *is* the bracket tag,
+    see list_pieces_for_composer), while every other collection's labels
+    are '[CollectionTag] Composer — Title' (composer follows the tag,
+    separated by an em dash -- see _catalog_piece_label/
+    _tasso_piece_label/fetch_seils_pieces/fetch_crim_pieces). Composer-
+    naming inconsistency across collections (documented at length in
+    build_browse_index's git history) isn't a problem here the way it
+    was for a filter dropdown -- a CSV column showing both spellings
+    as data is just honest, not confusing.
+    """
+    if collection == 'music21':
+        composer = label.split('] ', 1)[0].lstrip('[')
+    else:
+        inner = label.split('] ', 1)[1] if '] ' in label else label
+        composer = inner.partition(' — ')[0]
+
+    row = {'collection': collection, 'composer': composer, 'label': label,
+           'source_url': '', 'music21_corpus_path': ''}
+    if collection == 'music21':
+        corpus_key, piece_id = native_ref
+        row['music21_corpus_path'] = f'{corpus_key}/{piece_id}'
+    elif collection == 'crim':
+        row['source_url'] = native_ref['mei_links'][0]
+    else:
+        row['source_url'] = KERN_COLLECTION_BASE_URLS[collection] + native_ref
+    return row
+
+
+def _matches_to_csv_bytes(matches):
+    """The full match list (NOT capped to the 50 shown in the picker --
+    see tab_browse below) as UTF-8 CSV bytes, ready for
+    st.download_button. Plain csv.DictWriter + io.StringIO rather than
+    pandas -- this app has no other reason to depend on pandas directly
+    (crim_intervals pulls it in transitively, but nothing here has
+    imported it so far), so no new dependency for one CSV export."""
+    buf = io.StringIO()
+    fieldnames = ['collection', 'composer', 'label', 'source_url', 'music21_corpus_path']
+    writer = csv.DictWriter(buf, fieldnames=fieldnames)
+    writer.writeheader()
+    for label, collection, native_ref in matches:
+        writer.writerow(_browse_row_to_csv_dict(label, collection, native_ref))
+    return buf.getvalue().encode('utf-8')
+
+
 def annotate_by_collection(collection, native_ref, include_cadences=True, include_ptypes=False, include_homorhythm=False):
     """Dispatches to whichever collection's own annotate path applies --
     reuses the exact same functions each dedicated tab already calls, so
@@ -1260,6 +1319,16 @@ with tab_browse:
         else:
             shown = matches[:50]
             st.caption(f"{len(matches)} match(es)" + (" -- showing first 50" if len(matches) > 50 else ""))
+            st.download_button(
+                f"📄 Download all {len(matches)} match(es) as CSV",
+                data=_matches_to_csv_bytes(matches),
+                file_name="browse_results.csv",
+                mime="text/csv",
+                key="browse_csv_download",
+                help="A manifest of every match (not just the 50 shown below) -- collection, "
+                     "composer, and a source URL or music21 corpus path for each, ready to "
+                     "load with pandas and fetch/parse in your own script.",
+            )
             browse_label = st.selectbox("Pick one", [m[0] for m in shown], key="browse_pick")
             _, collection, native_ref = next(m for m in shown if m[0] == browse_label)
             stem = _browse_piece_filename_stem(collection, native_ref)

@@ -35,6 +35,14 @@ once by composer or title. Pick a match, hit **Preview** to see
 its voice count and whether it has encoded text/lyrics before committing
 to anything heavier, or go straight to **Download**.
 
+Every search also gets a **"📄 Download all N match(es) as CSV"**
+button — a manifest of *every* match (not capped to the 50 shown in the
+picker below it): collection, composer, the display label, and a
+source URL or `music21` corpus path for each, meant to be loaded with
+`pandas` and fetched/parsed directly in your own script, no dependency
+on this app at all. Handy for "give me every Josquin piece across all
+7 collections to analyze myself" — search "Josquin", download the CSV.
+
 Or pick a piece from one collection directly:
 - **music21 corpus** — Palestrina (~1300 pieces) or Monteverdi, picked by
   composer then a real title (e.g. "Missa Ad coenam Agni: Agnus I"), not
