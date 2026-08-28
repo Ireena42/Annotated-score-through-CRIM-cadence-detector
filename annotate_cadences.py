@@ -43,15 +43,31 @@ def cadence_label(row):
     return f"{cad_type} → {tone}"
 
 
-def find_note_at_beat(part, measure_number, beat, tol=BEAT_TOLERANCE):
-    """The Note/Chord in `part`'s given measure whose onset beat matches
-    `beat` -- i.e. the note actually performing a role at the cadence's
-    perfection. None if nothing attacks exactly there (the voice may be
-    sustaining a tied note into the perfection rather than attacking on it)."""
-    m = part.measure(measure_number)
-    if m is None:
+def _measure_index(part):
+    """{measure_number: Measure} for one part, built in a single pass.
+
+    Exists because repeatedly calling part.measure(n) is expensive and
+    scales badly: measured directly on a 123-measure/6-voice piece, 200
+    varying-argument calls took ~6s, and the annotation step for that
+    piece's 52 cadences (which calls the equivalent of .measure() several
+    times per cadence -- once per cadential-role voice, plus once for the
+    label) took 13+ seconds total, dwarfing every other stage of the
+    pipeline (fetch+parse+cadence-detection combined: ~5s). Verified this
+    index produces identical results to part.measure(n) across every
+    measure of a real piece (0 mismatches, exact object identity) before
+    switching to it -- not just assumed equivalent."""
+    return {m.number: m for m in part.getElementsByClass('Measure')}
+
+
+def find_note_at_beat(measure, beat, tol=BEAT_TOLERANCE):
+    """The Note/Chord in `measure` whose onset beat matches `beat` -- i.e.
+    the note actually performing a role at the cadence's perfection. None
+    if `measure` is None, or nothing attacks exactly at `beat` (the voice
+    may be sustaining a tied note into the perfection rather than
+    attacking on it)."""
+    if measure is None:
         return None
-    for n in m.recurse().notes:
+    for n in measure.recurse().notes:
         if abs(n.beat - beat) < tol:
             return n
     return None
@@ -72,7 +88,9 @@ def annotate_score(score, cadences):
     counts, for the caller to report however it likes (print, st.write, ...).
     """
     parts = list(score.parts)  # index 0 = highest staff = PartMap position '1'
-    top_part = parts[0]
+    # built once per part, not once per cadence -- see _measure_index's
+    # docstring for the measured cost of not doing this
+    measure_indices = [_measure_index(p) for p in parts]
 
     n_labeled, n_missed_label, n_colored = 0, 0, 0
     for _, row in cadences.iterrows():
@@ -85,7 +103,7 @@ def annotate_score(score, cadences):
                 idx = int(pos) - 1
                 if idx >= len(parts):
                     continue
-                note_obj = find_note_at_beat(parts[idx], measure_no, beat)
+                note_obj = find_note_at_beat(measure_indices[idx].get(measure_no), beat)
                 if note_obj is not None:
                     note_obj.style.color = CADENCE_COLOR
                     n_colored += 1
@@ -102,7 +120,7 @@ def annotate_score(score, cadences):
         # attacking a note at this exact beat (the earlier attempt, timing
         # the label off a role-voice note, still missed cases where no
         # voice's attack lined up with floating-point beat equality).
-        target_measure = top_part.measure(measure_no)
+        target_measure = measure_indices[0].get(measure_no)
         if target_measure is not None:
             ts = target_measure.getContextByClass('TimeSignature')
             te = expressions.TextExpression(cadence_label(row))
