@@ -624,6 +624,46 @@ to pair with, ever.)
         """
     )
 
+with st.expander("What do the points-of-imitation labels mean?"):
+    st.markdown(
+        """
+This is a separate feature from cadences -- turn it on with the "Also
+mark points of imitation" checkbox next to Annotate. It runs CRIM's
+`presentationTypes()`, which finds **where a melodic idea (a "soggetto")
+enters in one voice and is then imitated by others** -- the other
+hallmark structural feature of this repertoire, alongside cadences.
+
+**How it finds them:** it looks at each voice's melodic line and marks
+"entries" -- a short run of notes (4 by default) that starts right after
+a rest, a fermata, or a section break, since that's where a new
+melodic idea is most likely to be freshly stated. It then checks every
+other voice for a similar run of notes (allowing for transposition, and
+optionally a little melodic "flex") appearing at a *later* offset. A
+group of two or more such matching entries across different voices,
+close enough together in time, becomes one "presentation type" instance.
+
+**The three labels you'll see, `PEN` / `ID` / `FUGA`:** CRIM classifies
+each instance by the *pattern of time gaps* between successive entries
+(checked directly in its source -- there's no fuller plain-language
+definition in CRIM's own documentation beyond this, so this reflects
+what the code actually does, not an assumption):
+- **PEN** (Point of Entry) -- every entry is spaced from the next by the
+  *exact same* time interval -- a strict, regularly-staggered entry.
+- **ID** (Imitative Duo) -- a smaller, odd-numbered, alternating group of
+  entries -- typically two voices trading a short motive back and forth.
+- **FUGA** -- everything else -- the general case, most often several
+  voices (3+) each taking up the same subject one after another, less
+  strictly regular than a PEN.
+
+**What actually appears on the score:** the note where each voice's
+entry begins is colored **blue** (cadences are red, so both survive on
+one file together), and the *first* entry of each instance gets a text
+label naming its type (e.g. `FUGA`), placed above the top staff at that
+same beat -- same placement convention as cadence labels, so it always
+reads cleanly above the system regardless of which voice enters first.
+        """
+    )
+
 def _annotate_crim_piece(mei_url, include_ptypes=False):
     """Shared by the CRIM tab and Browse: import + metadata-fix + cadence-
     detect + annotate for one CRIM MEI piece. Returns (annotated_score,
