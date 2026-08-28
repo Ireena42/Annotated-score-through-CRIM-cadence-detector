@@ -1148,6 +1148,10 @@ def preview_piece(collection, native_ref):
     if collection == 'crim':
         p = native_ref
         voices = p.get('number_of_voices')
+        if not p['mei_links']:
+            # A real gap in CRIM's own catalog (confirmed directly) --
+            # this piece is listed but has no MEI file at all yet.
+            return voices, None, "CRIM has no MEI file for this piece yet -- can't check its text/lyrics or annotate it."
         try:
             mei_text = requests.get(p['mei_links'][0], timeout=20).text
             has_text = ('<verse' in mei_text) or ('<syl' in mei_text)
@@ -1217,7 +1221,15 @@ def _browse_row_to_csv_dict(label, collection, native_ref):
         corpus_key, piece_id = native_ref
         row['music21_corpus_path'] = f'{corpus_key}/{piece_id}'
     elif collection == 'crim':
-        row['source_url'] = native_ref['mei_links'][0]
+        # A real gap in CRIM's own catalog, not something wrong with this
+        # app: some pieces are listed with an empty mei_links list at all
+        # (no MEI file exists for them yet on CRIM's side) -- confirmed
+        # directly, e.g. 20 of the 52 "Palestrina" CRIM matches, including
+        # "Missa Io mi son giovinetta" and "Missa Gabriel archangelus".
+        # source_url is left blank for these rather than crashing the
+        # whole export over one row.
+        if native_ref['mei_links']:
+            row['source_url'] = native_ref['mei_links'][0]
     else:
         row['source_url'] = KERN_COLLECTION_BASE_URLS[collection] + native_ref
     return row
@@ -1253,6 +1265,15 @@ def annotate_by_collection(collection, native_ref, include_cadences=True, includ
             include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
         )
     if collection == 'crim':
+        # A real gap in CRIM's own catalog (confirmed directly, see
+        # _browse_row_to_csv_dict's comment) -- some pieces are listed
+        # with an empty mei_links list, no MEI file available at all.
+        # Caught here with a clear, specific message rather than letting
+        # native_ref['mei_links'][0] raise an unhelpful IndexError that
+        # the caller's generic exception handler would report as just
+        # "list index out of range."
+        if not native_ref['mei_links']:
+            return None, None, "CRIM has this piece catalogued but no MEI file for it yet (a gap in CRIM's own data, not a problem with your search)."
         return _annotate_crim_piece(
             native_ref['mei_links'][0], include_cadences=include_cadences,
             include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
