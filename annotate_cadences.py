@@ -135,11 +135,28 @@ def annotate_score(score, cadences):
 
 PRESENTATION_COLOR = '#2266CC'  # distinct from cadence red, so both survive on one score
 
+# CRIM's own category codes, translated for the label that actually goes
+# on the score. 'FUGA' in particular reads as a false claim to anyone not
+# already steeped in 16th-century terminology -- it's CRIM's classifier
+# name for the general/catch-all case (usually 3+ voices), using the
+# period Latin/Italian sense of "fuga" (voices "fleeing" one after
+# another), not the fixed Baroque form the word suggests to a modern
+# reader glancing at a score. CRIM's own raw codes are kept as a
+# cross-reference in the app's explanation text, just never printed onto
+# the exported score itself, which is what a request explicitly asked for.
+PRESENTATION_TYPE_LABELS = {
+    'PEN': 'Point of Entry',
+    'ID': 'Imitative Duo',
+    'FUGA': 'Imitative Entry',
+}
+
 
 def annotate_presentation_types(score, ptypes, part_names):
     """Marks each point-of-imitation entry directly on the score: colors
     the note where each voice's entry begins, and labels the FIRST entry
-    of each instance with its Presentation_Type (e.g. 'FUGA', 'ID') --
+    of each instance with its type in plain language (see
+    PRESENTATION_TYPE_LABELS -- NOT CRIM's raw 'PEN'/'ID'/'FUGA' codes,
+    which don't read cleanly out of context on an actual score) --
     placed on the top staff, same visual-consistency reasoning as
     cadence labels above (always reads above the system, regardless of
     which voice actually enters first).
@@ -180,7 +197,10 @@ def annotate_presentation_types(score, ptypes, part_names):
                 target_measure = measure_indices[0].get(measure_no)
                 if target_measure is not None:
                     ts = target_measure.getContextByClass('TimeSignature')
-                    te = expressions.TextExpression(row['Presentation_Type'])
+                    label_text = PRESENTATION_TYPE_LABELS.get(
+                        row['Presentation_Type'], row['Presentation_Type']
+                    )
+                    te = expressions.TextExpression(label_text)
                     te.style.absoluteY = 40  # above cadence labels (20), to reduce collision
                     te.style.color = PRESENTATION_COLOR
                     target_measure.insert(ts.getOffsetFromBeat(beat), te)

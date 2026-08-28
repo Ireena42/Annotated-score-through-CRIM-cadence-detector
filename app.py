@@ -642,23 +642,31 @@ optionally a little melodic "flex") appearing at a *later* offset. A
 group of two or more such matching entries across different voices,
 close enough together in time, becomes one "presentation type" instance.
 
-**The three labels you'll see, `PEN` / `ID` / `FUGA`:** CRIM classifies
-each instance by the *pattern of time gaps* between successive entries
-(checked directly in its source -- there's no fuller plain-language
-definition in CRIM's own documentation beyond this, so this reflects
-what the code actually does, not an assumption):
-- **PEN** (Point of Entry) -- every entry is spaced from the next by the
-  *exact same* time interval -- a strict, regularly-staggered entry.
-- **ID** (Imitative Duo) -- a smaller, odd-numbered, alternating group of
-  entries -- typically two voices trading a short motive back and forth.
-- **FUGA** -- everything else -- the general case, most often several
-  voices (3+) each taking up the same subject one after another, less
-  strictly regular than a PEN.
+**The three labels you'll see** -- CRIM classifies each instance by the
+*pattern of time gaps* between successive entries (checked directly in
+its source -- there's no fuller plain-language definition in CRIM's own
+documentation beyond this, so this reflects what the code actually does,
+not an assumption). The label on the score uses plain language, not
+CRIM's own short codes (shown here in parentheses only for anyone
+cross-referencing CRIM's own tools/output):
+- **Point of Entry** (CRIM's code: `PEN`) -- every entry is spaced from
+  the next by the *exact same* time interval -- a strict,
+  regularly-staggered entry.
+- **Imitative Duo** (`ID`) -- a smaller, odd-numbered, alternating group
+  of entries -- typically two voices trading a short motive back and
+  forth.
+- **Imitative Entry** (`FUGA`) -- everything else -- the general case,
+  most often several voices (3+) each taking up the same subject one
+  after another, less strictly regular than a Point of Entry. CRIM's own
+  code name uses the 16th-century sense of the Latin/Italian word
+  "fuga" (voices "fleeing" one after another) -- deliberately not shown
+  on the score itself, since to a modern eye it reads as a claim about
+  the later, much stricter Baroque fugue, which this isn't.
 
 **What actually appears on the score:** the note where each voice's
 entry begins is colored **blue** (cadences are red, so both survive on
 one file together), and the *first* entry of each instance gets a text
-label naming its type (e.g. `FUGA`), placed above the top staff at that
+label naming its type (e.g. `Imitative Entry`), placed above the top staff at that
 same beat -- same placement convention as cadence labels, so it always
 reads cleanly above the system regardless of which voice enters first.
         """
@@ -929,7 +937,7 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
     one key in the same script run."""
     key_prefix = key_prefix or collection
     include_ptypes = st.checkbox(
-        "Also mark points of imitation (PEN/ID/FUGA)", key=f"ptypes_{key_prefix}",
+        "Also mark points of imitation", key=f"ptypes_{key_prefix}",
     )
     col1, col2 = st.columns(2)
     if col1.button("Preview", key=f"preview_{key_prefix}"):
