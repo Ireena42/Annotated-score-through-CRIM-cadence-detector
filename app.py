@@ -46,10 +46,11 @@ st.title("Renaissance Score Workbench")
 st.caption(
     "Renaissance polyphony is scattered across dozens of separate archives "
     "online -- this app gathers ~4,300 pieces from 7 of them into one "
-    "searchable place, then hands you back a real annotated score: "
-    "cadences (and, optionally, points of imitation and homorhythmic "
-    "passages) marked directly on the notation, ready to open in "
-    "MuseScore or Finale."
+    "searchable, analysis-ready place. Run CRIM's structural analyses "
+    "(cadences, points of imitation, homorhythmic passages), see where they "
+    "fall across the piece, and take the results further -- an annotated "
+    "score for MuseScore/Finale, a raw file for your own code, or a dataset "
+    "across a whole search."
 )
 
 

@@ -2,19 +2,20 @@
 
 Renaissance polyphony is scattered across dozens of separate archives
 online. This app gathers **~4,300 pieces from 7 of them** into one
-searchable place, then hands you back a real annotated score: cadences
-(e.g. `Authentic → G`) and, optionally, points of imitation and
-homorhythmic passages, marked **directly onto the score itself** with
-text labels and colored noteheads — so you can open the result in
-MuseScore, Finale, or any notation software and see exactly where and
-how each happens.
+searchable, analysis-ready place. Run [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals)'s
+structural analyses — cadences (e.g. `Authentic → G`), points of
+imitation, and homorhythmic passages — on any piece, see where they
+fall across its structure, and take the results further: an annotated
+score marked **directly onto the notation itself** (ready for MuseScore,
+Finale, or any notation software), a raw score for your own code, or a
+CSV dataset across a whole search.
 
-Cadence detection is done by [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals)
-(Morgan & Freedman, CRIM Project), which analyzes contrapuntal voice
-functions (Cantizans, Tenorizans, Bassizans, Altizans, etc.) rather than
-just harmonic labeling — built for exactly this repertoire. This tool adds
-the missing last step: writing those results back into a real, readable
-score file instead of only a table or an interactive chart.
+CRIM Intervals (Morgan & Freedman, CRIM Project) analyzes contrapuntal
+voice functions (Cantizans, Tenorizans, Bassizans, Altizans, etc.) rather
+than just harmonic labeling — built for exactly this repertoire. This
+tool adds what CRIM's own output doesn't give you on its own: the
+results written back into a real, readable score file, plotted across
+the piece, or exported as data ready for your own analysis.
 
 Started as a single-purpose "Cadence Annotator"; renamed once the
 collection-aggregation side grew into something worth naming on its own.
