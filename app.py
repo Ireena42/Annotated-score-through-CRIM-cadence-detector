@@ -38,10 +38,11 @@ import crim_intervals as ci
 st.set_page_config(page_title="Renaissance Score Workbench", layout="centered")
 st.title("Renaissance Score Workbench")
 st.caption(
-    "Browse ~4,300 Renaissance polyphony pieces across 7 sources, then run "
-    "CRIM Intervals cadence detection and write the result back onto the "
-    "score itself -- a text label + colored notes at every cadence -- so "
-    "you can open the output directly in MuseScore or Finale."
+    "Renaissance polyphony is scattered across dozens of separate archives "
+    "online -- this app gathers ~4,300 pieces from 7 of them into one "
+    "searchable place, then hands you back a real annotated score: "
+    "cadences (and, optionally, points of imitation) marked directly on "
+    "the notation, ready to open in MuseScore or Finale."
 )
 
 

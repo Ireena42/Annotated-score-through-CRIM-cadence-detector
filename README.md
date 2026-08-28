@@ -1,11 +1,12 @@
 # Renaissance Score Workbench
 
-A small Streamlit app that aggregates **~4,300 Renaissance polyphony
-pieces across 7 sources** into one searchable place, then detects
-cadences and writes them **directly onto the score itself** — a text
-label (e.g. `Authentic → G`) plus colored noteheads at every cadential
-voice — so you can open the result in MuseScore, Finale, or any notation
-software and see exactly where and how each cadence happens.
+Renaissance polyphony is scattered across dozens of separate archives
+online. This app gathers **~4,300 pieces from 7 of them** into one
+searchable place, then hands you back a real annotated score: cadences
+(e.g. `Authentic → G`) and, optionally, points of imitation, marked
+**directly onto the score itself** with text labels and colored
+noteheads — so you can open the result in MuseScore, Finale, or any
+notation software and see exactly where and how each happens.
 
 Cadence detection is done by [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals)
 (Morgan & Freedman, CRIM Project), which analyzes contrapuntal voice
