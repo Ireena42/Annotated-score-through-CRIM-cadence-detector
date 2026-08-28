@@ -25,7 +25,7 @@ sleeps idle apps); after that it's fast.
 
 ## Use it
 
-Four ways to give it a piece:
+Seven ways to give it a piece:
 - **music21 corpus** — Palestrina (~1300 pieces) or Monteverdi, picked by
   composer then a real title (e.g. "Missa Ad coenam Agni: Agnus I"), not
   an internal file id
@@ -34,6 +34,13 @@ Four ways to give it a piece:
 - **Josquin Research Project** — ~1340 pieces, 21 Franco-Flemish
   composers (Josquin, Ockeghem, Obrecht, la Rue, and more), live from
   their public GitHub repository
+- **1520s Project** — 662 pieces, ca. 1510-1540, mostly France/Germany/
+  Italy/the Low Countries, live from their public GitHub repository
+- **Tasso in Music Project** — 503 madrigal settings of Torquato Tasso's
+  poetry (1570s-1640s, many composers), live from their public GitHub
+  repository
+- **More collections** — SEILS (Italian secular songs, ca. 1600) and
+  Lassus's Geistliche Psalmen, two smaller collections sharing one tab
 - **upload your own file** — MusicXML (`.xml`/`.musicxml`) or MEI (`.mei`)
 
 Click **Annotate**, then download the resulting `.xml`. Two in-app
@@ -67,8 +74,9 @@ above is the one to share.
 
 - Humdrum (`.krn`) upload isn't offered in the "upload your own file" tab
   — CRIM's own reference app only demonstrates MEI/MusicXML uploads from
-  text, so that's the tested, reliable set here too. (The Josquin
-  Research Project tab handles `.krn` internally via its own known-good
-  fetch, which is different from a user-supplied upload.)
+  text, so that's the tested, reliable set here too. (The five
+  GitHub-backed tabs — JRP, 1520s, Tasso, SEILS, Lassus Psalms — all
+  handle `.krn` internally via their own known-good fetch, which is
+  different from a user-supplied upload.)
 - Nothing you upload is stored server-side; it only exists for the
   duration of your browser session.

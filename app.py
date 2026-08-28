@@ -11,36 +11,6 @@ here). Streamlit re-runs this whole script top-to-bottom on every user
 interaction (button click, dropdown change, etc.) -- that's normal for
 Streamlit, not a bug; it's why there's no explicit event-loop code below.
 
-Three ways to pick a piece:
-  1. a dropdown of the ids already bundled in music21's Palestrina corpus
-     (same ids used throughout findings.md/todo.md, e.g. 'Agnus_15')
-  2. a dropdown of the CRIM Project's own online corpus (359 pieces, 48
-     composers, live-fetched from crimproject.org -- see below)
-  3. uploading your own MusicXML/MEI file directly
-
-WHY THE CRIM CORPUS TAB, NOT MORE music21 COMPOSERS: checked music21's
-other bundled composers before adding anything (directory listing +
-piece counts, not assumed) -- besides Palestrina, the only other
-Renaissance/sacred-adjacent entries are either a single piece each
-(lusitano, luca, ciconia) or not actually sacred polyphony (josquin's
-bundled set is secular ABC-notation chansons; monteverdi is secular
-madrigals). Padding the UI with those wouldn't have delivered "more
-sacred polyphony" in practice. CRIM's own corpus does: it's Lassus's
-parody masses (~300 movements) plus the polyphonic models they're based
-on -- motets/chansons/madrigals by Willaert, Rore, Morales, Guerrero,
-Palestrina himself, and 40+ other 16th-century composers -- fetched live
-from https://crimproject.org/data/pieces/ (the same public JSON endpoint
-CRIM's own reference Streamlit app in this repo, intervals_streamlit2.py,
-uses -- checked its source before building this, per this project's
-"verify, don't assume" habit).
-
-WHY NOT HUMDRUM (.krn) UPLOAD: crim_intervals' own reference Streamlit
-app only offers 'mei'/'xml' in its file_uploader -- Humdrum-from-a-raw-
-string isn't demonstrated anywhere in CRIM's own code, so it isn't
-promised to work reliably here either. Corpus pieces (which mostly START
-as Humdrum .krn) still work fine via the dropdown, since music21's own
-corpus loader handles that format from its own bundled files -- only a
-raw uploaded .krn file's content is untested territory.
 """
 import html
 import re
@@ -189,13 +159,23 @@ def list_pieces_for_composer(corpus_key):
         if stem not in raw_labels[label]:
             raw_labels[label].append(stem)
 
+    return _dedupe_labels(raw_labels)
+
+
+def _dedupe_labels(raw_labels):
+    """{label: [ids sharing it]} -> {label: id}, appending the id itself
+    in brackets for any label mapping to more than one id, so nothing
+    becomes silently unreachable in a dropdown. Shared by every
+    collection below (music21 corpus, JRP, 1520s, Tasso, ...) -- each
+    one hits real, checked collisions (documented at each call site),
+    not a hypothetical worth guarding against speculatively."""
     result = {}
-    for label, stems in raw_labels.items():
-        if len(stems) == 1:
-            result[label] = stems[0]
+    for label, ids in raw_labels.items():
+        if len(ids) == 1:
+            result[label] = ids[0]
         else:
-            for stem in stems:
-                result[f'{label} [{stem}]'] = stem
+            for id_ in ids:
+                result[f'{label} [{Path(id_).stem}]'] = id_
     return result
 
 
@@ -240,13 +220,16 @@ JRP_COMPOSER_NAMES = {
 }
 
 
-def _jrp_piece_label(composer_name, stem):
+def _catalog_piece_label(composer_name, stem):
     """'Agr1001a-Missa_In_myne_zin-Gloria' -> 'Agricola, Alexander --
-    Missa In myne zin: Gloria'. The catalogue-number prefix (composer
-    code + work number + optional movement letter) is stripped; whatever
-    follows is underscore-to-space-converted and, if there's a further
-    '-'-separated movement/source segment, joined on ': ' the same way
-    the Palestrina tab formats mass:movement."""
+    Missa In myne zin: Gloria'. The catalogue-number prefix (composer/
+    project code + work number + optional movement letter) is stripped;
+    whatever follows is underscore-to-space-converted and, if there's a
+    further '-'-separated movement/source segment, joined on ': ' the
+    same way the Palestrina tab formats mass:movement. Shared by JRP and
+    the 1520s Project -- both use this exact filename convention,
+    confirmed directly against real filenames from each before reusing
+    the same function rather than assuming they'd match."""
     rest = re.sub(r'^[A-Za-z]+\d+[a-z]?-', '', stem)
     segments = [html.unescape(s.replace('_', ' ')) for s in rest.split('-')]
     title = segments[0]
@@ -254,22 +237,21 @@ def _jrp_piece_label(composer_name, stem):
     return f'{composer_name} — {piece_desc}'
 
 
-@st.cache_data(ttl=3600, show_spinner=False)
-def fetch_jrp_pieces():
-    """{label: repo path} for the Josquin Research Project's full corpus,
-    live from GitHub's tree API -- one request lists the ENTIRE repo
-    (1427 entries) at once, verified directly, rather than one request
-    per composer folder (would be 20+ separate calls against GitHub's
-    unauthenticated rate limit for no real benefit).
+def _fetch_catalog_collection(owner, repo, branch, composer_names, min_size=500):
+    """Generic fetcher for JRP-style repos: composer/project-code
+    top-level folders, filenames like '<Code><Num><Letter?>-<Title>
+    [-<Movement>].krn', read via one recursive git-tree API call.
+    Shared by JRP and the 1520s Project (structurally identical, checked
+    directly for each before merging them into one function).
 
-    Two filters applied, both verified against the real data, not
-    assumed: only '.krn' files (skips the repo's README/LICENSE/scripts),
-    and only files >=500 bytes -- real scores here run from ~2KB to
-    ~20KB+, while every redirect stub found was under 60 bytes, so 500 is
-    a safe, wide margin between the two, not a fragile cutoff.
+    min_size filters out redirect-stub files (a relative-path text blob
+    standing in for a piece actually stored under another composer's
+    folder, e.g. JRP's entire Mou/ folder) -- 500 bytes is a wide,
+    verified margin: real scores in both repos run from ~1KB to tens of
+    KB, every redirect stub found was under 60 bytes.
     """
     response = requests.get(
-        'https://api.github.com/repos/josquin-research-project/jrp-scores/git/trees/main',
+        f'https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}',
         params={'recursive': '1'}, timeout=20,
     )
     response.raise_for_status()
@@ -278,24 +260,197 @@ def fetch_jrp_pieces():
     raw_labels = {}
     for item in tree:
         path = item['path']
-        if not path.endswith('.krn') or item.get('size', 0) < 500:
+        if not path.endswith('.krn') or item.get('size', 0) < min_size:
             continue
-        code = path.split('/')[0]
-        if code not in JRP_COMPOSER_NAMES:
+        # immediate parent folder, not path.split('/')[0]: JRP's layout is
+        # flat ('<Code>/<file>.krn') but 1520s nests one level deeper
+        # ('humdrum/<Code>/<file>.krn') -- confirmed directly against both
+        # repos' real trees before writing this, not assumed identical.
+        code = path.split('/')[-2]
+        if code not in composer_names:
             continue
-        label = _jrp_piece_label(JRP_COMPOSER_NAMES[code], Path(path).stem)
+        label = _catalog_piece_label(composer_names[code], Path(path).stem)
         raw_labels.setdefault(label, [])
         if path not in raw_labels[label]:
             raw_labels[label].append(path)
 
-    result = {}
-    for label, paths in raw_labels.items():
-        if len(paths) == 1:
-            result[label] = paths[0]
-        else:
-            for path in paths:
-                result[f'{label} [{Path(path).stem}]'] = path
-    return result
+    return _dedupe_labels(raw_labels)
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_jrp_pieces():
+    """{label: repo path} for the Josquin Research Project's full corpus,
+    live from GitHub's tree API -- one request lists the ENTIRE repo
+    (1427 entries) at once, verified directly, rather than one request
+    per composer folder (would be 20+ separate calls against GitHub's
+    unauthenticated rate limit for no real benefit)."""
+    return _fetch_catalog_collection(
+        'josquin-research-project', 'jrp-scores', 'main', JRP_COMPOSER_NAMES
+    )
+
+
+# Composer names for The 1520s Project (1520s-project-scores repo), read
+# directly from the repo's own README table (a proper HTML table mapping
+# code -> name -- much more reliable than JRP's, which had to be
+# reconstructed from individual file headers since no such table existed
+# there). Verified every code in the actual repo tree is covered by this
+# table (checked directly, zero orphans) before using it.
+PROJECT_1520S_COMPOSER_NAMES = {
+    'Any': 'Anonymous', 'Arc': 'Jacques Arcadelt', 'Bar': 'Hotinet Barra',
+    'Bau': 'Noel Bauldeweyn', 'Bis': 'Bisgueria', 'Bnt': 'Johannes Brunet',
+    'Boy': 'Boyleau', 'Cha': 'Nicolas Champion', 'Con': 'Jean Conseil',
+    'Crp': 'Carpentras', 'Div': 'Antonius Divitis', 'Era': 'Erasmus?',
+    'Fsc': 'Costanzo Festa', 'Fss': 'Sebastiano Festa', 'Fva': 'Antoine de Févin',
+    'Gom': 'Nicolas Gombert', 'Gsc': 'Mathieu Gascongne', 'Jac': 'Jacotin Frontin?',
+    'Jan': 'Maistre Jan', 'Jom': 'Jacquet of Mantua', 'Lfg': 'Jean de la Fage',
+    'Lhe': 'Jean Lhéritier', 'Lpi': 'Johannes Lupi', 'Lps': 'Lupus Hellinck',
+    'Lsa': 'Jean Le Santier', 'Mlu': 'Pierre Moulu', 'Mou': 'Jean Mouton',
+    'Opi': 'Benedictus de Opitiis', 'Ren': 'Renaldo', 'Res': 'Nicole Regnes',
+    'Ric': 'Jean Richafort', 'Ror': 'Cipriano de Rore', 'Ser': 'Claudin de Sermisy',
+    'Snf': 'Ludwig Senfl', 'Sil': 'Andreas de Silva', 'The': 'Pierrequin de Therache',
+    'Ver': 'Philippe Verdelot', 'Vin': 'Jheronimus Vinders', 'Wil': 'Adrian Willaert',
+}
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_1520s_pieces():
+    """{label: repo path} for The 1520s Project (ca. 1510-1540 music,
+    mostly France/Germany/Italy/Low Countries) -- 662 real pieces,
+    verified directly against the repo's file tree."""
+    return _fetch_catalog_collection(
+        'benory', '1520s-project-scores', 'main', PROJECT_1520S_COMPOSER_NAMES
+    )
+
+
+def _tasso_piece_label(stem):
+    """'Tam1010001a-Vorrai_dunque_pur_Silvia--Porto_1625' -> 'Porto
+    (1625) -- Vorrai dunque pur Silvia'. The Tasso in Music Project
+    names files '<catalog-code>-<poem title>--<composer>_<year>' (the
+    catalog code prefix encodes the specific Tasso poem via the Solerti
+    numbering, not the composer -- confirmed directly against the
+    project's own README, which is why this needs its own parser
+    instead of reusing _catalog_piece_label). Checked the real data
+    before trusting this shape: 498 of 503 files match it exactly; the
+    remaining 5 either have no composer suffix at all, or use a single
+    '-' instead of '--' -- both handled by the fallback regex below
+    rather than assumed not to exist.
+    """
+    rest = re.sub(r'^T\w{2}\d+[a-z]?-', '', stem)
+    if '--' in rest:
+        title_part, _, composer_part = rest.partition('--')
+    else:
+        # fallback for the ~1% of files without a clean '--' separator
+        m = re.match(r'^(.*)-([A-Za-z]+_\d{4})$', rest)
+        title_part, composer_part = (m.group(1), m.group(2)) if m else (rest, '')
+    title = html.unescape(title_part.replace('_', ' '))
+    m = re.match(r'^(.+?)_(\d{4})$', composer_part)
+    composer = f'{m.group(1)} ({m.group(2)})' if m else (composer_part.replace('_', ' ') or 'Unknown composer')
+    return f'{composer} — {title}'
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_tasso_pieces():
+    """{label: repo path} for the Tasso in Music Project (madrigal
+    settings of Torquato Tasso's poetry, mostly 1570s-1640s, many
+    composers) -- 503 real pieces across 8 genre-code folders (Tam, Tbv,
+    Tco, Tec, Tri, Trm, Trt, Tsg -- different Tasso poem collections, not
+    composers; composer comes from the filename itself, see
+    _tasso_piece_label). No composer-code allowlist needed here (unlike
+    JRP/1520s) since every genre folder is real content, verified
+    directly (zero redirect-stub-sized files in the whole repo)."""
+    response = requests.get(
+        'https://api.github.com/repos/TassoInMusicProject/tasso-scores/git/trees/master',
+        params={'recursive': '1'}, timeout=20,
+    )
+    response.raise_for_status()
+    tree = response.json().get('tree', [])
+
+    raw_labels = {}
+    for item in tree:
+        path = item['path']
+        if not path.endswith('.krn'):
+            continue
+        label = _tasso_piece_label(Path(path).stem)
+        raw_labels.setdefault(label, [])
+        if path not in raw_labels[label]:
+            raw_labels[label].append(path)
+
+    return _dedupe_labels(raw_labels)
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_seils_pieces():
+    """{label: repo path} for SEILS (small: 32 real pieces, Italian
+    secular songs ca. 1600 -- composer folder names are already real
+    surnames, e.g. 'Alberti', 'Bardi'). Titles are NOT clean here --
+    checked directly and these files carry no !!!OTL/!!!COM header
+    metadata at all (unlike JRP/1520s/Tasso), and the compressed
+    filenames (e.g. 'alberti_dalmio_mn') don't reliably split back into
+    real words programmatically -- rather than guess-reconstruct a title
+    that might be wrong, the raw filename fragment is shown as-is. Also
+    filters out the '_annotation' duplicate of each piece (an OMR/
+    analysis-annotated copy of the same music, confirmed by checking
+    file pairs directly) so each piece appears once, not twice."""
+    response = requests.get(
+        'https://api.github.com/repos/SEILSdataset/SEILSdataset/git/trees/master',
+        params={'recursive': '1'}, timeout=20,
+    )
+    response.raise_for_status()
+    tree = response.json().get('tree', [])
+
+    raw_labels = {}
+    for item in tree:
+        path = item['path']
+        if not path.endswith('.krn') or 'SEILS_with_annotations' not in path:
+            continue
+        # Scoped to the filename, NOT the whole path: the parent folder
+        # is itself named 'SEILS_with_annotations', which contains
+        # '_annotation' as a substring -- checking the full path against
+        # that excluded every single file, real pieces included (caught
+        # directly: an all-path check returned zero results before this
+        # fix). '_annotat' (not '_annotation') catches both duplicate
+        # suffixes actually used here -- '_annotated.krn' AND
+        # '_annotation.krn', two different endings for the same kind of
+        # duplicate, confirmed against the real file list.
+        filename = path.rsplit('/', 1)[-1]
+        if '_annotat' in filename:
+            continue
+        parts = path.split('/')
+        composer, stem = parts[2], Path(path).stem
+        title = stem.split('_', 1)[1] if '_' in stem else stem  # drop composer-surname prefix
+        label = f'{composer} — {title}'
+        raw_labels.setdefault(label, [])
+        if path not in raw_labels[label]:
+            raw_labels[label].append(path)
+
+    return _dedupe_labels(raw_labels)
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_lassus_psalms_pieces():
+    """{label: repo path} for Lassus's Geistliche Psalmen (50 psalm
+    settings) -- a single-composer collection, so just a clean title per
+    piece (filenames are already 'NN-title-words.krn', no code/catalog
+    prefix to strip)."""
+    response = requests.get(
+        'https://api.github.com/repos/WolfgangDrescher/lassus-geistliche-psalmen/git/trees/master',
+        params={'recursive': '1'}, timeout=20,
+    )
+    response.raise_for_status()
+    tree = response.json().get('tree', [])
+
+    raw_labels = {}
+    for item in tree:
+        path = item['path']
+        if not path.endswith('.krn'):
+            continue
+        stem = Path(path).stem
+        title = re.sub(r'^\d+-', '', stem).replace('-', ' ').capitalize()
+        raw_labels.setdefault(title, [])
+        if path not in raw_labels[title]:
+            raw_labels[title].append(path)
+
+    return _dedupe_labels(raw_labels)
 
 
 def run_pipeline(score, source_label):
@@ -434,26 +589,24 @@ reason the two music21-bundled composers left out of the Composer
 dropdown above don't work here: their files are a single monophonic
 voice, full stop -- not "a 2-voice passage," genuinely no second voice
 to pair with, ever.)
-
-**What it genuinely can't see:** a moment where a voice pair's interval
-is literally `Rest` (checked directly in CRIM's own code -- a rest
-isn't blank/missing data, it's an explicit `'Rest'` value in the
-interval table) instead of a real interval. None of CRIM's coded
-patterns expect `Rest` mid-progression, so if most or all voices stop
-sounding right where a cadence would otherwise land, nothing matches --
-even though, musically, that silence right before a resolution is often
-a very deliberate expressive gesture. Fixing that specific class of miss
-isn't a small edit to CRIM's cadence-type table -- the whole method is
-built on sounding voice *pairs*, so it would need a genuinely separate
-detection strategy layered on top (e.g. explicitly watching for a
-simultaneous multi-voice rest following built-up approach motion), not
-a patch to the existing one.
         """
     )
 
-tab_corpus, tab_crim, tab_jrp, tab_upload = st.tabs(
-    ["music21 corpus", "CRIM Project corpus", "Josquin Research Project", "Upload your own file"]
-)
+def _annotate_kern_from_url(raw_url, source_label):
+    """Shared by every GitHub-hosted Humdrum kern tab (JRP, 1520s, Tasso,
+    SEILS, Lassus Psalms): fetch the raw file, parse, run the pipeline.
+    Humdrum **kern auto-detects fine from raw text content, same as
+    music21's converter.parse does for MusicXML/MEI elsewhere in this
+    app -- verified directly before relying on it."""
+    kern_text = requests.get(raw_url, timeout=20).text
+    score = m21.converter.parse(kern_text)
+    return run_pipeline(score, source_label)
+
+
+tab_corpus, tab_crim, tab_jrp, tab_1520s, tab_tasso, tab_smaller, tab_upload = st.tabs([
+    "music21 corpus", "CRIM Project corpus", "Josquin Research Project",
+    "1520s Project", "Tasso in Music Project", "More collections", "Upload your own file",
+])
 
 with tab_corpus:
     composer_name = st.selectbox("Composer", sorted(CORPUS_COMPOSERS.keys()))
@@ -533,12 +686,68 @@ with tab_jrp:
         path = jrp_pieces[jrp_label]
         raw_url = f"https://raw.githubusercontent.com/josquin-research-project/jrp-scores/main/{path}"
         with st.spinner(f"Downloading and parsing {jrp_label}..."):
-            # Humdrum **kern format auto-detects fine from raw text content,
-            # same as music21's own converter.parse does for MusicXML/MEI in
-            # the other tabs -- verified directly before wiring this up.
-            kern_text = requests.get(raw_url, timeout=20).text
-            score = m21.converter.parse(kern_text)
-            annotated_score, stats = run_pipeline(score, Path(path).stem)
+            annotated_score, stats = _annotate_kern_from_url(raw_url, Path(path).stem)
+        if annotated_score is None:
+            st.warning("No cadences were detected in this piece.")
+        else:
+            show_result(annotated_score, stats, f"{Path(path).stem}_annotated.xml")
+
+with tab_1520s:
+    st.caption(
+        "662 pieces from The 1520s Project (ca. 1510-1540 music, mostly France, "
+        "Germany, Italy, and the Low Countries -- 38 composers plus anonymous "
+        "works), fetched live from their public GitHub repository."
+    )
+    p1520_pieces = fetch_1520s_pieces()
+    p1520_label = st.selectbox("Piece", sorted(p1520_pieces.keys()), key="p1520_piece")
+    if st.button("Annotate", key="annotate_1520s"):
+        path = p1520_pieces[p1520_label]
+        raw_url = f"https://raw.githubusercontent.com/benory/1520s-project-scores/main/{path}"
+        with st.spinner(f"Downloading and parsing {p1520_label}..."):
+            annotated_score, stats = _annotate_kern_from_url(raw_url, Path(path).stem)
+        if annotated_score is None:
+            st.warning("No cadences were detected in this piece.")
+        else:
+            show_result(annotated_score, stats, f"{Path(path).stem}_annotated.xml")
+
+with tab_tasso:
+    st.caption(
+        "503 madrigal settings of Torquato Tasso's poetry (mostly 1570s-1640s, "
+        "many composers) from the Tasso in Music Project, fetched live from "
+        "their public GitHub repository."
+    )
+    tasso_pieces = fetch_tasso_pieces()
+    tasso_label = st.selectbox("Piece", sorted(tasso_pieces.keys()), key="tasso_piece")
+    if st.button("Annotate", key="annotate_tasso"):
+        path = tasso_pieces[tasso_label]
+        raw_url = f"https://raw.githubusercontent.com/TassoInMusicProject/tasso-scores/master/{path}"
+        with st.spinner(f"Downloading and parsing {tasso_label}..."):
+            annotated_score, stats = _annotate_kern_from_url(raw_url, Path(path).stem)
+        if annotated_score is None:
+            st.warning("No cadences were detected in this piece.")
+        else:
+            show_result(annotated_score, stats, f"{Path(path).stem}_annotated.xml")
+
+with tab_smaller:
+    st.caption("Two smaller collections, not big enough on their own to earn a full tab.")
+    SMALLER_COLLECTIONS = {
+        "SEILS (30 Italian secular songs, ca. 1600)": (
+            fetch_seils_pieces, "https://raw.githubusercontent.com/SEILSdataset/SEILSdataset/master/"
+        ),
+        "Lassus -- Geistliche Psalmen (50 psalm settings)": (
+            fetch_lassus_psalms_pieces,
+            "https://raw.githubusercontent.com/WolfgangDrescher/lassus-geistliche-psalmen/master/",
+        ),
+    }
+    collection_name = st.selectbox("Collection", sorted(SMALLER_COLLECTIONS.keys()))
+    fetch_fn, base_url = SMALLER_COLLECTIONS[collection_name]
+    small_pieces = fetch_fn()
+    small_label = st.selectbox("Piece", sorted(small_pieces.keys()), key="small_piece")
+    if st.button("Annotate", key="annotate_small"):
+        path = small_pieces[small_label]
+        raw_url = base_url + path
+        with st.spinner(f"Downloading and parsing {small_label}..."):
+            annotated_score, stats = _annotate_kern_from_url(raw_url, Path(path).stem)
         if annotated_score is None:
             st.warning("No cadences were detected in this piece.")
         else:
