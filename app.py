@@ -487,12 +487,20 @@ def _safe_cadences(piece):
         )
 
 
-def run_pipeline(score, source_label, include_ptypes=False, include_homorhythm=False):
+def run_pipeline(score, source_label, include_cadences=True, include_ptypes=False, include_homorhythm=False):
     """Shared by both input modes below: given a parsed music21 Score,
-    run CRIM cadence detection (voice_detail=True, for the PartMap this
-    tool relies on -- see crim_export_cadences.py's docstring) directly
-    on it, then hand off to annotate_score() for the actual labeling/
-    coloring. Returns the annotated Score plus a stats dict.
+    optionally runs each of CRIM's three structural analyses on it and
+    writes whichever ones are requested onto the score. Returns
+    (annotated_score, stats, error).
+
+    include_cadences=True (the default, preserving this app's original
+    behavior) runs CRIM cadence detection (voice_detail=True, for the
+    PartMap this tool relies on -- see crim_export_cadences.py's
+    docstring) and hands off to annotate_score() for the actual
+    labeling/coloring. Set it False to skip cadences entirely -- e.g. to
+    get only points-of-imitation/homorhythm, or, with all three flags
+    False, a completely unmodified score for a plain download with zero
+    CRIM computation at all.
 
     include_ptypes=True additionally runs presentationTypes() (points of
     imitation -- PEN/ID/FUGA) and marks those on the same score too, in a
@@ -509,29 +517,36 @@ def run_pipeline(score, source_label, include_ptypes=False, include_homorhythm=F
     directly in its own source before relying on this -- so that's
     checked for explicitly rather than assumed away.
 
-    Returns (annotated_score, stats, error) -- error is None unless
-    cadence detection itself failed (see _safe_cadences); ptypes/
-    homorhythm are individually guarded too (a crash in either just
-    skips that one optional feature -- see the 'ptypes_failed'/
-    'hr_failed' stats keys -- rather than losing the whole annotation
-    when cadence detection itself succeeded fine).
+    error is None unless cadence detection itself failed (see
+    _safe_cadences) -- ptypes/homorhythm are individually guarded too (a
+    crash in either just skips that one optional feature -- see the
+    'ptypes_failed'/'hr_failed' stats keys -- rather than losing an
+    otherwise-successful annotation over it). Barring that error,
+    annotated_score is never None -- if nothing was requested, or
+    everything requested came up empty, the caller still gets a score
+    back (unmodified in the former case) plus a stats dict that's empty
+    or missing the relevant keys; show_result() reads that to decide
+    what to tell the user, rather than this function refusing to return
+    anything.
     """
+    if not (include_cadences or include_ptypes or include_homorhythm):
+        return score, {}, None
+
     # ci.ImportedPiece normally comes from ci.importScore(path_or_text),
     # which re-parses from scratch internally -- but it also accepts an
     # already-built music21 Score directly via its own constructor, which
     # avoids parsing the same piece twice (once for us, once for CRIM).
     piece = ci.main_objs.ImportedPiece(score, source_label)
-    cadences, error = _safe_cadences(piece)
-    if error:
-        return None, None, error
+    annotated_score, stats = score, {}
 
-    if cadences.empty and not include_ptypes and not include_homorhythm:
-        return None, None, None
-
-    if cadences.empty:
-        annotated_score, stats = score, {'labeled': 0, 'missed_label': 0, 'colored': 0}
-    else:
-        annotated_score, stats = annotate_score(score, cadences)
+    if include_cadences:
+        cadences, error = _safe_cadences(piece)
+        if error:
+            return None, None, error
+        if not cadences.empty:
+            annotated_score, stats = annotate_score(score, cadences)
+        else:
+            stats = {'labeled': 0, 'missed_label': 0, 'colored': 0}
 
     if include_ptypes:
         try:
@@ -579,17 +594,28 @@ def score_to_download_bytes(score):
         tmp_path.unlink(missing_ok=True)
 
 
-def show_result(annotated_score, stats, out_filename):
-    st.success(
-        f"{stats['labeled'] + stats['missed_label']} cadences found -- "
-        f"{stats['labeled']} labeled, {stats['colored']} cadential notes colored."
-    )
-    if stats['missed_label']:
-        st.info(
-            f"{stats['missed_label']} cadence(s) couldn't be labeled (no matching "
-            "measure found on the top staff) -- rare, usually means a metadata "
-            "irregularity in that specific cadence's measure/beat."
+def show_result(annotated_score, stats, filename_stem):
+    """Reports whatever run_pipeline()/_annotate_crim_piece() actually
+    did (cadences/ptypes/homorhythm are all optional now -- see
+    run_pipeline's docstring) and offers the resulting file for
+    download. `stats` can be empty (nothing was requested, or everything
+    requested came up empty) -- annotated_score is still a real Score
+    either way, just unmodified in that case, so a download is always
+    offered; the filename/button text are the only things that change,
+    honestly reflecting whether the file actually has anything written
+    onto it.
+    """
+    if 'labeled' in stats:
+        st.success(
+            f"{stats['labeled'] + stats['missed_label']} cadences found -- "
+            f"{stats['labeled']} labeled, {stats['colored']} cadential notes colored."
         )
+        if stats['missed_label']:
+            st.info(
+                f"{stats['missed_label']} cadence(s) couldn't be labeled (no matching "
+                "measure found on the top staff) -- rare, usually means a metadata "
+                "irregularity in that specific cadence's measure/beat."
+            )
     if 'ptypes_labeled' in stats:
         st.success(
             f"{stats['ptypes_labeled']} point(s) of imitation found -- "
@@ -603,18 +629,31 @@ def show_result(annotated_score, stats, out_filename):
     if stats.get('ptypes_failed'):
         st.info(
             "Points-of-imitation detection hit an internal error on this piece and "
-            "was skipped -- the cadence annotation above is unaffected."
+            "was skipped -- the rest of the annotation above is unaffected."
         )
     if stats.get('hr_failed'):
         st.info(
             "Homorhythm detection hit an internal error on this piece and was "
-            "skipped -- the cadence annotation above is unaffected."
+            "skipped -- the rest of the annotation above is unaffected."
         )
+
+    # True only if something was actually written onto the score -- not
+    # just requested. A feature that was checked but found nothing (or
+    # nothing was checked at all) leaves stats without any of these keys,
+    # and the file is a plain, unmodified score, not a broken annotation.
+    annotated = any(k in stats for k in ('labeled', 'ptypes_labeled', 'hr_labeled'))
+    if not annotated:
+        st.info(
+            "No structural annotations were added to this file -- either no "
+            "analysis was selected, or none of the selected analyses found "
+            "anything in this piece. The file below is the unmodified score."
+        )
+
     xml_bytes = score_to_download_bytes(annotated_score)
     st.download_button(
-        "Download annotated MusicXML",
+        "Download annotated MusicXML" if annotated else "Download MusicXML",
         data=xml_bytes,
-        file_name=out_filename,
+        file_name=f"{filename_stem}_annotated.xml" if annotated else f"{filename_stem}.xml",
         mime="application/vnd.recordare.musicxml+xml",
     )
 
@@ -778,14 +817,15 @@ none of the three ever overlap even when they coincide.
         """
     )
 
-def _annotate_crim_piece(mei_url, include_ptypes=False, include_homorhythm=False):
-    """Shared by the CRIM tab and Browse: import + metadata-fix + cadence-
-    detect + annotate for one CRIM MEI piece. Returns (annotated_score,
-    stats, error) -- error is None on success, or a message string if
-    CRIM's own import failed, or if cadence detection itself failed (see
-    _safe_cadences). include_ptypes/include_homorhythm=True add points-
-    of-imitation/homorhythm marking too -- see run_pipeline's docstring
-    for what those add to `stats`."""
+def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, include_homorhythm=False):
+    """Shared by the CRIM tab and Browse: import + metadata-fix, then
+    whichever of CRIM's three analyses are requested, for one CRIM MEI
+    piece. Returns (annotated_score, stats, error) -- error is None on
+    success, or a message string if CRIM's own import failed, or if
+    cadence detection itself failed (see _safe_cadences). include_
+    cadences/ptypes/homorhythm all default/behave exactly as in
+    run_pipeline's docstring -- see that for what each adds to `stats`,
+    and why annotated_score is never None barring an actual error."""
     piece = ci.importScore(mei_url)
     if piece is None:
         return None, None, "CRIM couldn't import this piece (bad MEI file or network issue)."
@@ -797,15 +837,19 @@ def _annotate_crim_piece(mei_url, include_ptypes=False, include_homorhythm=False
     # text ("Music21 Fragment"/"Music21" -- confirmed directly).
     piece.score.metadata.title = piece.metadata.get('title') or piece.score.metadata.title
     piece.score.metadata.composer = piece.metadata.get('composer') or piece.score.metadata.composer
-    cadences, error = _safe_cadences(piece)
-    if error:
-        return None, None, error
-    if cadences.empty and not include_ptypes and not include_homorhythm:
-        return None, None, None
-    if cadences.empty:
-        annotated_score, stats = piece.score, {'labeled': 0, 'missed_label': 0, 'colored': 0}
-    else:
-        annotated_score, stats = annotate_score(piece.score, cadences)
+
+    if not (include_cadences or include_ptypes or include_homorhythm):
+        return piece.score, {}, None
+
+    annotated_score, stats = piece.score, {}
+    if include_cadences:
+        cadences, error = _safe_cadences(piece)
+        if error:
+            return None, None, error
+        if not cadences.empty:
+            annotated_score, stats = annotate_score(piece.score, cadences)
+        else:
+            stats = {'labeled': 0, 'missed_label': 0, 'colored': 0}
     if include_ptypes:
         try:
             ptypes = piece.presentationTypes()
@@ -833,7 +877,7 @@ def _annotate_crim_piece(mei_url, include_ptypes=False, include_homorhythm=False
     return annotated_score, stats, None
 
 
-def _annotate_kern_from_url(raw_url, source_label, include_ptypes=False, include_homorhythm=False):
+def _annotate_kern_from_url(raw_url, source_label, include_cadences=True, include_ptypes=False, include_homorhythm=False):
     """Shared by every GitHub-hosted Humdrum kern tab (JRP, 1520s, Tasso,
     SEILS, Lassus Psalms): fetch the raw file, parse, run the pipeline.
     Humdrum **kern auto-detects fine from raw text content, same as
@@ -841,7 +885,10 @@ def _annotate_kern_from_url(raw_url, source_label, include_ptypes=False, include
     app -- verified directly before relying on it."""
     kern_text = requests.get(raw_url, timeout=20).text
     score = m21.converter.parse(kern_text)
-    return run_pipeline(score, source_label, include_ptypes=include_ptypes, include_homorhythm=include_homorhythm)
+    return run_pipeline(
+        score, source_label, include_cadences=include_cadences,
+        include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
+    )
 
 
 # Base raw-content URLs for the five kern-backed collections, shared by
@@ -857,28 +904,27 @@ KERN_COLLECTION_BASE_URLS = {
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def build_browse_index():
-    """One flat list of (display_label, collection, native_ref, genre)
-    spanning all 7 collections (~4,300 pieces) -- built by tagging each
-    collection's own already-built {label: id} dict with a
-    '[Collection]' prefix, NOT by restructuring any of them into a new
-    shared schema (every existing per-collection tab's code is untouched
-    by this). native_ref is exactly whatever that collection's own
-    fetcher already uses as a dict value: (corpus_key, piece_id) for
-    music21, the full piece dict for CRIM, a repo path string for the
-    five kern collections. genre is added purely for Browse's own genre
-    filter -- it's only ever populated for CRIM (the only collection
-    that actually carries genre metadata; every other row gets None,
-    which the genre filter treats as "not applicable" rather than a
-    match).
+    """One flat list of (display_label, collection, native_ref) spanning
+    all 7 collections (~4,300 pieces) -- built by tagging each
+    collection's own already-built {label: id} dict with a '[Collection]'
+    prefix, NOT by restructuring any of them into a new shared schema
+    (every existing per-collection tab's code is untouched by this).
+    native_ref is exactly whatever that collection's own fetcher already
+    uses as a dict value: (corpus_key, piece_id) for music21, the full
+    piece dict for CRIM, a repo path string for the five kern collections.
 
-    A per-row `composer` field and Collection/Composer filter widgets
-    were tried here and removed: Collection duplicated what the
-    dedicated per-collection tabs already do, and composer naming isn't
-    normalized across collections (e.g. CRIM's 'Josquin Des Prez' vs
-    JRP's 'Josquin des Prez' would show up as separate filter values for
-    the same composer), which made a flat composer list more confusing
-    than useful. Worth revisiting with real normalization later rather
-    than as a duplicate-riddled dropdown.
+    Per-row `composer`/`genre` fields and Collection/Composer/Genre
+    filter widgets were all tried here and removed: Collection duplicated
+    what the dedicated per-collection tabs already do; composer naming
+    isn't normalized across collections (e.g. CRIM's 'Josquin Des Prez'
+    vs JRP's 'Josquin des Prez' would show up as separate filter values
+    for the same composer), making a flat composer list more confusing
+    than useful; and genre was only ever populated for CRIM, making a
+    cross-collection genre filter mostly empty for every other source.
+    Genre filtering now lives on the CRIM tab itself instead, where every
+    piece actually has one (see tab_crim below) -- the right place for a
+    facet that only one collection supports, rather than a cross-
+    collection filter here.
 
     First call is slow-ish (calls every collection's own fetcher, several
     of which are themselves slow on a cold cache -- the metadata bundle
@@ -890,18 +936,17 @@ def build_browse_index():
     rows = []
     for composer_name, corpus_key in CORPUS_COMPOSERS.items():
         for label, piece_id in list_pieces_for_composer(corpus_key).items():
-            rows.append((f'[{composer_name}] {label}', 'music21', (corpus_key, piece_id), None))
+            rows.append((f'[{composer_name}] {label}', 'music21', (corpus_key, piece_id)))
     for p in fetch_crim_pieces():
-        genre = p['genre']['name']
-        label = f"{p['composer']['name']} — {p['full_title']} [{genre}]"
-        rows.append((f'[CRIM] {label}', 'crim', p, genre))
+        label = f"{p['composer']['name']} — {p['full_title']} [{p['genre']['name']}]"
+        rows.append((f'[CRIM] {label}', 'crim', p))
     for key, fetch_fn, prefix in [
         ('jrp', fetch_jrp_pieces, 'JRP'), ('1520s', fetch_1520s_pieces, '1520s'),
         ('tasso', fetch_tasso_pieces, 'Tasso'), ('seils', fetch_seils_pieces, 'SEILS'),
         ('lassus_psalms', fetch_lassus_psalms_pieces, 'Lassus Psalms'),
     ]:
         for label, path in fetch_fn().items():
-            rows.append((f'[{prefix}] {label}', key, path, None))
+            rows.append((f'[{prefix}] {label}', key, path))
     return rows
 
 
@@ -1039,7 +1084,7 @@ def _browse_piece_filename_stem(collection, native_ref):
     return Path(native_ref).stem
 
 
-def annotate_by_collection(collection, native_ref, include_ptypes=False, include_homorhythm=False):
+def annotate_by_collection(collection, native_ref, include_cadences=True, include_ptypes=False, include_homorhythm=False):
     """Dispatches to whichever collection's own annotate path applies --
     reuses the exact same functions each dedicated tab already calls, so
     Browse's Annotate button behaves identically to picking the same
@@ -1049,15 +1094,18 @@ def annotate_by_collection(collection, native_ref, include_ptypes=False, include
         corpus_key, piece_id = native_ref
         score = m21.corpus.parse(f"{corpus_key}/{piece_id}")
         return run_pipeline(
-            score, piece_id, include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
+            score, piece_id, include_cadences=include_cadences,
+            include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
         )
     if collection == 'crim':
         return _annotate_crim_piece(
-            native_ref['mei_links'][0], include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
+            native_ref['mei_links'][0], include_cadences=include_cadences,
+            include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
         )
     raw_url = KERN_COLLECTION_BASE_URLS[collection] + native_ref
     return _annotate_kern_from_url(
-        raw_url, Path(native_ref).stem, include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
+        raw_url, Path(native_ref).stem, include_cadences=include_cadences,
+        include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
     )
 
 
@@ -1076,6 +1124,13 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
     selected there) would collide -- two different widgets can't share
     one key in the same script run."""
     key_prefix = key_prefix or collection
+    # Cadences default to checked (this app's original, still-primary
+    # feature); unchecking all three gives back a completely unmodified
+    # score -- see run_pipeline's docstring -- so "download without
+    # annotation" is just "uncheck everything" rather than a separate flow.
+    include_cadences = st.checkbox(
+        "Annotate cadences", value=True, key=f"cadences_{key_prefix}",
+    )
     include_ptypes = st.checkbox(
         "Also mark points of imitation", key=f"ptypes_{key_prefix}",
     )
@@ -1095,7 +1150,8 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
         with st.spinner(f"Downloading and parsing {piece_label}..."):
             try:
                 annotated_score, stats, error = annotate_by_collection(
-                    collection, native_ref, include_ptypes=include_ptypes, include_homorhythm=include_homorhythm
+                    collection, native_ref, include_cadences=include_cadences,
+                    include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
                 )
             except Exception as e:
                 # A safety net, not the primary fix -- _safe_cadences already
@@ -1109,10 +1165,8 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
                 annotated_score, stats, error = None, None, f"Unexpected error analyzing this piece: {e}"
         if error:
             st.error(error)
-        elif annotated_score is None:
-            st.warning("No cadences were detected in this piece.")
         else:
-            show_result(annotated_score, stats, f"{filename_stem}_annotated.xml")
+            show_result(annotated_score, stats, filename_stem)
 
 
 
@@ -1136,26 +1190,13 @@ with tab_browse:
         "preview a piece's voice count and whether it has encoded text/lyrics "
         "before committing to the full analysis, then annotate it directly."
     )
-    # Loaded eagerly (not just when a query is typed) since the genre filter
-    # below needs the real set of genres to populate its options -- same
-    # cache (@st.cache_data(ttl=3600) on build_browse_index itself), so this
-    # cost is still paid once per hour shared across every visitor, not per
-    # page load.
-    with st.spinner("Indexing all collections (first load after a quiet spell can "
-                     "take up to ~15s -- instant after that)..."):
-        index = build_browse_index()
-
     query = st.text_input("Search by composer or title", key="browse_query")
-    genre_filter = st.multiselect(
-        "Genre (CRIM only)", sorted({row[3] for row in index if row[3]}), key="browse_genre_filter",
-    )
 
-    if query or genre_filter:
-        matches = [
-            row for row in index
-            if (not query or query.lower() in row[0].lower())
-            and (not genre_filter or row[3] in genre_filter)
-        ]
+    if query:
+        with st.spinner("Searching (first search after a quiet spell indexes all "
+                         "collections, can take up to ~15s -- instant after that)..."):
+            index = build_browse_index()
+        matches = [row for row in index if query.lower() in row[0].lower()]
 
         if not matches:
             st.info("No matches.")
@@ -1163,15 +1204,18 @@ with tab_browse:
             shown = matches[:50]
             st.caption(f"{len(matches)} match(es)" + (" -- showing first 50" if len(matches) > 50 else ""))
             browse_label = st.selectbox("Pick one", [m[0] for m in shown], key="browse_pick")
-            _, collection, native_ref, _genre = next(m for m in shown if m[0] == browse_label)
+            _, collection, native_ref = next(m for m in shown if m[0] == browse_label)
             stem = _browse_piece_filename_stem(collection, native_ref)
             render_preview_and_annotate(collection, native_ref, browse_label, stem, key_prefix='browse')
 
 with tab_upload:
     st.caption("Accepted formats: MusicXML (.xml/.musicxml) or MEI (.mei).")
     uploaded = st.file_uploader("Score file", type=['xml', 'musicxml', 'mei'])
+    include_cadences_upload = st.checkbox("Annotate cadences", value=True, key="cadences_upload")
+    include_ptypes_upload = st.checkbox("Also mark points of imitation", key="ptypes_upload")
+    include_homorhythm_upload = st.checkbox("Also mark homorhythmic passages", key="hr_upload")
     if uploaded is not None and st.button("Annotate", key="annotate_upload"):
-        with st.spinner("Parsing upload and detecting cadences..."):
+        with st.spinner("Parsing upload..."):
             # Decoding to text and handing the STRING (not a file path) to
             # music21/CRIM is the same pattern crim_intervals' own code
             # documents for "user-supplied piece in streamlit" (see this
@@ -1181,16 +1225,16 @@ with tab_upload:
             text = uploaded.getvalue().decode('utf-8')
             score = m21.converter.parse(text)
             try:
-                annotated_score, stats, error = run_pipeline(score, uploaded.name)
+                annotated_score, stats, error = run_pipeline(
+                    score, uploaded.name, include_cadences=include_cadences_upload,
+                    include_ptypes=include_ptypes_upload, include_homorhythm=include_homorhythm_upload,
+                )
             except Exception as e:
                 annotated_score, stats, error = None, None, f"Unexpected error analyzing this piece: {e}"
         if error:
             st.error(error)
-        elif annotated_score is None:
-            st.warning("No cadences were detected in this piece.")
         else:
-            stem = Path(uploaded.name).stem
-            show_result(annotated_score, stats, f"{stem}_annotated.xml")
+            show_result(annotated_score, stats, Path(uploaded.name).stem)
 
 with tab_corpus:
     composer_name = st.selectbox("Composer", sorted(CORPUS_COMPOSERS.keys()))
@@ -1207,15 +1251,28 @@ with tab_crim:
         "fetched live from crimproject.org."
     )
     crim_pieces = fetch_crim_pieces()
+    # Genre filter lives here, not on Browse -- CRIM is the only collection
+    # that actually carries genre metadata, so it's a real, always-populated
+    # facet in this tab specifically, rather than a mostly-empty one bolted
+    # onto a cross-collection search (see build_browse_index's docstring).
+    genre_filter = st.multiselect(
+        "Filter by genre", sorted({p['genre']['name'] for p in crim_pieces}), key="crim_genre_filter",
+    )
+    if genre_filter:
+        crim_pieces = [p for p in crim_pieces if p['genre']['name'] in genre_filter]
+
     # label -> full piece dict, so selecting a label gets us straight back to
     # its mei_links entry without a second lookup pass
     crim_options = {
         f"{p['composer']['name']} — {p['full_title']} [{p['genre']['name']}]": p
         for p in crim_pieces
     }
-    crim_label = st.selectbox("Piece", sorted(crim_options.keys()))
-    selected = crim_options[crim_label]
-    render_preview_and_annotate('crim', selected, crim_label, selected['piece_id'])
+    if not crim_options:
+        st.info("No pieces match that genre filter.")
+    else:
+        crim_label = st.selectbox("Piece", sorted(crim_options.keys()))
+        selected = crim_options[crim_label]
+        render_preview_and_annotate('crim', selected, crim_label, selected['piece_id'])
 
 with tab_jrp:
     st.caption(

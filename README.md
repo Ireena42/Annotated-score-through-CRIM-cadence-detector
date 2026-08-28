@@ -31,10 +31,7 @@ sleeps idle apps); after that it's fast.
 ## Use it
 
 **🔍 Browse all** — search all ~4,300 pieces across every collection at
-once by composer or title, optionally narrowed by **Genre** (CRIM-only —
-it's the one collection that carries that metadata). The genre filter
-works with or without a text search, so "every CRIM motet" is a valid
-Browse query on its own. Pick a match, hit **Preview** to see
+once by composer or title. Pick a match, hit **Preview** to see
 its voice count and whether it has encoded text/lyrics before committing
 to anything heavier, or go straight to **Annotate**.
 
@@ -43,7 +40,10 @@ Or pick a piece from one collection directly:
   composer then a real title (e.g. "Missa Ad coenam Agni: Agnus I"), not
   an internal file id
 - **CRIM Project corpus** — 359 pieces: Lassus's parody masses plus the
-  motets/chansons/madrigals they're modeled on, live from crimproject.org
+  motets/chansons/madrigals they're modeled on, live from crimproject.org.
+  Filterable by **genre** (Motet/Madrigal/Mass movement/Chanson/...) —
+  the only one of the 7 collections where genre exists as real per-piece
+  data, so the filter lives here rather than on Browse.
 - **Josquin Research Project** — ~1340 pieces, 21 Franco-Flemish
   composers (Josquin, Ockeghem, Obrecht, la Rue, and more), live from
   their public GitHub repository
@@ -58,21 +58,29 @@ Or pick a piece from one collection directly:
 Or use **📤 Upload your own file**, right next to Browse, to bring your
 own score: MusicXML (`.xml`/`.musicxml`) or MEI (`.mei`).
 
-Every collection also has two checkboxes, both off by default (extra
-computation on top of cadence detection) — check whichever you want
-before hitting Annotate:
+Every collection has three independent checkboxes before hitting
+**Annotate**:
+- **"Annotate cadences"** — CRIM's `cadences()`, marked in red. On by
+  default, since it's this app's original and still-primary feature.
 - **"Also mark points of imitation"** — CRIM's `presentationTypes()`,
   which finds where a melodic subject enters in one voice and is
   imitated by others (a Point of Entry, Imitative Duo, or Fuga), marked
-  on the same score in blue alongside the cadences in red.
+  in blue. Off by default.
 - **"Also mark homorhythmic passages"** — CRIM's `homorhythm()`, which
   finds passages where two or more voices move together in the same
   rhythm while singing the same words (a chordal, declamatory texture),
-  marked in green.
+  marked in green. Off by default.
 
-Click **Annotate**, then download the resulting `.xml`. In-app expanders
-explain what the cadence labels mean and how the detector actually
-works, in case any of it isn't self-explanatory at a glance.
+Uncheck all three and hit Annotate anyway to just get the piece back
+unmodified — useful if all you want is this app's aggregated access to
+a piece (in real MusicXML, converted from whatever format its home
+collection actually ships) without any CRIM analysis at all. The
+download button and file name are honest about which case you're in
+("Download annotated MusicXML" vs. plain "Download MusicXML").
+
+In-app expanders explain what the cadence labels mean and how the
+detector actually works, in case any of it isn't self-explanatory at a
+glance.
 
 ## Run it locally
 
@@ -89,10 +97,13 @@ above is the one to share.
 ## How it works, briefly
 
 1. The score is parsed with [music21](https://www.music21.org/).
-2. CRIM's `.cadences(voice_detail=True)` is run on it, which — beyond the
+2. If **"Annotate cadences"** is checked (on by default), CRIM's
+   `.cadences(voice_detail=True)` is run on it, which — beyond the
    usual cadence type/tone/measure columns — also returns a `PartMap`:
    which staff performed each cadential role (Cantizans, Tenorizans,
-   Bassizans, ...) at each cadence.
+   Bassizans, ...) at each cadence. Unchecking it (along with the other
+   two checkboxes) skips CRIM entirely and hands back the parsed score
+   as-is.
 3. `annotate_cadences.py` uses `PartMap` to find the exact notes involved
    and colors them, and inserts a text label into the score's measure
    structure at the cadence's precise beat. Measure lookups are indexed
