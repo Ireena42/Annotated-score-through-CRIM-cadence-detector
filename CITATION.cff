@@ -19,3 +19,4 @@ authors:
 repository-code: "https://github.com/vclag/Renaissance-score-workbench"
 url: "https://renaissance-polyphony-research-toolkit.streamlit.app/"
 date-released: "2026-08-29"
+license: MIT

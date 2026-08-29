@@ -677,6 +677,10 @@ source code: [github.com/vclag/Renaissance-score-workbench](https://github.com/v
 citing CRIM Intervals/music21 above for the actual analysis methods --
 this repo has a `CITATION.cff` file; GitHub renders a "Cite this
 repository" button from it (APA/BibTeX) in the repo's own sidebar.
+
+This repo's own source code (not the musical data it aggregates, nor
+the third-party libraries above -- several of which are more
+restrictive) is [MIT-licensed](https://github.com/vclag/Renaissance-score-workbench/blob/master/LICENSE).
         """
     )
 

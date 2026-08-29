@@ -370,6 +370,10 @@ citing CRIM Intervals/music21 above for the actual analysis methods —
 this repo has a [`CITATION.cff`](CITATION.cff) file; GitHub renders a
 "Cite this repository" button from it (APA/BibTeX) in the sidebar.
 
+This repo's own source code (not the musical data it aggregates, nor
+the third-party libraries above — several of which are more
+restrictive) is [MIT-licensed](LICENSE).
+
 ## Notes
 
 - Humdrum (`.krn`) upload isn't offered in the "upload your own file" tab
