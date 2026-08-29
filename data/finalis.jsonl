@@ -1703,3 +1703,53 @@
 {"label": "[CRIM] Victoria, Tomás Luis de — Missa Ascendens Christus: Sanctus [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
 {"label": "[CRIM] Victoria, Tomás Luis de — Missa Ascendens Christus: Agnus Dei [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
 {"label": "[CRIM] Victoria, Tomás Luis de — Missa Ave Regina: Kyrie [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Ave Regina: Gloria [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Ave Regina: Credo [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Ave Regina: Sanctus [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Ave Regina: Agnus Dei [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Quam pulchri: Kyrie [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Quam pulchri: Gloria [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Quam pulchri: Credo [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Quam pulchri: Sanctus [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Quam pulchri: Agnus Dei [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Salve Regina: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Salve Regina: Gloria [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Salve Regina: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Salve Regina: Sanctus [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Salve Regina: Agnus Dei [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Trahe me: Kyrie [Mass movement]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Trahe me: Gloria [Mass movement]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Trahe me: Credo [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Trahe me: Sanctus [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM has this piece catalogued but no MEI file for it yet."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Trahe me: Agnus Dei [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM has this piece catalogued but no MEI file for it yet."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Vidi speciosam: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Vidi speciosam: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Vidi speciosam: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Vidi speciosam: Sanctus [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM has this piece catalogued but no MEI file for it yet."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Vidi speciosam: Agnus Dei [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM has this piece catalogued but no MEI file for it yet."}
+{"label": "[JRP] Agricola, Alexander — Missa In myne zin: Gloria", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Agricola, Alexander — Missa In myne zin: Credo", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Agricola, Alexander — Missa In myne zin: Sanctus", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Agricola, Alexander — Missa In myne zin: Agnus", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Agricola, Alexander — Missa Malheur me bat: Kyrie", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Agricola, Alexander — Missa Malheur me bat: Gloria", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Agricola, Alexander — Missa Malheur me bat: Credo", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Agricola, Alexander — Missa Malheur me bat: Sanctus", "collection": "jrp", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[JRP] Agricola, Alexander — Missa Malheur me bat: Agnus", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Agricola, Alexander — Jay beau heur", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Agricola, Alexander — Tout a par moy I", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Bergerette savoysienne: Kyrie Jena 32", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Bergerette savoysienne: Gloria Jena 32", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Bergerette savoysienne: Credo Jena 32", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Bergerette savoysienne: Sanctus Jena 32", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Bergerette savoysienne: Agnus Jena 32", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Sanctus Super iste puer magnus:  Munich 3154", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Lardant desir: Kyrie Cappella Sistina 51", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Lardant desir: Gloria Cappella Sistina 51", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Lardant desir: Credo Cappella Sistina 51", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Lardant desir: Sanctus Cappella Sistina 51", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Lardant desir: Agnus Cappella Sistina 51", "collection": "jrp", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Gross senen: Kyrie  Trent 89", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Gross senen: Gloria  Trent 89", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Gross senen: Credo  Trent 89", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Missa Gross senen: Sanctus  Trent 89", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
