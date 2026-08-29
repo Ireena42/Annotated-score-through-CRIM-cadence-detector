@@ -910,9 +910,24 @@ CRIM detected the shape of, but that doesn't fully "land," which is why
 rows like this often have a blank CadType (no complete standard pattern
 matched) rather than one of the named types above.
 
-Source: [CRIM Intervals' own documentation](https://github.com/HCDigitalScholarship/intervals)
-(`ImportedPiece.cadences`/`.cvfs` docstrings) -- reproduced here, not
-reinterpreted, so it stays accurate if CRIM's own definitions change.
+**References** -- the categories above aren't this app's own invention, or
+even CRIM's: the CVF names/roles are reproduced from
+[CRIM Intervals' own documentation](https://github.com/HCDigitalScholarship/intervals)
+(`ImportedPiece.cadences`/`.cvfs` docstrings), so this stays accurate if
+CRIM's own definitions change -- but CRIM itself is applying an existing
+musicological framework, not one it invented:
+- The Cantizans/Tenorizans/Bassizans/Altizans names are Bernhard Meier's
+  own Latin coinages for these voice-leading roles: Bernhard Meier, *Die
+  Tonarten der klassischen Vokalpolyphonie* (Utrecht: A. Oosthoek, 1974);
+  trans. Ellen S. Beebe, rev. by the author, as *The Modes of Classical
+  Vocal Polyphony: Described According to the Sources* (New York: Broude
+  Brothers, 1988).
+- The systematic classification into named cadence types (Authentic,
+  Phrygian, Clausula Vera, etc.) that CRIM's algorithm implements is
+  documented in Alexander Morgan, Daniel Russo-Batterham, and Richard
+  Freedman, ["Musicologists and Data Scientists Pull out all the Stops:
+  Defining Renaissance Cadences Systematically"](https://www.academia.edu/109443988/Musicologists_and_Data_Scientists_Pull_out_all_the_Stops_Defining_Renaissance_Cadences_Systematically)
+  (Music Encoding Conference, Halifax, Canada, 2022).
         """
     )
 
@@ -941,6 +956,14 @@ reason the two music21-bundled composers left out of the Composer
 dropdown above don't work here: their files are a single monophonic
 voice, full stop -- not "a 2-voice passage," genuinely no second voice
 to pair with, ever.)
+
+**Reference:** this pairwise, interval-progression approach to detecting
+cadences computationally is documented in Alexander Morgan, Daniel
+Russo-Batterham, and Richard Freedman, ["Musicologists and Data Scientists
+Pull out all the Stops: Defining Renaissance Cadences Systematically"](https://www.academia.edu/109443988/Musicologists_and_Data_Scientists_Pull_out_all_the_Stops_Defining_Renaissance_Cadences_Systematically)
+(Music Encoding Conference, Halifax, Canada, 2022) -- same paper as the
+cadence-labels expander above, since it covers both the categories and
+the detection method together.
         """
     )
 
@@ -989,6 +1012,19 @@ one file together), and the *first* entry of each instance gets a text
 label naming its type (e.g. `Imitative Entry`), placed above the top staff at that
 same beat -- same placement convention as cadence labels, so it always
 reads cleanly above the system regardless of which voice enters first.
+
+**References** -- "presentation types" and this specific three-way split
+(Point of Entry / Imitative Duo / Fuga) are Peter Schubert's own
+terminology, not CRIM's: Peter N. Schubert, *Modal Counterpoint,
+Renaissance Style* (New York: Oxford University Press, 1999). See also
+Julie E. Cumming and Peter Schubert, "The Origins of Pervasive
+Imitation," in *The Cambridge History of Fifteenth-Century Music*, ed.
+Anna Maria Busse Berger and Jesse Rodin (Cambridge: Cambridge University
+Press, 2015), chapter 12, for how this fits into the broader history of
+imitative texture in the repertoire. CRIM's own `presentationTypes()` is
+its computational implementation of Schubert's categories, not a new
+taxonomy of its own -- see [CRIM Intervals' own documentation](https://github.com/HCDigitalScholarship/intervals)
+for the code side of that.
         """
     )
 
@@ -1019,6 +1055,16 @@ imitation are blue, so all three survive on one file together), and one
 `Homorhythm` text label marks the start of each passage, placed above
 the top staff, higher than the cadence and points-of-imitation labels so
 none of the three ever overlap even when they coincide.
+
+**Reference:** unlike cadences (Meier) or presentation types (Schubert),
+"homorhythm" itself isn't a single scholar's coinage -- it's standard,
+widely-used musicological terminology for chordal, same-rhythm textures,
+so there's no one naming source to point to the way the other two
+expanders do. CRIM's own rhythm+lyrics n-gram method for detecting it
+computationally is part of the same project documented in Richard
+Freedman and David Fiala, ["Citations: The Renaissance Imitation Mass
+Project (CRIM)"](https://online.ucpress.edu/jams/article/77/3/863/203475/Citations-The-Renaissance-Imitation-Mass-Project),
+*Journal of the American Musicological Society* 77, no. 3 (2024): 863-875.
         """
     )
 
