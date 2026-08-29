@@ -21,22 +21,33 @@ against elsewhere). Every record notes which of the two produced its
 Finalis (`source`: 'cadence' or 'final_fallback'), or records an
 `error` with no guess at all rather than a silently wrong one.
 
-Run twice so far, both confirmed against the real GitHub Actions logs
-(not just assumed from a green checkmark): a 5-piece test run (correct
--- Agnus_00 came back 'G'/'cadence', matching this corpus's one
-hand-verified answer), then a full-corpus run that made steady progress
-(355 pieces in ~6 minutes, ~1/s) and then produced ZERO further
-progress for the remaining ~1h47m of a job that still exited with a
-clean "success" status -- meaning the process didn't crash, it just
-never returned from whatever it was doing on piece #356 (almost
-certainly a pathologically slow piece.cadences() call on some real
-piece with an unusual voice/measure count). PIECE_TIMEOUT_SECONDS (a
-signal.alarm-based per-piece timeout, added after diagnosing this) is
-the fix -- untested against a REAL hang yet, since it was written after
-the fact from log evidence, not reproduced locally, but the mechanism
-itself (signal.alarm + a caught exception) is standard and should work
-on the same ubuntu-latest runner. Re-running now resumes from piece
-#356 onward (see load_existing) with that protection in place.
+Run three times so far, each confirmed against real GitHub state (commit
+history, run/job timing) rather than just the green checkmark:
+1. A 5-piece test run (correct -- Agnus_00 came back 'G'/'cadence',
+   matching this corpus's one hand-verified answer).
+2. A full-corpus run that made steady progress (355 pieces in ~6
+   minutes) then produced ZERO further progress commits for the
+   remaining ~1h47m of a job that still exited "success" -- diagnosed at
+   the time as a hang on piece #356 with no per-piece timeout to catch
+   it. Added PIECE_TIMEOUT_SECONDS (signal.alarm) as the fix.
+3. A second full-corpus run, resuming from #356 with that timeout in
+   place, showed the exact same SHAPE of failure (steady progress --
+   405 to 1005 -- then silence for the remaining ~1h39m). This time the
+   cause was confirmed differently: cross-referencing GitHub's commit
+   history showed the repo owner's own machine pushed several unrelated
+   commits to master during that exact silent window. git_commit_progress
+   had no fetch/rebase before pushing, so the instant any other commit
+   landed on master first, its own push became a plain non-fast-forward
+   rejection -- and with no recovery logic, EVERY later attempt for the
+   rest of the run failed the same way, silently (by design, so a push
+   failure wouldn't crash the whole job). The script may well have kept
+   computing the whole time; it just could never persist any of it past
+   that point. Fixed by having git_commit_progress pull --rebase and
+   retry once on a rejected push (see its own docstring) -- this doesn't
+   rule out the ORIGINAL per-piece-hang theory being real too (both
+   fixes stay in place), but it's a fully sufficient explanation on its
+   own for everything observed in run 2, and is the more likely one of
+   the two given how precisely the timestamps line up.
 
 This is a genuinely long-running job for the full corpus -- likely many
 hours, almost certainly longer than a single GitHub Actions job's
@@ -218,19 +229,55 @@ def git_commit_progress(out_path, done_count, total_count):
     longer than a single CI job's own time limit, so if THIS invocation
     gets killed mid-run, the last periodic commit's progress survives
     for a following manual re-run to resume from (see load_existing).
-    Failures here are logged, not fatal -- the previous commit's
-    progress is still intact either way, and the next periodic attempt
-    (or the final one) just tries again."""
+
+    Real, observed failure this guards against, not a speculative one:
+    the second full-corpus run (2026-08-29) made steady progress (350
+    pieces committed in ~15 minutes) then produced ZERO further progress
+    commits for the remaining ~1h39m of a job that still exited with a
+    clean success status -- looking exactly like the FIRST run's hang,
+    but confirmed by a different mechanism this time: cross-referencing
+    commit timestamps/authors on GitHub showed the repo owner's own
+    local machine pushed several unrelated commits to master during that
+    exact window. `git push` with no prior fetch/rebase fails as a plain
+    non-fast-forward rejection the moment ANY other commit lands on the
+    remote first -- and since this function had no recovery from that,
+    EVERY later attempt for the rest of the run kept failing the same
+    way (silently caught below, by design, so the job wouldn't crash
+    over a push failure) even though the script itself may well have
+    kept computing pieces the whole time -- just never able to persist
+    them past that point. `git pull --rebase` re-syncs onto whatever
+    landed on origin and replays this commit on top before retrying the
+    push once; safe here since this job is the only writer to out_path,
+    so a real conflict on it would mean two precompute jobs running at
+    once, not a routine collision with unrelated work landing on master.
+    Failures even after that retry are logged, not fatal -- the local
+    commit still exists in this job's own worktree either way, and the
+    next periodic attempt (or the final one) tries the whole thing again."""
     try:
         subprocess.run(['git', 'add', str(out_path)], check=True)
         subprocess.run(
             ['git', 'commit', '-m', f'Finalis precompute progress: {done_count}/{total_count} pieces'],
             check=True,
         )
+    except subprocess.CalledProcessError as e:
+        print(f"[commit] commit step FAILED, continuing anyway: {e}", flush=True)
+        return
+
+    try:
         subprocess.run(['git', 'push'], check=True)
         print(f"[commit] pushed progress at {done_count}/{total_count}", flush=True)
+        return
+    except subprocess.CalledProcessError:
+        print("[commit] push rejected (probably behind origin -- something else "
+              "pushed to master meanwhile) -- pulling --rebase and retrying once", flush=True)
+
+    try:
+        subprocess.run(['git', 'pull', '--rebase'], check=True)
+        subprocess.run(['git', 'push'], check=True)
+        print(f"[commit] pushed progress at {done_count}/{total_count} (after rebase)", flush=True)
     except subprocess.CalledProcessError as e:
-        print(f"[commit] FAILED, continuing anyway (progress is still on disk): {e}", flush=True)
+        print(f"[commit] FAILED even after rebase, continuing anyway "
+              f"(progress is still committed locally in this job's worktree): {e}", flush=True)
 
 
 def main():
