@@ -44,19 +44,38 @@ def cadence_label(row):
 
 
 def _measure_index(part):
-    """{measure_number: Measure} for one part, built in a single pass.
+    """{measure_position: Measure} for one part, built in a single pass --
+    keyed by POSITION (1st Measure object = 1, 2nd = 2, ...), NOT by each
+    Measure's own encoded .number attribute. This has to match whatever
+    convention crim_intervals' own 'Measure' column in cadences()/
+    presentationTypes()/homorhythm() actually uses, and CRIM does not use
+    the score's encoded numbers at all: its measures() (main_objs.py) calls
+    part.makeMeasures() and reads .measureNumber off THAT freshly-rebuilt
+    sequence, which numbers 1, 2, 3, ... with no gaps regardless of what
+    the original encoding said. For most pieces the encoded .number
+    already happens to be exactly positional (1, 2, 3, ...), so keying by
+    .number looked fine and even seemed independently verified (see git
+    history for this function) -- but that check only ever compared
+    against music21's own part.measure(n), which ALSO keys by .number, so
+    it could never have caught this. It surfaces on any piece whose
+    encoded numbers aren't already positional -- confirmed directly on a
+    real one: Palestrina's 'Kyrie_b.krn' (the Christe, split out of the
+    full Kyrie into its own file) keeps the ORIGINAL piece's numbering
+    (1, 30, 31, ... 55) instead of restarting at 1, so every single
+    cadence CRIM found in it used to fail to place (100% missed_label on
+    that piece, not the "rare" case the caller-facing message describes).
+    Confirmed the positional and .makeMeasures()-derived sequences line up
+    one-to-one in count and order on that same piece before landing on
+    this fix, not assumed.
 
-    Exists because repeatedly calling part.measure(n) is expensive and
+    Also exists because repeatedly calling part.measure(n) is expensive and
     scales badly: measured directly on a 123-measure/6-voice piece, 200
     varying-argument calls took ~6s, and the annotation step for that
     piece's 52 cadences (which calls the equivalent of .measure() several
     times per cadence -- once per cadential-role voice, plus once for the
     label) took 13+ seconds total, dwarfing every other stage of the
-    pipeline (fetch+parse+cadence-detection combined: ~5s). Verified this
-    index produces identical results to part.measure(n) across every
-    measure of a real piece (0 mismatches, exact object identity) before
-    switching to it -- not just assumed equivalent."""
-    return {m.number: m for m in part.getElementsByClass('Measure')}
+    pipeline (fetch+parse+cadence-detection combined: ~5s)."""
+    return {i: m for i, m in enumerate(part.getElementsByClass('Measure'), start=1)}
 
 
 def find_note_at_beat(measure, beat, tol=BEAT_TOLERANCE):

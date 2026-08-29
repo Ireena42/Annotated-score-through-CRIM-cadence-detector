@@ -750,6 +750,7 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
     if st.button(
         "📄 Build annotated PDF" if annotated else "📄 Build PDF",
         key=f"{key_prefix}_pdf_build",
+        type="primary",
     ):
         with st.spinner(_random_loading_message()):
             try:
@@ -1749,6 +1750,10 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
         st.write(f"**Has encoded text/lyrics:** {has_text_display}")
         if note:
             st.caption(note)
+    # Keyed by tab AND piece (not just key_prefix) so switching the "Pick
+    # one" dropdown to a different piece without re-clicking Analyze doesn't
+    # keep showing a stale result for the previous one.
+    result_key = f"{key_prefix}_{filename_stem}_result"
     if col2.button(action_label, key=f"annotate_{key_prefix}", type="primary"):
         with st.spinner(_random_loading_message()):
             try:
@@ -1767,13 +1772,24 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
                 # this fix existed.
                 annotated_score, stats, error = None, None, f"Unexpected error analyzing this piece: {e}"
         if error:
+            st.session_state.pop(result_key, None)
             st.error(error)
         else:
-            show_result(
-                annotated_score, stats, filename_stem, include_cadences=include_cadences,
-                include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
-                key_prefix=key_prefix,
-            )
+            st.session_state[result_key] = (annotated_score, stats, include_cadences, include_ptypes, include_homorhythm)
+
+    # Rendered from session_state, OUTSIDE the button's own if-block --
+    # Streamlit only returns True from a button on the exact rerun it was
+    # clicked in, so a widget nested inside show_result() (the "Build PDF"
+    # button) would otherwise make the *entire* result -- including itself --
+    # vanish the moment it's clicked, since that rerun sees col2.button(...)
+    # as False again. Confirmed live: this was the actual cause of "clicked
+    # Build PDF and nothing happened," not a LilyPond/PDF-specific bug.
+    if result_key in st.session_state:
+        stored_score, stored_stats, stored_cad, stored_pt, stored_hr = st.session_state[result_key]
+        show_result(
+            stored_score, stored_stats, filename_stem, include_cadences=stored_cad,
+            include_ptypes=stored_pt, include_homorhythm=stored_hr, key_prefix=key_prefix,
+        )
 
 
 
@@ -2054,6 +2070,12 @@ with tab_upload:
     # Same reasoning as render_preview_and_annotate's action_label -- see
     # that comment for why this isn't just always "Download".
     action_label_upload = "Analyze" if (include_cadences_upload or include_ptypes_upload or include_homorhythm_upload) else "Download"
+    # Same session_state pattern as render_preview_and_annotate -- see its
+    # comment for why show_result() can't be rendered directly inside this
+    # button's own if-block once it contains a nested button (Build PDF).
+    # Keyed by the uploaded file's own name so a different upload doesn't
+    # keep showing a stale previous result.
+    upload_result_key = f"upload_{uploaded.name}_result" if uploaded is not None else None
     if uploaded is not None and st.button(action_label_upload, key="annotate_upload", type="primary"):
         with st.spinner(_random_loading_message()):
             # Decoding to text and handing the STRING (not a file path) to
@@ -2072,12 +2094,19 @@ with tab_upload:
             except Exception as e:
                 annotated_score, stats, error = None, None, f"Unexpected error analyzing this piece: {e}"
         if error:
+            st.session_state.pop(upload_result_key, None)
             st.error(error)
         else:
-            show_result(
-                annotated_score, stats, Path(uploaded.name).stem, include_cadences=include_cadences_upload,
-                include_ptypes=include_ptypes_upload, include_homorhythm=include_homorhythm_upload,
+            st.session_state[upload_result_key] = (
+                annotated_score, stats, include_cadences_upload, include_ptypes_upload, include_homorhythm_upload,
             )
+
+    if upload_result_key is not None and upload_result_key in st.session_state:
+        stored_score, stored_stats, stored_cad, stored_pt, stored_hr = st.session_state[upload_result_key]
+        show_result(
+            stored_score, stored_stats, Path(uploaded.name).stem, include_cadences=stored_cad,
+            include_ptypes=stored_pt, include_homorhythm=stored_hr,
+        )
 
 with tab_corpus:
     composer_name = st.selectbox("Composer", sorted(CORPUS_COMPOSERS.keys()))
