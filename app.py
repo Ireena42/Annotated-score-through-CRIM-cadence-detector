@@ -23,6 +23,7 @@ Streamlit, not a bug; it's why there's no explicit event-loop code below.
 import csv
 import html
 import io
+import random
 import re
 import sys
 import zipfile
@@ -88,6 +89,27 @@ st.markdown(
        st.metric in this app (checked directly), so scoping this
        narrower isn't needed. */
     [data-testid="stMetricValue"] { font-size: 1.5rem; }
+    /* Custos hover -- a small manuscript guide-mark that appears next
+       to a button's label on hover, approved from the widget-ideas
+       preview. Applied broadly to every button (checked directly:
+       "stBaseButton-secondary" is the real, stable data-testid this
+       app's own buttons render with), not narrowed to just Analyze/
+       Download specifically -- Streamlit doesn't expose a per-button
+       CSS hook based on its own label text, so narrowing further isn't
+       reliably possible without risking it silently matching nothing.
+       A pure-CSS ::after pseudo-element (not a JS-inserted sibling
+       node), so it isn't affected by Streamlit's own React re-renders.
+       Same custos path as the favicon/divider above, inlined as an SVG
+       data URI since a CSS background-image can't reference this
+       file's own <symbol> definitions. */
+    [data-testid^="stBaseButton"]:hover::after {
+        content: "";
+        display: inline-block;
+        width: 15px; height: 11px;
+        margin-left: 7px;
+        vertical-align: middle;
+        background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 24'%3E%3Cpath d='M4 20 L14 4 L20 14 L28 4' fill='none' stroke='%233d1620' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -1510,6 +1532,37 @@ def _bulk_zip_bytes(matches, progress_callback=None):
     return buf.getvalue(), failed
 
 
+# Flavor text for the Analyze/Download button's own spinner -- purely
+# decorative, picked together with the user from a larger brainstormed
+# list (the rest were deliberately cut, not forgotten -- see this
+# project's own conversation history). Real music-theory/notation
+# terms throughout, not generic "loading..." filler: counterpoint,
+# meantone temperament (tempering the syntonic comma is literally how
+# meantone works, not a generic "tuning" reference), mensural notation
+# (ligatures, breves, perfect/imperfect mensuration), and solmization
+# (the hexachord).
+_ANALYZE_LOADING_MESSAGES = [
+    "Untangling counterpoint...",
+    "Splitting the comma...",
+    "Untying the ligatures...",
+    "Balancing the voices...",
+    "Coloring the breves...",
+    "Checking for parallel fifths...",
+    "Negotiating the hexachord...",
+    "Weighing the perfect and imperfect...",
+]
+
+
+def _random_loading_message():
+    """One random line from _ANALYZE_LOADING_MESSAGES for the Analyze/
+    Download button's own spinner -- a fresh pick per click via
+    random.choice, not a fixed rotation: Streamlit reruns the whole
+    script on every interaction (see this file's own module docstring),
+    so there's no persistent state across reruns to cycle through
+    anyway without extra machinery this doesn't need."""
+    return random.choice(_ANALYZE_LOADING_MESSAGES)
+
+
 def render_preview_and_annotate(collection, native_ref, piece_label, filename_stem, key_prefix=None):
     """Two-column Preview/Download buttons -- shared by every dedicated
     collection tab AND Browse (same layout, same underlying calls), so a
@@ -1557,7 +1610,7 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
         if note:
             st.caption(note)
     if col2.button(action_label, key=f"annotate_{key_prefix}"):
-        with st.spinner(f"Downloading and parsing {piece_label}..."):
+        with st.spinner(_random_loading_message()):
             try:
                 annotated_score, stats, error = annotate_by_collection(
                     collection, native_ref, include_cadences=include_cadences,
@@ -1582,6 +1635,27 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
             )
 
 
+
+# One-time flourish marking "intro/credits is over, the actual app
+# starts here" -- deliberately placed ONCE, at this one real boundary,
+# not scattered as a general-purpose divider elsewhere (a decorative
+# element repeated throughout the page reads as clutter fast -- see
+# this project's own conversation history on why the "featured piece"
+# widget idea was dropped for exactly that risk). Reuses three of the
+# same mensural notehead shapes as the favicon (breve/void semibreve/
+# minim), not new art.
+st.markdown(
+    """
+    <div style="display:flex; align-items:center; justify-content:center; gap:0.9rem; margin:1.6rem 0; color:#a8451f; opacity:0.85;">
+        <div style="flex:1; max-width:90px; height:1px; background:#f0dfc4;"></div>
+        <svg width="20" height="20" viewBox="0 0 40 24"><rect x="4" y="4" width="32" height="16" fill="currentColor"/></svg>
+        <svg width="20" height="20" viewBox="0 0 32 24"><polygon points="16,3 28,12 16,21 4,12" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+        <svg width="20" height="20" viewBox="0 0 32 64"><polygon points="16,34 28,44 16,54 4,44" fill="currentColor"/><line x1="27" y1="44" x2="27" y2="4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        <div style="flex:1; max-width:90px; height:1px; background:#f0dfc4;"></div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 # "Upload your own file" is 2nd, right after Browse -- NOT last, where it
 # used to sit: as the 8th of 8 tabs it fell past the visible tab-bar width
@@ -1829,7 +1903,7 @@ with tab_upload:
     # that comment for why this isn't just always "Download".
     action_label_upload = "Analyze" if (include_cadences_upload or include_ptypes_upload or include_homorhythm_upload) else "Download"
     if uploaded is not None and st.button(action_label_upload, key="annotate_upload"):
-        with st.spinner("Parsing upload..."):
+        with st.spinner(_random_loading_message()):
             # Decoding to text and handing the STRING (not a file path) to
             # music21/CRIM is the same pattern crim_intervals' own code
             # documents for "user-supplied piece in streamlit" (see this
