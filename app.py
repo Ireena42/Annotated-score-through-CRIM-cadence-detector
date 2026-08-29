@@ -569,13 +569,55 @@ def score_to_pdf_bytes(score):
     -- read that back to bytes, then clean up both the .pdf and the .ly
     music21 leaves behind next to it (neither is auto-deleted).
     """
-    pdf_path = Path(score.write('lily.pdf'))
+    try:
+        pdf_path = Path(score.write('lily.pdf'))
+    except Exception as exc:
+        # LilyPond's own translator can choke on a Note/Rest/Chord with a
+        # literally zero-typed duration (confirmed real: music21's lily/
+        # translate.py raises this exact "Cannot translate an object of
+        # zero duration" message from deep inside its own stream-walking
+        # code, with no indication of WHERE). Rather than let that bare,
+        # unlocatable message reach the user again, re-scan the score
+        # ourselves for the same condition and name exactly which
+        # part/measure it's in -- confirmed this is the one music21 error
+        # message worth enriching this way (every other failure mode seen
+        # so far -- missing lilypond binary, etc. -- already names itself
+        # clearly).
+        if 'zero duration' in str(exc):
+            locations = _locate_zero_duration_notes(score)
+            if locations:
+                raise RuntimeError(
+                    f"{exc} -- found in: {'; '.join(locations)}. This is "
+                    "content in the score itself (not something this app's "
+                    "annotation added), and LilyPond can't typeset it."
+                ) from exc
+        raise
     ly_path = pdf_path.with_suffix('')  # strips the trailing .pdf, leaving the .ly path
     try:
         return pdf_path.read_bytes()
     finally:
         pdf_path.unlink(missing_ok=True)
         ly_path.unlink(missing_ok=True)
+
+
+def _locate_zero_duration_notes(score, limit=5):
+    """Finds every Note/Rest/Chord whose duration.type is literally 'zero'
+    (not just quarterLength == 0 -- a real grace note also has
+    quarterLength 0 but keeps a normal duration.type like 'eighth', so this
+    doesn't flag those) and describes where each one is, for
+    score_to_pdf_bytes()'s error message above. Returns at most `limit`
+    location strings (a piece could in principle have many; the point is
+    naming enough to find the passage, not an exhaustive list)."""
+    locations = []
+    for part_idx, part in enumerate(score.parts):
+        for el in part.recurse().notesAndRests:
+            if el.duration.type == 'zero':
+                locations.append(
+                    f"part {part_idx + 1}, measure {el.measureNumber}, {el.classes[0]}"
+                )
+                if len(locations) >= limit:
+                    return locations
+    return locations
 
 
 # One sentence per analysis, written to read naturally whether one or all
