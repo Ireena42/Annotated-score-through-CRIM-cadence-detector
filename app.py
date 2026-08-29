@@ -546,78 +546,65 @@ def score_to_download_bytes(score):
 
 
 def score_to_pdf_bytes(score):
-    """PDF export via music21's LilyPond backend (score.write('lily.pdf')) --
-    the only PDF path realistic to run headlessly on Streamlit Cloud. music21
-    also has a MuseScore-based PDF path (write('musicxml.pdf')), but that
-    needs a full MuseScore install plus a working Qt/X11 stack -- much
-    heavier and flakier to get running in a bare container than LilyPond,
-    which is a plain apt package (see packages.txt) built for exactly this
-    kind of headless/batch typesetting. Confirmed by reading music21's own
-    subConverters.py/lily/translate.py directly, not assumed.
+    """PDF export via Verovio -- replaces an earlier attempt that went
+    through music21's own LilyPond backend (score.write('lily.pdf')).
+    That path had two real, confirmed problems, not just a style
+    preference: every cadential note rendered in the SAME red regardless
+    of which analysis actually colored it, and the cadence-type text
+    labels (TextExpression) were silently dropped entirely -- music21's
+    LilyPond translator re-derives its own from-scratch .ly markup from
+    the Score object, and has real gaps in that translation. It also
+    could crash outright on a zero-duration Note/Rest/Chord already
+    present in some piece's own encoding (a separate, real bug in that
+    translation layer, unrelated to this app's own annotation).
 
-    This is a genuinely different rendering engine than MuseScore/Finale/
-    Dorico -- page layout, spacing, and how CRIM's own TextExpression
-    annotations render will look different from opening the MusicXML in one
-    of those. Not a bug, just a different engraver. This path is new and
-    hasn't been exercised on every piece in the corpus yet, so callers should
-    let a failure surface to the user rather than assume it always succeeds.
+    Verovio sidesteps all of that by reading the SAME already-correct
+    MusicXML the "Download MusicXML" button offers (via
+    score_to_download_bytes) -- the exact <notehead color="..."> and
+    <words> content MuseScore/Finale/Dorico already display correctly --
+    instead of re-deriving its own notation from the music21 object
+    model. Confirmed directly on a real annotated piece: the exact color
+    used for cadence notes (#CC3333) and the literal label text
+    ("Authentic -> G") both come through correctly in Verovio's output,
+    nothing else tinted. It's also a strictly simpler dependency: pure
+    pip packages (verovio/svglib/reportlab), no system binary and no
+    packages.txt entry, unlike LilyPond -- and crim_intervals already
+    depends on verovio itself for its own verovioCadences()/
+    verovioPrintExample() Jupyter helpers, so this isn't a new library
+    to the project, just a new use of one already installed.
 
-    Like score_to_download_bytes, this needs a real file path (music21 shells
-    out to the `lilypond` binary internally, via os.system) rather than an
-    in-memory buffer. score.write('lily.pdf') picks its own temp .ly path and
-    returns the resulting <name>.ly.pdf path (music21's own naming, not ours)
-    -- read that back to bytes, then clean up both the .pdf and the .ly
-    music21 leaves behind next to it (neither is auto-deleted).
+    Verovio only renders to SVG, one page at a time, not directly to
+    PDF -- so each page is converted to a reportlab Drawing (svglib) and
+    drawn onto its own page of one PDF via reportlab's own vector
+    renderer (renderPDF, not the raster renderPM path -- that needs a
+    native rlPyCairo/PIL backend this environment doesn't have, and
+    isn't needed for a vector format like PDF anyway, confirmed directly).
     """
-    try:
-        pdf_path = Path(score.write('lily.pdf'))
-    except Exception as exc:
-        # LilyPond's own translator can choke on a Note/Rest/Chord with a
-        # literally zero-typed duration (confirmed real: music21's lily/
-        # translate.py raises this exact "Cannot translate an object of
-        # zero duration" message from deep inside its own stream-walking
-        # code, with no indication of WHERE). Rather than let that bare,
-        # unlocatable message reach the user again, re-scan the score
-        # ourselves for the same condition and name exactly which
-        # part/measure it's in -- confirmed this is the one music21 error
-        # message worth enriching this way (every other failure mode seen
-        # so far -- missing lilypond binary, etc. -- already names itself
-        # clearly).
-        if 'zero duration' in str(exc):
-            locations = _locate_zero_duration_notes(score)
-            if locations:
-                raise RuntimeError(
-                    f"{exc} -- found in: {'; '.join(locations)}. This is "
-                    "content in the score itself (not something this app's "
-                    "annotation added), and LilyPond can't typeset it."
-                ) from exc
-        raise
-    ly_path = pdf_path.with_suffix('')  # strips the trailing .pdf, leaving the .ly path
-    try:
-        return pdf_path.read_bytes()
-    finally:
-        pdf_path.unlink(missing_ok=True)
-        ly_path.unlink(missing_ok=True)
+    import verovio
+    from svglib.svglib import svg2rlg
+    from reportlab.graphics import renderPDF
+    from reportlab.pdfgen import canvas as pdf_canvas
 
+    xml_bytes = score_to_download_bytes(score)
+    tk = verovio.toolkit()
+    if not tk.loadData(xml_bytes.decode('utf-8')):
+        raise RuntimeError("Verovio couldn't parse this piece's MusicXML.")
+    tk.setOptions({"adjustPageHeight": True, "pageWidth": 1500, "scale": 40})
+    page_count = tk.getPageCount()
 
-def _locate_zero_duration_notes(score, limit=5):
-    """Finds every Note/Rest/Chord whose duration.type is literally 'zero'
-    (not just quarterLength == 0 -- a real grace note also has
-    quarterLength 0 but keeps a normal duration.type like 'eighth', so this
-    doesn't flag those) and describes where each one is, for
-    score_to_pdf_bytes()'s error message above. Returns at most `limit`
-    location strings (a piece could in principle have many; the point is
-    naming enough to find the passage, not an exhaustive list)."""
-    locations = []
-    for part_idx, part in enumerate(score.parts):
-        for el in part.recurse().notesAndRests:
-            if el.duration.type == 'zero':
-                locations.append(
-                    f"part {part_idx + 1}, measure {el.measureNumber}, {el.classes[0]}"
-                )
-                if len(locations) >= limit:
-                    return locations
-    return locations
+    buffer = io.BytesIO()
+    canvas = None
+    for page in range(1, page_count + 1):
+        svg = tk.renderToSVG(page)
+        drawing = svg2rlg(io.BytesIO(svg.encode('utf-8')))
+        if canvas is None:
+            canvas = pdf_canvas.Canvas(buffer, pagesize=(drawing.width, drawing.height))
+        else:
+            canvas.setPageSize((drawing.width, drawing.height))
+        renderPDF.draw(drawing, canvas, 0, 0)
+        canvas.showPage()
+    canvas.save()
+    return buffer.getvalue()
 
 
 # One sentence per analysis, written to read naturally whether one or all
@@ -780,39 +767,39 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
         type="primary",
     )
 
-    # PDF, via LilyPond -- see score_to_pdf_bytes()'s own docstring for why
-    # this is a separate engraver from MuseScore/Finale and looks different.
-    # Built on its own button rather than eagerly alongside the MusicXML
-    # above: LilyPond typesetting takes real time (a few seconds, not
-    # instant), and Streamlit re-runs this whole function on every later
-    # interaction on the page -- eagerly computing it here would redo that
-    # work on every unrelated click, unlike the near-instant MusicXML bytes.
-    # Same on-demand "Build ... then download" pattern already used for the
-    # ZIP/bulk-analysis exports in Browse, not a new convention.
-    if st.button(
-        "📄 Build annotated PDF" if annotated else "📄 Build PDF",
-        key=f"{key_prefix}_pdf_build",
-        type="primary",
-    ):
+    # PDF, via Verovio -- see score_to_pdf_bytes()'s own docstring. A single
+    # Download button, not a separate Build-then-Download step -- computed
+    # once per analysis result and cached in session_state (keyed off the
+    # same key_prefix this whole result is already stored under, so a fresh
+    # Analyze naturally invalidates it) rather than recomputed on every
+    # later, unrelated rerun the way an uncached call under st.download_button
+    # would be (Streamlit reruns this whole function on every interaction on
+    # the page). The tradeoff, and the reason this wasn't done from the
+    # start: the PDF now renders automatically right after Analyze (with a
+    # spinner, like everywhere else that waits) instead of only on request.
+    pdf_cache_key = f"{key_prefix}_pdf"
+    if pdf_cache_key not in st.session_state:
         with st.spinner(_random_loading_message()):
             try:
-                pdf_bytes = score_to_pdf_bytes(annotated_score)
+                st.session_state[pdf_cache_key] = {'bytes': score_to_pdf_bytes(annotated_score), 'error': None}
             except Exception as exc:
-                pdf_bytes = None
-                st.error(
-                    "Couldn't render a PDF for this piece via LilyPond "
-                    f"({exc}). The MusicXML download above is unaffected -- "
-                    "open it directly in MuseScore, Finale, or Dorico instead."
-                )
-        if pdf_bytes:
-            st.download_button(
-                "Download annotated PDF" if annotated else "Download PDF",
-                data=pdf_bytes,
-                file_name=f"{filename_stem}_annotated.pdf" if annotated else f"{filename_stem}.pdf",
-                mime="application/pdf",
-                key=f"{key_prefix}_pdf_download",
-                type="primary",
-            )
+                st.session_state[pdf_cache_key] = {'bytes': None, 'error': str(exc)}
+    cached_pdf = st.session_state[pdf_cache_key]
+    if cached_pdf['error']:
+        st.error(
+            f"Couldn't render a PDF for this piece ({cached_pdf['error']}). "
+            "The MusicXML download above is unaffected -- open it directly "
+            "in MuseScore, Finale, or Dorico instead."
+        )
+    else:
+        st.download_button(
+            "Download annotated PDF" if annotated else "Download PDF",
+            data=cached_pdf['bytes'],
+            file_name=f"{filename_stem}_annotated.pdf" if annotated else f"{filename_stem}.pdf",
+            mime="application/pdf",
+            key=f"{key_prefix}_pdf_download",
+            type="primary",
+        )
 
 
 with st.expander("ℹ️ Credits & data sources"):

@@ -158,16 +158,19 @@ collection actually ships) without any CRIM analysis at all. The
 download button and file name are honest about which case you're in
 ("Download annotated MusicXML" vs. plain "Download MusicXML").
 
-A **"📄 Build annotated PDF"** button sits right below the MusicXML
-download (same "annotated" vs. plain wording) — click it to typeset the
-same score as a PDF via music21's LilyPond backend and get a second
-download button once it's ready. This is a genuinely different engraver
-from MuseScore/Finale/Dorico (LilyPond is the only PDF path realistic to
-run headlessly on Streamlit Cloud — MuseScore needs a full Qt/X11 stack),
-so page layout, spacing, and how CRIM's own annotations render will look
-different from opening the MusicXML in one of those — not a bug, just a
-different renderer. It's a separate button rather than automatic because
-LilyPond typesetting takes a few real seconds, not instant.
+A **"Download annotated PDF"** button sits right below the MusicXML
+download (same "annotated" vs. plain wording), rendered via
+[Verovio](https://www.verovio.org/) — the same MEI/MusicXML engraving
+library CRIM Intervals itself already uses for its own Jupyter helpers,
+so this isn't a new dependency to the project. It reads the exact same
+MusicXML the download above offers, so cadence colors and text labels
+come through correctly (an earlier version went through music21's own
+LilyPond backend instead, which re-derived its own notation from scratch
+and had real gaps — every cadential note came out the same red regardless
+of which analysis colored it, and the text labels were dropped entirely;
+not a page-layout quirk, an actual translation bug). The PDF is built
+automatically the first time it's needed and cached for the rest of the
+session, so later clicks don't re-render it.
 
 Whenever at least one analysis actually finds something, a small strip
 plot shows where each event falls across the piece (0 = start, 1 =
