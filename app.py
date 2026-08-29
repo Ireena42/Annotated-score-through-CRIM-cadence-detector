@@ -1570,6 +1570,49 @@ def _import_piece_by_collection(collection, native_ref):
 # originally came from. Revisit once real timing is in.
 BULK_ANALYSIS_MAX_MATCHES = 15
 
+# Tighter than BULK_ANALYSIS_MAX_MATCHES: a PDF isn't just CRIM analysis,
+# it's analysis PLUS a real Verovio render + reportlab page-assembly per
+# piece (measured directly on a single real piece earlier this project:
+# ~5-6s for a modest 4-page score, more for larger ones) -- meaningfully
+# heavier than the CSV export's per-piece cost, which is just dataframe
+# work. Also provisional/not benchmarked live at this exact number, same
+# honesty as the CSV cap above.
+BULK_PDF_ZIP_MAX_MATCHES = 10
+
+
+def _bulk_pdf_zip_bytes(matches, include_cadences, include_ptypes, include_homorhythm, progress_callback=None):
+    """Runs the checked analyses on every match (same annotate_by_collection
+    call the CSV export and single-piece Analyze both already use) and
+    renders each one to an annotated PDF via score_to_pdf_bytes -- the same
+    function and same Verovio path the single-piece "Download PDF" button
+    uses, just looped and zipped instead of offered one at a time. Returns
+    (zip_bytes, failed) where `failed` is a list of (label, reason) for any
+    piece that couldn't be fetched/analyzed/rendered -- skipped rather than
+    aborting the whole batch, same convention as _bulk_zip_bytes/
+    _bulk_analysis_csv_bytes. progress_callback(index, total, label), if
+    given, is called right before each piece starts."""
+    buf = io.BytesIO()
+    failed = []
+    with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for i, (label, collection, native_ref) in enumerate(matches):
+            if progress_callback:
+                progress_callback(i, len(matches), label)
+            try:
+                score, _stats, error = annotate_by_collection(
+                    collection, native_ref, include_cadences=include_cadences,
+                    include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
+                )
+                if error:
+                    raise RuntimeError(error)
+                pdf_bytes = score_to_pdf_bytes(score)
+            except Exception as e:
+                failed.append((label, str(e)))
+                continue
+            stem = _browse_piece_filename_stem(collection, native_ref)
+            annotated = include_cadences or include_ptypes or include_homorhythm
+            zf.writestr(f'{stem}_annotated.pdf' if annotated else f'{stem}.pdf', pdf_bytes)
+    return buf.getvalue(), failed
+
 
 def _bulk_analysis_csv_bytes(matches, include_cadences, include_ptypes, include_homorhythm, progress_callback=None):
     """Runs whichever of CRIM's cadences()/presentationTypes()/
@@ -2165,6 +2208,48 @@ with tab_browse:
                             key=f"browse_bulk_download_{analysis_key}",
                             type="primary",
                         )
+
+            # Same checkboxes as the CSV export above, not a separate set --
+            # a PDF only makes sense as a picture of what got annotated onto
+            # it, so it shares exactly what "checked" means with the CSV
+            # export rather than asking the same question twice.
+            if len(matches) > BULK_PDF_ZIP_MAX_MATCHES:
+                st.caption(
+                    f"📄 Bulk PDF export works for up to {BULK_PDF_ZIP_MAX_MATCHES} matches at "
+                    f"once (this search has {len(matches)}) -- narrow the search to enable it."
+                )
+            elif not (bulk_cadences or bulk_ptypes or bulk_hr):
+                st.caption("Check at least one analysis above to enable the bulk PDF export.")
+            elif st.button(f"📄 Build a ZIP of all {len(matches)} piece(s) as annotated PDFs", key="browse_pdf_zip_build", type="primary"):
+                progress_bar = st.progress(0.0)
+                status = st.empty()
+
+                def _update_pdf_zip_progress(i, total, label):
+                    progress_bar.progress(i / total)
+                    status.caption(f"Rendering {i + 1}/{total}: {label}")
+
+                with st.spinner(_random_loading_message()):
+                    pdf_zip_bytes, failed = _bulk_pdf_zip_bytes(
+                        matches, bulk_cadences, bulk_ptypes, bulk_hr,
+                        progress_callback=_update_pdf_zip_progress,
+                    )
+                progress_bar.progress(1.0)
+                status.empty()
+
+                if failed:
+                    detail = "; ".join(f"{label} ({reason})" for label, reason in failed[:5])
+                    st.warning(
+                        f"{len(failed)} of {len(matches)} piece(s) couldn't be included and were "
+                        f"skipped: {detail}" + (", ..." if len(failed) > 5 else "")
+                    )
+                st.download_button(
+                    f"Download ZIP ({len(matches) - len(failed)} PDF(s))",
+                    data=pdf_zip_bytes,
+                    file_name="browse_results_pdfs.zip",
+                    mime="application/zip",
+                    key="browse_pdf_zip_download",
+                    type="primary",
+                )
 
             st.divider()
             st.markdown(

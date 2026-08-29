@@ -80,9 +80,18 @@ real per-piece CRIM computation on top of the fetch, so it's capped
 tighter than the ZIP (15 matches) — a provisional cap, not yet
 benchmarked live the way the ZIP's 30 was.
 
+Right below that, using the exact same checkboxes (a PDF is a picture of
+whatever got annotated, so it shares what "checked" means with the CSV
+export rather than asking twice) — **"📄 Build a ZIP of all N piece(s)
+as annotated PDFs"** — runs the checked analyses and renders each match
+to PDF via the same [Verovio](https://www.verovio.org/) path the
+single-piece "Download PDF" button uses, then zips them all together.
+Real analysis *and* a real render per piece, so it's capped tighter
+still (10 matches) — also provisional, not yet benchmarked live.
+
 Handy for "give me every Josquin piece across all 7 collections to
 analyze myself" — search "Josquin", download the CSV (or, narrowed
-further, the ZIP or the analysis-data CSVs).
+further, the ZIP, the analysis-data CSVs, or the annotated PDFs).
 
 No search at all needed for the **whole corpus's metadata** either (not
 the scores themselves): a **"📦 Download the whole corpus metadata"**
