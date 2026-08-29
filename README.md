@@ -64,19 +64,23 @@ Handy for "give me every Josquin piece across all 7 collections to
 analyze myself" — search "Josquin", download the CSV (or, narrowed
 further, the ZIP).
 
-No search at all needed for the **whole corpus's metadata** (not the
-scores themselves): a **"📦 Download the whole corpus metadata"**
-expander sits right below the search box, with the same CSV manifest
-(all ~4,300 pieces, all 7 collections at once), a
-small per-collection piece-count CSV, a per-collection *composer*-count
-CSV (how many pieces each composer has *within* their own collection —
-not merged across collections, since composer spelling isn't consistent
-between them), and a composer word cloud sized by piece count across
-the whole corpus — this one *does* merge across collections, since it's
-illustrative rather than a precise count (the same composer can
-genuinely appear twice, spelled two different ways, which is visible in
-the cloud itself, not hidden). Useful for scoping a study before you've
-decided what to search for.
+A composer word cloud across all ~4,300 pieces, all 7 collections
+merged, sized by piece count, renders right at the top of this tab —
+no search, no click, no expander needed. It merges composers across
+collections purely for a visual overview, not a precise count (the
+same composer can genuinely appear twice, spelled two different ways —
+visible in the cloud itself, not hidden). Useful for a first sense of
+scope before you've decided what to search for.
+
+No search at all needed for the **whole corpus's metadata** either (not
+the scores themselves): a **"📦 Download the whole corpus metadata"**
+expander sits right below the search box, with a CSV manifest (all
+~4,300 pieces, all 7 collections at once, same columns as a search
+result's own CSV export), a small per-collection piece-count CSV, and a
+per-collection *composer*-count CSV (how many pieces each composer has
+*within* their own collection — not merged across collections, unlike
+the word cloud above, since this one's meant to be a precise count and
+composer spelling isn't consistent between collections).
 
 Or pick a piece from one collection directly. Every tab below filters by
 **Composer**, one at a time with an "All composers" default (each
@@ -202,10 +206,13 @@ above is the one to share.
    can describe the same passage via overlapping sliding windows — so
    this tool deduplicates them into one label per passage before writing
    anything to the score.
-7. The **strip plot** reads the `Progress` column every one of CRIM's
-   three analyses already computes on its own (offset divided by the
-   piece's last note offset, 0-1) — no separate calculation needed, just
-   collecting a column CRIM already gives back.
+7. The **strip plot** places each event by its actual measure number,
+   not CRIM's 0-1 `Progress` fraction — a number that reads directly off
+   the score. Cadences expose `Measure` as a plain column and
+   `homorhythm()` as an index level; `presentationTypes()` exposes
+   neither, so there the first voice's own entry measure is parsed out
+   of its `Measures_Beats` field instead (the same value this tool
+   itself tries first when placing that instance's label on the score).
 
 ## Credits & licensing
 

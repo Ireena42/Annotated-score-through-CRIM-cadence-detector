@@ -558,22 +558,25 @@ def _safe_cadences(piece):
         )
 
 
-def _append_timeline(stats, progress_values, label, color):
+def _append_timeline(stats, measure_values, label, color):
     """Appends one row per detected event to stats['timeline'] -- the
     data behind the strip-plot visualization rendered in show_result().
-    Every one of CRIM's three analyses (cadences/presentationTypes/
-    homorhythm) independently computes its own 'Progress' column the
-    same way -- offset divided by the piece's last note offset, giving
-    0-1 position through the piece (confirmed directly in all three
-    methods' source before relying on it) -- so this is just collecting
-    that column, tagged with which analysis it came from and that
-    analysis's own notehead color (CADENCE_COLOR/PRESENTATION_COLOR/
-    HOMORHYTHM_COLOR), so the plot's colors match the annotated score's
-    colors exactly. Shared by cadences/ptypes/homorhythm in both
-    run_pipeline() and _annotate_crim_piece() rather than duplicated six
-    times across the two functions."""
+    Uses each event's actual measure number (e.g. 47), not CRIM's 0-1
+    'Progress' fraction -- a measure number reads directly off the
+    score, a fraction of total piece length doesn't. Cadences expose
+    'Measure' as a plain column and homorhythm as an index level
+    (confirmed directly in both methods' source); presentationTypes()
+    exposes neither -- there, the calling site parses the first voice's
+    entry measure out of its 'Measures_Beats' field instead (the same
+    value annotate_presentation_types() itself tries first when placing
+    that instance's own label), tagged with which analysis it came from
+    and that analysis's own notehead color (CADENCE_COLOR/
+    PRESENTATION_COLOR/HOMORHYTHM_COLOR), so the plot's colors match the
+    annotated score's colors exactly. Shared by cadences/ptypes/
+    homorhythm in both run_pipeline() and _annotate_crim_piece() rather
+    than duplicated six times across the two functions."""
     stats.setdefault('timeline', []).extend(
-        {'Progress': p, 'Type': label, 'color': color} for p in progress_values
+        {'Measure': m, 'Type': label, 'color': color} for m in measure_values
     )
 
 
@@ -635,7 +638,7 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
             return None, None, error
         if not cadences.empty:
             annotated_score, stats = annotate_score(score, cadences)
-            _append_timeline(stats, cadences['Progress'], 'Cadence', CADENCE_COLOR)
+            _append_timeline(stats, cadences['Measure'], 'Cadence', CADENCE_COLOR)
         else:
             stats = {'labeled': 0, 'missed_label': 0, 'colored': 0}
 
@@ -651,7 +654,10 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
             )
             stats['ptypes_labeled'] = ptype_stats['labeled']
             stats['ptypes_colored'] = ptype_stats['colored']
-            _append_timeline(stats, ptypes['Progress'], 'Points of Imitation', PRESENTATION_COLOR)
+            first_entry_measures = ptypes['Measures_Beats'].apply(
+                lambda mb: int(float(mb[0].split('/')[0]))
+            )
+            _append_timeline(stats, first_entry_measures, 'Points of Imitation', PRESENTATION_COLOR)
 
     if include_homorhythm:
         try:
@@ -665,7 +671,7 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
             )
             stats['hr_labeled'] = hr_stats['labeled']
             stats['hr_colored'] = hr_stats['colored']
-            _append_timeline(stats, hr['Progress'], 'Homorhythm', HOMORHYTHM_COLOR)
+            _append_timeline(stats, hr.index.get_level_values('Measure'), 'Homorhythm', HOMORHYTHM_COLOR)
 
     return annotated_score, stats, None
 
@@ -796,8 +802,8 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
     # guard is needed beyond `if timeline`.
     timeline = stats.get('timeline')
     if timeline:
-        st.caption("Where these occur across the piece (progress from start to end):")
-        st.scatter_chart(pd.DataFrame(timeline), x='Progress', y='Type', color='color', height=200)
+        st.caption("Where these occur across the piece, by measure number:")
+        st.scatter_chart(pd.DataFrame(timeline), x='Measure', y='Type', color='color', height=200)
 
     methods_blurb = _build_methods_blurb(include_cadences, include_ptypes, include_homorhythm)
     if methods_blurb:
@@ -1043,7 +1049,7 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
             return None, None, error
         if not cadences.empty:
             annotated_score, stats = annotate_score(piece.score, cadences)
-            _append_timeline(stats, cadences['Progress'], 'Cadence', CADENCE_COLOR)
+            _append_timeline(stats, cadences['Measure'], 'Cadence', CADENCE_COLOR)
         else:
             stats = {'labeled': 0, 'missed_label': 0, 'colored': 0}
     if include_ptypes:
@@ -1058,7 +1064,10 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
             )
             stats['ptypes_labeled'] = ptype_stats['labeled']
             stats['ptypes_colored'] = ptype_stats['colored']
-            _append_timeline(stats, ptypes['Progress'], 'Points of Imitation', PRESENTATION_COLOR)
+            first_entry_measures = ptypes['Measures_Beats'].apply(
+                lambda mb: int(float(mb[0].split('/')[0]))
+            )
+            _append_timeline(stats, first_entry_measures, 'Points of Imitation', PRESENTATION_COLOR)
     if include_homorhythm:
         try:
             hr = piece.homorhythm()
@@ -1071,7 +1080,7 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
             )
             stats['hr_labeled'] = hr_stats['labeled']
             stats['hr_colored'] = hr_stats['colored']
-            _append_timeline(stats, hr['Progress'], 'Homorhythm', HOMORHYTHM_COLOR)
+            _append_timeline(stats, hr.index.get_level_values('Measure'), 'Homorhythm', HOMORHYTHM_COLOR)
     return annotated_score, stats, None
 
 
@@ -1560,6 +1569,23 @@ with tab_browse:
         "or download every match at once, as a CSV manifest (any size) or a "
         "ZIP of raw MusicXML scores (up to 30 at a time)."
     )
+    # Eager, not button-gated: build_browse_index() is the same
+    # @st.cache_data(ttl=3600)-wrapped call the search box below (and
+    # every collection tab) already shares, so this doesn't add a new
+    # expensive operation -- it just moves the first hit of it earlier,
+    # to whoever opens this tab first in a given hour, so the word cloud
+    # can render right away rather than waiting behind an extra click.
+    with st.spinner("Loading corpus overview (first visit this hour can take ~15s, instant "
+                     "after)..."):
+        full_index = build_browse_index()
+    st.caption(
+        "☁️ Composer word cloud across all ~4,300 pieces in this app, sized by piece count "
+        "(all 7 collections merged -- the same composer may appear twice here if spelled "
+        "differently across collections, e.g. CRIM's \"Josquin Des Prez\" vs JRP's \"Josquin "
+        "des Prez\"):"
+    )
+    st.image(_composer_wordcloud_png_bytes(full_index))
+
     query = st.text_input(
         'Search (partial words OK -- try "josquin missa" or "159")',
         key="browse_query",
@@ -1575,72 +1601,60 @@ with tab_browse:
             "across all 7 collections, as one CSV -- same columns as a search result's own "
             "CSV export (collection, composer, label, source URL / music21 corpus path) -- "
             "plus a small per-collection piece-count table. To get actual scores for a set of "
-            "pieces, search or filter down to them above and use that tab's ZIP download. "
-            "Building this indexes every collection live the first time (~15s cold, instant "
-            "after -- same hourly cache Search and every collection tab already share)."
+            "pieces, search or filter down to them above and use that tab's ZIP download."
         )
-        if st.button("Build the full corpus index", key="browse_full_index_build"):
-            with st.spinner("Indexing all 7 collections..."):
-                full_index = build_browse_index()
-            st.download_button(
-                f"📄 Download all {len(full_index)} pieces as CSV",
-                data=_matches_to_csv_bytes(full_index),
-                file_name="full_corpus.csv",
-                mime="text/csv",
-                key="browse_full_csv_download",
-            )
-            counts = Counter(row[1] for row in full_index)
-            overview_buf = io.StringIO()
-            writer = csv.writer(overview_buf)
-            writer.writerow(['collection', 'display_name', 'piece_count'])
-            for key in sorted(counts, key=lambda k: -counts[k]):
-                writer.writerow([key, COLLECTION_DISPLAY_NAMES.get(key, key), counts[key]])
-            st.download_button(
-                "📊 Download per-collection piece counts as CSV",
-                data=overview_buf.getvalue().encode('utf-8'),
-                file_name="corpus_overview.csv",
-                mime="text/csv",
-                key="browse_overview_csv_download",
-            )
+        st.download_button(
+            f"📄 Download all {len(full_index)} pieces as CSV",
+            data=_matches_to_csv_bytes(full_index),
+            file_name="full_corpus.csv",
+            mime="text/csv",
+            key="browse_full_csv_download",
+        )
+        counts = Counter(row[1] for row in full_index)
+        overview_buf = io.StringIO()
+        writer = csv.writer(overview_buf)
+        writer.writerow(['collection', 'display_name', 'piece_count'])
+        for key in sorted(counts, key=lambda k: -counts[k]):
+            writer.writerow([key, COLLECTION_DISPLAY_NAMES.get(key, key), counts[key]])
+        st.download_button(
+            "📊 Download per-collection piece counts as CSV",
+            data=overview_buf.getvalue().encode('utf-8'),
+            file_name="corpus_overview.csv",
+            mime="text/csv",
+            key="browse_overview_csv_download",
+        )
 
-            # Per-COLLECTION composer counts -- not merged across
-            # collections (composer naming isn't consistent across them,
-            # see build_browse_index's docstring), just how many pieces
-            # each composer has within their own collection. Reuses
-            # _browse_row_to_csv_dict's own composer extraction (already
-            # built and tested for the manifest CSV) rather than a third
-            # copy of the same per-collection parsing logic.
-            composer_counts = Counter(
-                (row[1], _browse_row_to_csv_dict(row[0], row[1], row[2])['composer'])
-                for row in full_index
-            )
-            composer_buf = io.StringIO()
-            writer = csv.writer(composer_buf)
-            writer.writerow(['collection', 'composer', 'piece_count'])
-            for (collection, composer), count in sorted(composer_counts.items(), key=lambda kv: -kv[1]):
-                writer.writerow([collection, composer, count])
-            st.download_button(
-                "🎼 Download per-collection composer counts as CSV",
-                data=composer_buf.getvalue().encode('utf-8'),
-                file_name="composer_overview.csv",
-                mime="text/csv",
-                key="browse_composer_overview_csv_download",
-                help="How many pieces each composer has WITHIN their own collection -- not merged "
-                     "across collections, since composer spelling isn't consistent between them "
-                     "(e.g. CRIM's 'Josquin Des Prez' vs JRP's 'Josquin des Prez').",
-            )
-
-            st.caption(
-                "☁️ Composer word cloud (all 7 collections merged, sized by piece count -- unlike "
-                "the CSV above, the same composer may appear twice here if spelled differently "
-                "across collections):"
-            )
-            st.image(_composer_wordcloud_png_bytes(full_index))
+        # Per-COLLECTION composer counts -- not merged across
+        # collections (composer naming isn't consistent across them,
+        # see build_browse_index's docstring), just how many pieces
+        # each composer has within their own collection. Reuses
+        # _browse_row_to_csv_dict's own composer extraction (already
+        # built and tested for the manifest CSV) rather than a third
+        # copy of the same per-collection parsing logic.
+        composer_counts = Counter(
+            (row[1], _browse_row_to_csv_dict(row[0], row[1], row[2])['composer'])
+            for row in full_index
+        )
+        composer_buf = io.StringIO()
+        writer = csv.writer(composer_buf)
+        writer.writerow(['collection', 'composer', 'piece_count'])
+        for (collection, composer), count in sorted(composer_counts.items(), key=lambda kv: -kv[1]):
+            writer.writerow([collection, composer, count])
+        st.download_button(
+            "🎼 Download per-collection composer counts as CSV",
+            data=composer_buf.getvalue().encode('utf-8'),
+            file_name="composer_overview.csv",
+            mime="text/csv",
+            key="browse_composer_overview_csv_download",
+            help="How many pieces each composer has WITHIN their own collection -- not merged "
+                 "across collections, since composer spelling isn't consistent between them "
+                 "(e.g. CRIM's 'Josquin Des Prez' vs JRP's 'Josquin des Prez').",
+        )
 
     if query:
-        with st.spinner("Searching (first search after a quiet spell indexes all "
-                         "collections, can take up to ~15s -- instant after that)..."):
-            index = build_browse_index()
+        # Reuses full_index, already built above for the word cloud --
+        # no second build_browse_index() call needed.
+        index = full_index
         # Every space-separated word in the query must appear somewhere in
         # the label, in any order -- not one single substring match. "josquin
         # missa" used to match nothing at all (no label literally contains
