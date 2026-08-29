@@ -10,8 +10,8 @@ place. Run cadences (e.g. `Authentic → G`), points of imitation, and
 homorhythmic passages on any piece, see where they fall across its
 structure, and take the results further: an annotated score marked
 **directly onto the notation itself** (ready for MuseScore, Finale, or
-any notation software), a raw score for your own code, or a CSV dataset
-across a whole search.
+any notation software), a PDF to read or print, a raw score for your own
+code, or a CSV dataset across a whole search.
 
 CRIM Intervals (Morgan & Freedman, CRIM Project) analyzes contrapuntal
 voice functions (Cantizans, Tenorizans, Bassizans, Altizans, etc.) rather
@@ -157,6 +157,17 @@ a piece (in real MusicXML, converted from whatever format its home
 collection actually ships) without any CRIM analysis at all. The
 download button and file name are honest about which case you're in
 ("Download annotated MusicXML" vs. plain "Download MusicXML").
+
+A **"📄 Build annotated PDF"** button sits right below the MusicXML
+download (same "annotated" vs. plain wording) — click it to typeset the
+same score as a PDF via music21's LilyPond backend and get a second
+download button once it's ready. This is a genuinely different engraver
+from MuseScore/Finale/Dorico (LilyPond is the only PDF path realistic to
+run headlessly on Streamlit Cloud — MuseScore needs a full Qt/X11 stack),
+so page layout, spacing, and how CRIM's own annotations render will look
+different from opening the MusicXML in one of those — not a bug, just a
+different renderer. It's a separate button rather than automatic because
+LilyPond typesetting takes a few real seconds, not instant.
 
 Whenever at least one analysis actually finds something, a small strip
 plot shows where each event falls across the piece (0 = start, 1 =

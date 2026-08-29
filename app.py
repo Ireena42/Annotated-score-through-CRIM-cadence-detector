@@ -162,8 +162,8 @@ st.caption(
     "7 sources into one searchable, analysis-ready place. Run CRIM's "
     "structural analyses (cadences, points of imitation, homorhythmic "
     "passages), see where they fall across the piece, and take the results "
-    "further -- an annotated score for MuseScore/Finale, a raw file for your "
-    "own code, or a dataset across a whole search."
+    "further -- an annotated score for MuseScore/Finale, a PDF to read or "
+    "print, a raw file for your own code, or a dataset across a whole search."
 )
 
 
@@ -545,6 +545,39 @@ def score_to_download_bytes(score):
         tmp_path.unlink(missing_ok=True)
 
 
+def score_to_pdf_bytes(score):
+    """PDF export via music21's LilyPond backend (score.write('lily.pdf')) --
+    the only PDF path realistic to run headlessly on Streamlit Cloud. music21
+    also has a MuseScore-based PDF path (write('musicxml.pdf')), but that
+    needs a full MuseScore install plus a working Qt/X11 stack -- much
+    heavier and flakier to get running in a bare container than LilyPond,
+    which is a plain apt package (see packages.txt) built for exactly this
+    kind of headless/batch typesetting. Confirmed by reading music21's own
+    subConverters.py/lily/translate.py directly, not assumed.
+
+    This is a genuinely different rendering engine than MuseScore/Finale/
+    Dorico -- page layout, spacing, and how CRIM's own TextExpression
+    annotations render will look different from opening the MusicXML in one
+    of those. Not a bug, just a different engraver. This path is new and
+    hasn't been exercised on every piece in the corpus yet, so callers should
+    let a failure surface to the user rather than assume it always succeeds.
+
+    Like score_to_download_bytes, this needs a real file path (music21 shells
+    out to the `lilypond` binary internally, via os.system) rather than an
+    in-memory buffer. score.write('lily.pdf') picks its own temp .ly path and
+    returns the resulting <name>.ly.pdf path (music21's own naming, not ours)
+    -- read that back to bytes, then clean up both the .pdf and the .ly
+    music21 leaves behind next to it (neither is auto-deleted).
+    """
+    pdf_path = Path(score.write('lily.pdf'))
+    ly_path = pdf_path.with_suffix('')  # strips the trailing .pdf, leaving the .ly path
+    try:
+        return pdf_path.read_bytes()
+    finally:
+        pdf_path.unlink(missing_ok=True)
+        ly_path.unlink(missing_ok=True)
+
+
 # One sentence per analysis, written to read naturally whether one or all
 # three are strung together -- see _build_methods_blurb(). Citation style
 # (name + year/project, no full bibliography) deliberately matches what
@@ -592,7 +625,7 @@ def _build_methods_blurb(include_cadences, include_ptypes, include_homorhythm):
     return ' '.join([_METHODS_BLURB_MUSIC21] + sentences)
 
 
-def show_result(annotated_score, stats, filename_stem, include_cadences=False, include_ptypes=False, include_homorhythm=False):
+def show_result(annotated_score, stats, filename_stem, include_cadences=False, include_ptypes=False, include_homorhythm=False, key_prefix=None):
     """Reports whatever run_pipeline()/_annotate_crim_piece() actually
     did (cadences/ptypes/homorhythm are all optional now -- see
     run_pipeline's docstring) and offers the resulting file for
@@ -603,7 +636,14 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
     honestly reflecting whether the file actually has anything written
     onto it. include_cadences/ptypes/homorhythm are only used to build
     the methods-section blurb below -- see _build_methods_blurb().
+    key_prefix disambiguates this call's own widget keys (the PDF build
+    button) when the same filename_stem could render from more than one
+    tab at once -- same collision this app already guards against
+    elsewhere (see render_preview_and_annotate's docstring); defaults to
+    filename_stem itself when the caller doesn't have a more specific one
+    (e.g. the Upload tab, where only one instance ever exists).
     """
+    key_prefix = key_prefix or filename_stem
     # Shown unconditionally, before anything analysis-specific -- which
     # print edition (or, for CRIM, which modern critical edition and
     # editorial team) an encoding derives from matters for Renaissance
@@ -697,6 +737,39 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
         mime="application/vnd.recordare.musicxml+xml",
         type="primary",
     )
+
+    # PDF, via LilyPond -- see score_to_pdf_bytes()'s own docstring for why
+    # this is a separate engraver from MuseScore/Finale and looks different.
+    # Built on its own button rather than eagerly alongside the MusicXML
+    # above: LilyPond typesetting takes real time (a few seconds, not
+    # instant), and Streamlit re-runs this whole function on every later
+    # interaction on the page -- eagerly computing it here would redo that
+    # work on every unrelated click, unlike the near-instant MusicXML bytes.
+    # Same on-demand "Build ... then download" pattern already used for the
+    # ZIP/bulk-analysis exports in Browse, not a new convention.
+    if st.button(
+        "📄 Build annotated PDF" if annotated else "📄 Build PDF",
+        key=f"{key_prefix}_pdf_build",
+    ):
+        with st.spinner(_random_loading_message()):
+            try:
+                pdf_bytes = score_to_pdf_bytes(annotated_score)
+            except Exception as exc:
+                pdf_bytes = None
+                st.error(
+                    "Couldn't render a PDF for this piece via LilyPond "
+                    f"({exc}). The MusicXML download above is unaffected -- "
+                    "open it directly in MuseScore, Finale, or Dorico instead."
+                )
+        if pdf_bytes:
+            st.download_button(
+                "Download annotated PDF" if annotated else "Download PDF",
+                data=pdf_bytes,
+                file_name=f"{filename_stem}_annotated.pdf" if annotated else f"{filename_stem}.pdf",
+                mime="application/pdf",
+                key=f"{key_prefix}_pdf_download",
+                type="primary",
+            )
 
 
 with st.expander("ℹ️ Credits & data sources"):
@@ -1699,6 +1772,7 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
             show_result(
                 annotated_score, stats, filename_stem, include_cadences=include_cadences,
                 include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
+                key_prefix=key_prefix,
             )
 
 
