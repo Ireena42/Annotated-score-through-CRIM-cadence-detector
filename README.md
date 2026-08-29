@@ -168,9 +168,10 @@ come through correctly (an earlier version went through music21's own
 LilyPond backend instead, which re-derived its own notation from scratch
 and had real gaps — every cadential note came out the same red regardless
 of which analysis colored it, and the text labels were dropped entirely;
-not a page-layout quirk, an actual translation bug). The PDF is built
-automatically the first time it's needed and cached for the rest of the
-session, so later clicks don't re-render it.
+not a page-layout quirk, an actual translation bug). Clicking it renders
+the PDF on that click and swaps in a second, real download button once
+it's ready — cached per piece for the rest of the session, so switching
+back to a piece you already built one for doesn't re-render it.
 
 Whenever at least one analysis actually finds something, a small strip
 plot shows where each event falls across the piece (0 = start, 1 =

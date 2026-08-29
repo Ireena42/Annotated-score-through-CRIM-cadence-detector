@@ -588,7 +588,14 @@ def score_to_pdf_bytes(score):
     xml_bytes = score_to_download_bytes(score)
     tk = verovio.toolkit()
     if not tk.loadData(xml_bytes.decode('utf-8')):
-        raise RuntimeError("Verovio couldn't parse this piece's MusicXML.")
+        # tk.getLog() carries Verovio's own reason (e.g. which element it
+        # choked on) -- surfacing it here so a failure is diagnosable from
+        # the error message alone, rather than needing another round of
+        # blind reproduction like the earlier zero-duration LilyPond bug.
+        log = tk.getLog().strip()
+        raise RuntimeError(
+            "Verovio couldn't parse this piece's MusicXML" + (f": {log}" if log else ".")
+        )
     tk.setOptions({"adjustPageHeight": True, "pageWidth": 1500, "scale": 40})
     page_count = tk.getPageCount()
 
@@ -767,39 +774,59 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
         type="primary",
     )
 
-    # PDF, via Verovio -- see score_to_pdf_bytes()'s own docstring. A single
-    # Download button, not a separate Build-then-Download step -- computed
-    # once per analysis result and cached in session_state (keyed off the
-    # same key_prefix this whole result is already stored under, so a fresh
-    # Analyze naturally invalidates it) rather than recomputed on every
-    # later, unrelated rerun the way an uncached call under st.download_button
-    # would be (Streamlit reruns this whole function on every interaction on
-    # the page). The tradeoff, and the reason this wasn't done from the
-    # start: the PDF now renders automatically right after Analyze (with a
-    # spinner, like everywhere else that waits) instead of only on request.
-    pdf_cache_key = f"{key_prefix}_pdf"
+    # PDF, via Verovio -- see score_to_pdf_bytes()'s own docstring. Built
+    # only on an explicit click (not automatically alongside the MusicXML
+    # above), and cached in session_state once built so a later, unrelated
+    # rerun doesn't recompute it.
+    #
+    # pdf_cache_key MUST include filename_stem, not just key_prefix -- a
+    # real bug, not a hypothetical: an earlier version keyed this by
+    # key_prefix alone (e.g. just "browse"), which is shared by every piece
+    # reachable from that same tab. Analyzing piece A, then switching to
+    # piece B in the same tab's "Pick one" dropdown and clicking Analyze
+    # again, found piece A's cache entry already present and reused IT --
+    # including a cached error -- for piece B, with no recomputation at
+    # all. That's confirmed to be the actual explanation for a report of
+    # "Verovio couldn't parse" recurring across several different pieces:
+    # it was one real (or spurious) failure on the FIRST piece, replayed
+    # unchanged for everything analyzed afterward in that tab session, not
+    # independent failures on each piece -- a from-scratch reproduction of
+    # each reported piece in isolation never failed. filename_stem is
+    # already unique per piece (see result_key above, same pattern).
+    pdf_cache_key = f"{key_prefix}_{filename_stem}_pdf"
+    # The trigger button only renders before it's been built -- once cached,
+    # only the real download button (or the error) shows, so a successful
+    # build doesn't leave a redundant "Download PDF" sitting above the
+    # actual download button.
     if pdf_cache_key not in st.session_state:
-        with st.spinner(_random_loading_message()):
-            try:
-                st.session_state[pdf_cache_key] = {'bytes': score_to_pdf_bytes(annotated_score), 'error': None}
-            except Exception as exc:
-                st.session_state[pdf_cache_key] = {'bytes': None, 'error': str(exc)}
-    cached_pdf = st.session_state[pdf_cache_key]
-    if cached_pdf['error']:
-        st.error(
-            f"Couldn't render a PDF for this piece ({cached_pdf['error']}). "
-            "The MusicXML download above is unaffected -- open it directly "
-            "in MuseScore, Finale, or Dorico instead."
-        )
-    else:
-        st.download_button(
-            "Download annotated PDF" if annotated else "Download PDF",
-            data=cached_pdf['bytes'],
-            file_name=f"{filename_stem}_annotated.pdf" if annotated else f"{filename_stem}.pdf",
-            mime="application/pdf",
-            key=f"{key_prefix}_pdf_download",
+        if st.button(
+            "📄 Download annotated PDF" if annotated else "📄 Download PDF",
+            key=f"{pdf_cache_key}_build",
             type="primary",
-        )
+        ):
+            with st.spinner(_random_loading_message()):
+                try:
+                    st.session_state[pdf_cache_key] = {'bytes': score_to_pdf_bytes(annotated_score), 'error': None}
+                except Exception as exc:
+                    st.session_state[pdf_cache_key] = {'bytes': None, 'error': str(exc)}
+
+    if pdf_cache_key in st.session_state:
+        cached_pdf = st.session_state[pdf_cache_key]
+        if cached_pdf['error']:
+            st.error(
+                f"Couldn't render a PDF for this piece ({cached_pdf['error']}). "
+                "The MusicXML download above is unaffected -- open it directly "
+                "in MuseScore, Finale, or Dorico instead."
+            )
+        else:
+            st.download_button(
+                "Download annotated PDF" if annotated else "Download PDF",
+                data=cached_pdf['bytes'],
+                file_name=f"{filename_stem}_annotated.pdf" if annotated else f"{filename_stem}.pdf",
+                mime="application/pdf",
+                key=f"{pdf_cache_key}_download",
+                type="primary",
+            )
 
 
 with st.expander("ℹ️ Credits & data sources"):
