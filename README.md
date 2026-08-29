@@ -234,6 +234,46 @@ above is the one to share.
    of its `Measures_Beats` field instead (the same value this tool
    itself tries first when placing that instance's label on the score).
 
+## Finalis precompute (in progress, not yet in the app's UI)
+
+A **Finalis** filter for Browse is planned — full-corpus, not scoped to
+one search — but that needs a Finalis *value* for all ~4,300 pieces
+already sitting somewhere cheap to read, since computing it live would
+mean running real CRIM cadence detection on every piece just to
+populate a filter dropdown. That precompute is built but **not yet run
+even once**:
+
+- `corpus_sources.py` — the piece-*listing* logic (which pieces exist,
+  across all 7 collections) extracted out of `app.py` into its own
+  module, so a script outside the Streamlit app can enumerate the exact
+  same pieces without a second, drifting copy of that logic. `app.py`
+  imports from it now instead of defining these functions itself.
+- `scripts/precompute_finalis.py` — a standalone batch script. For each
+  piece: last detected cadence's `Low` column (the *clausula basizans*
+  convention — matching how this corpus's one hand-verified finalis,
+  Agnus_00 = G, was actually confirmed), falling back to
+  crim_intervals' own cruder `.final()` (literally the lowest note at
+  the very last moment, no cadence detection) only if a piece has zero
+  detected cadences. Writes one JSON record per piece to
+  `data/finalis.jsonl`, keyed by the piece's own Browse label. Designed
+  to be resumable across many separate runs (reads what's already
+  there, skips it) and to commit its own progress periodically, not
+  just at the end.
+- `.github/workflows/precompute_finalis.yml` — manually triggered
+  (`workflow_dispatch`, from the Actions tab), since a full run is a
+  genuinely multi-hour job, almost certainly longer than one workflow
+  run's own time limit — expect to trigger this several times over
+  several days, each pass resuming from the last one's committed
+  progress, to work through the full corpus.
+
+**Run a small test first** (`--limit 5 --collection music21`, or the
+matching workflow inputs) **before the real run** — this whole pipeline
+was written without a working local Python environment to test it
+against, so a 5-piece test is the way to catch a real bug cheaply
+instead of hours into the full one. Once `data/finalis.jsonl` actually
+exists and looks right, the remaining step — reading it and wiring up
+an actual Finalis filter widget in Browse — hasn't been built yet.
+
 ## Credits & licensing
 
 *(The same content is also in the app itself, in the "ℹ️ Credits & data

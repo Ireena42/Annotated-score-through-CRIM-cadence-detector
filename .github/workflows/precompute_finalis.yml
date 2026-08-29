@@ -1,0 +1,67 @@
+name: Precompute Finalis
+
+# Manual trigger only -- this is a genuinely long-running batch job
+# (potentially hours, likely longer than this workflow's own runtime
+# cap for the full corpus), not something that should fire on every
+# push. Trigger it from the Actions tab -> "Precompute Finalis" ->
+# "Run workflow", optionally filling in the test-run inputs below.
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Stop after N newly-computed pieces (blank = no limit, i.e. the full remaining corpus). Use a small number for a test run first."
+        required: false
+        default: ""
+      collection:
+        description: "Restrict to one collection (music21/crim/jrp/1520s/tasso/seils/lassus_psalms). Blank = all 7."
+        required: false
+        default: ""
+
+# Needed for the script's own `git push` (see scripts/precompute_finalis.py's
+# git_commit_progress) to succeed with the default GITHUB_TOKEN.
+permissions:
+  contents: write
+
+jobs:
+  precompute:
+    runs-on: ubuntu-latest
+    # Just under GitHub's own 360-minute (6-hour) hard cap for standard
+    # runners, leaving headroom for setup. If the full corpus takes
+    # longer than this (likely, at ~4,300 pieces each needing a real
+    # crim_intervals cadences() call), this job gets cut off -- the
+    # script's own periodic commits (--commit-every, default 50 pieces)
+    # mean that's a stopped run, not a lost one: re-trigger this same
+    # workflow again and it resumes from the last committed progress
+    # (see scripts/precompute_finalis.py's own module docstring).
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"  # matches this repo's runtime.txt
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install crim_intervals==2.0.78 music21==8.3.0 requests==2.31.0 pandas==2.3.3
+
+      - name: Configure git identity for progress commits
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run precompute (test run, if 'limit' was given)
+        if: ${{ inputs.limit != '' }}
+        run: |
+          python scripts/precompute_finalis.py \
+            --limit "${{ inputs.limit }}" \
+            ${{ inputs.collection != '' && format('--collection {0}', inputs.collection) || '' }}
+
+      - name: Run precompute (full remaining corpus, if no 'limit' was given)
+        if: ${{ inputs.limit == '' }}
+        run: |
+          python scripts/precompute_finalis.py \
+            ${{ inputs.collection != '' && format('--collection {0}', inputs.collection) || '' }}
