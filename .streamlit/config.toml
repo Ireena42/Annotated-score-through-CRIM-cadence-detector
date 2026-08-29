@@ -1,0 +1,11 @@
+# Visual identity, Option 3 from the identity-review mockup ("Bolder --
+# warmer, more confident"): a deep wine ink on warm cream, with a burnt-
+# orange accent. Colors only -- Streamlit's [theme] section doesn't
+# support arbitrary custom fonts (Fraunces/IBM Plex Sans), so those are
+# injected as CSS in app.py itself (see the _apply_visual_identity()
+# call near the top of that file).
+[theme]
+primaryColor = "#a8451f"
+backgroundColor = "#fbf3e7"
+secondaryBackgroundColor = "#f0dfc4"
+textColor = "#3d1620"

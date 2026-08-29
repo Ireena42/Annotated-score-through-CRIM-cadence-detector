@@ -58,6 +58,32 @@ st.set_page_config(
     # file's own real notehead shapes below for the manuscript-derived motif.
     layout="centered",
 )
+# Visual identity, Option 3 from the identity-review mockup ("Bolder --
+# warmer, more confident"): Fraunces for headings, IBM Plex Sans for
+# body text. Colors themselves live in .streamlit/config.toml's [theme]
+# section (Streamlit's own supported theming mechanism, robust across
+# Streamlit versions) -- only the custom Google Fonts need injecting
+# here, since config.toml's font option doesn't support arbitrary named
+# fonts. Scoped to h1/h2/h3 (Streamlit's own tags for title/header/
+# subheader) and body/caption text via their stable data-testid
+# attributes, not a blanket wildcard selector -- Streamlit's icon fonts
+# (expander arrows, etc.) rely on their own specific font-family and
+# would break under a wildcard override.
+st.markdown(
+    """
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+    h1, h2, h3 { font-family: 'Fraunces', Georgia, serif !important; font-weight: 600; }
+    body, [data-testid="stMarkdownContainer"], [data-testid="stCaptionContainer"],
+    [data-testid="stWidgetLabel"], [data-testid="stMetricValue"] {
+        font-family: 'IBM Plex Sans', Arial, sans-serif;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 st.markdown(
     """
     <div style="
@@ -1359,15 +1385,6 @@ with tab_browse:
                      "after)..."):
         full_index = build_browse_index()
 
-    query = st.text_input(
-        'Search (partial words OK)',
-        key="browse_query",
-        help='Matches any text in a result -- composer, title, movement, catalog year, anything '
-             'shown. Words don\'t need to be whole or in order ("159" matches any 1590s piece), '
-             'but every word you type must appear somewhere, so "josquin missa" finds every '
-             'Josquin mass movement.',
-    )
-
     with st.expander("📦 Download the whole corpus metadata, no search needed (all 7 collections)"):
         st.caption(
             "Not the scores themselves -- a manifest of every piece this app knows about, "
@@ -1423,6 +1440,15 @@ with tab_browse:
                  "across collections, since composer spelling isn't consistent between them "
                  "(e.g. CRIM's 'Josquin Des Prez' vs JRP's 'Josquin des Prez').",
         )
+
+    query = st.text_input(
+        'Search (partial words OK)',
+        key="browse_query",
+        help='Matches any text in a result -- composer, title, movement, catalog year, anything '
+             'shown. Words don\'t need to be whole or in order ("159" matches any 1590s piece), '
+             'but every word you type must appear somewhere, so "josquin missa" finds every '
+             'Josquin mass movement.',
+    )
 
     if query:
         # Reuses full_index, already built above for the word cloud --
