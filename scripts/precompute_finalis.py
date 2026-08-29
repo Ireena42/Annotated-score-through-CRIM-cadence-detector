@@ -21,28 +21,34 @@ against elsewhere). Every record notes which of the two produced its
 Finalis (`source`: 'cadence' or 'final_fallback'), or records an
 `error` with no guess at all rather than a silently wrong one.
 
-THIS SCRIPT HAS NOT BEEN RUN EVEN ONCE as of writing it -- no local
-Python environment with music21/crim_intervals was available while
-building it (see the conversation this came out of). Run a small test
-FIRST:
-
-    python scripts/precompute_finalis.py --limit 5 --collection music21
-
-before trusting it with the full ~4,300-piece corpus. If that small run
-produces reasonable-looking Finalis values (spot-check Agnus_00
-specifically -- it should come back 'G', 'cadence'), the full run is
-plausibly safe; if it errors or the values look wrong, that's a much
-cheaper failure to debug than hours into the real run.
+Run twice so far, both confirmed against the real GitHub Actions logs
+(not just assumed from a green checkmark): a 5-piece test run (correct
+-- Agnus_00 came back 'G'/'cadence', matching this corpus's one
+hand-verified answer), then a full-corpus run that made steady progress
+(355 pieces in ~6 minutes, ~1/s) and then produced ZERO further
+progress for the remaining ~1h47m of a job that still exited with a
+clean "success" status -- meaning the process didn't crash, it just
+never returned from whatever it was doing on piece #356 (almost
+certainly a pathologically slow piece.cadences() call on some real
+piece with an unusual voice/measure count). PIECE_TIMEOUT_SECONDS (a
+signal.alarm-based per-piece timeout, added after diagnosing this) is
+the fix -- untested against a REAL hang yet, since it was written after
+the fact from log evidence, not reproduced locally, but the mechanism
+itself (signal.alarm + a caught exception) is standard and should work
+on the same ubuntu-latest runner. Re-running now resumes from piece
+#356 onward (see load_existing) with that protection in place.
 
 This is a genuinely long-running job for the full corpus -- likely many
 hours, almost certainly longer than a single GitHub Actions job's
-runtime cap. Designed to be resumable across separate invocations:
-reads whatever's already in the output file and skips those pieces, and
-(via --commit-every) commits+pushes its own progress periodically, not
-just at the end, so a run that gets killed mid-way doesn't lose
-everything before it. Realistically expect to (or have the workflow)
-trigger this several times over several days to complete the full
-corpus, each run picking up where the last one stopped.
+runtime cap, now compounded by whatever pathological pieces the new
+timeout will skip past rather than hang on. Designed to be resumable
+across separate invocations: reads whatever's already in the output
+file and skips those pieces, and (via --commit-every) commits+pushes
+its own progress periodically, not just at the end, so a run that gets
+killed (or hangs) mid-way doesn't lose everything before it.
+Realistically expect to (or have the workflow) trigger this several
+times over several days to complete the full corpus, each run picking
+up where the last one stopped.
 
 Usage:
     python scripts/precompute_finalis.py [--limit N] [--collection KEY]
@@ -63,6 +69,7 @@ Usage:
 import argparse
 import json
 import re
+import signal
 import subprocess
 import sys
 import time
@@ -74,6 +81,34 @@ import crim_intervals as ci
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import corpus_sources  # noqa: E402 (needs the sys.path insert above first)
+
+
+# Real, observed failure this guards against, not a speculative one:
+# the first full-corpus run (2026-08-29) made steady progress (355
+# pieces in ~6 minutes) then produced ZERO further progress commits for
+# the remaining ~1h47m of a job that still exited with a clean success
+# status -- meaning the process didn't crash, it just never returned
+# from whatever it was doing on piece #356 (almost certainly a
+# pathologically slow piece.cadences() call on some real Palestrina
+# piece with an unusual voice/measure count -- CRIM's cadence detector
+# is a pairwise-voice search, so an atypical piece could plausibly cost
+# far more than the ~1s/piece average seen everywhere else). Nothing in
+# the per-piece try/except below catches a HANG, only a raised
+# exception -- this signal.alarm-based timeout is what actually bounds
+# it. SIGALRM is Unix-only (fine for the GitHub Actions ubuntu-latest
+# runner this is designed for) -- guarded so this script doesn't just
+# crash on an unsupported platform (e.g. someone running it locally on
+# Windows), it just quietly loses the timeout protection there.
+PIECE_TIMEOUT_SECONDS = 120  # generous next to the ~1s/piece average seen so far, tight next to "hung for 6000+ seconds"
+_HAS_ALARM = hasattr(signal, 'SIGALRM')
+
+
+class _PieceTimeout(Exception):
+    pass
+
+
+def _timeout_handler(signum, frame):
+    raise _PieceTimeout(f"exceeded the {PIECE_TIMEOUT_SECONDS}s per-piece limit")
 
 
 def _import_piece(collection, native_ref):
@@ -226,6 +261,14 @@ def main():
     todo = [r for r in rows if r[0] not in existing]
     print(f"{len(todo)} piece(s) still to compute.", flush=True)
 
+    if _HAS_ALARM:
+        signal.signal(signal.SIGALRM, _timeout_handler)
+    else:
+        print("Note: signal.SIGALRM isn't available on this platform -- "
+              "per-piece timeout protection is disabled here (fine on the "
+              "GitHub Actions runner this is designed for; only matters if "
+              "run locally on e.g. Windows).", flush=True)
+
     done_this_run = 0
     t0 = time.time()
     with out_path.open('a', encoding='utf-8') as f:
@@ -234,6 +277,8 @@ def main():
                 print(f"Hit --limit {args.limit}, stopping this run.", flush=True)
                 break
 
+            if _HAS_ALARM:
+                signal.alarm(PIECE_TIMEOUT_SECONDS)
             try:
                 piece, error = _import_piece(collection, native_ref)
                 if error:
@@ -244,8 +289,15 @@ def main():
                     record = {'label': label, 'collection': collection, 'finalis': finalis,
                               'source': source, 'detail': detail}
             except Exception as e:
+                # Catches _PieceTimeout too (it's a plain Exception
+                # subclass) -- its own message already says "exceeded
+                # the Ns per-piece limit", clear enough without a
+                # separate except clause just for it.
                 record = {'label': label, 'collection': collection, 'finalis': None,
                           'source': 'error', 'detail': f"{type(e).__name__}: {e}"}
+            finally:
+                if _HAS_ALARM:
+                    signal.alarm(0)  # cancel -- otherwise a fast piece right after a near-timeout could get a stray alarm mid-flight
 
             f.write(json.dumps(record, ensure_ascii=False) + '\n')
             f.flush()
