@@ -1601,7 +1601,10 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
     action_label = "Analyze" if (include_cadences or include_ptypes or include_homorhythm) else "Download"
 
     col1, col2 = st.columns(2)
-    if col1.button("Preview", key=f"preview_{key_prefix}"):
+    # type="primary" -- Streamlit's own accent-colored button style,
+    # using .streamlit/config.toml's primaryColor (the same orange from
+    # the identity-review mockup) directly, not a custom CSS override.
+    if col1.button("Preview", key=f"preview_{key_prefix}", type="primary"):
         with st.spinner("Checking..."):
             voices, has_text, note = preview_piece(collection, native_ref)
         st.write(f"**Voices:** {voices if voices is not None else 'unknown'}")
@@ -1609,7 +1612,7 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
         st.write(f"**Has encoded text/lyrics:** {has_text_display}")
         if note:
             st.caption(note)
-    if col2.button(action_label, key=f"annotate_{key_prefix}"):
+    if col2.button(action_label, key=f"annotate_{key_prefix}", type="primary"):
         with st.spinner(_random_loading_message()):
             try:
                 annotated_score, stats, error = annotate_by_collection(
@@ -1902,7 +1905,7 @@ with tab_upload:
     # Same reasoning as render_preview_and_annotate's action_label -- see
     # that comment for why this isn't just always "Download".
     action_label_upload = "Analyze" if (include_cadences_upload or include_ptypes_upload or include_homorhythm_upload) else "Download"
-    if uploaded is not None and st.button(action_label_upload, key="annotate_upload"):
+    if uploaded is not None and st.button(action_label_upload, key="annotate_upload", type="primary"):
         with st.spinner(_random_loading_message()):
             # Decoding to text and handing the STRING (not a file path) to
             # music21/CRIM is the same pattern crim_intervals' own code
