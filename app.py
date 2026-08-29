@@ -81,6 +81,13 @@ st.markdown(
     [data-testid="stWidgetLabel"], [data-testid="stMetricValue"] {
         font-family: 'IBM Plex Sans', Arial, sans-serif;
     }
+    /* Density stat tiles (show_result's Cadence/Points of Imitation/
+       Homorhythm percentages) -- st.metric's own default size reads as
+       too prominent for what's meant to be a quick, secondary figure
+       next to the strip plot, not a headline number. Only user of
+       st.metric in this app (checked directly), so scoping this
+       narrower isn't needed. */
+    [data-testid="stMetricValue"] { font-size: 1.5rem; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -1303,12 +1310,24 @@ def _bulk_analysis_csv_bytes(matches, include_cadences, include_ptypes, include_
 
     Returns (csv_bytes_by_analysis, failed) -- csv_bytes_by_analysis is
     a dict with only the keys among 'cadences'/'presentation_types'/
-    'homorhythm' that were both requested AND produced at least one row
-    anywhere in the batch (an analysis requested but found nowhere just
-    doesn't appear, rather than handing back an empty file). failed is
-    a list of (label, reason) for any piece that couldn't be
-    fetched/imported/analyzed -- skipped rather than aborting the whole
-    batch, reported rather than silently missing.
+    'homorhythm'/'density' that were both requested AND produced at
+    least one row anywhere in the batch (an analysis requested but
+    found nowhere just doesn't appear, rather than handing back an
+    empty file). failed is a list of (label, reason) for any piece that
+    couldn't be fetched/imported/analyzed -- skipped rather than
+    aborting the whole batch, reported rather than silently missing.
+
+    'density' is a separate, one-row-per-piece summary CSV (not one row
+    per event like the other three) -- the same per-piece density
+    figure show_result() shows for a single piece (see _add_density's
+    own docstring for exactly what it measures and why: fraction of
+    measures touched, not a raw event count), collected across every
+    piece in this batch so they're directly comparable side by side --
+    the actual point of a bulk export, per direct feedback, that the
+    raw per-event CSVs above don't serve on their own. A density of 0
+    for a requested-but-empty analysis is a real, meaningful data point
+    (kept as 0, not blank); a blank cell means that analysis wasn't
+    successfully computed for that piece at all (e.g. ptypes failed).
 
     List-valued columns crim_intervals itself produces (e.g.
     presentationTypes()' Measures_Beats/Voices/Soggetti/Offsets) come
@@ -1318,6 +1337,7 @@ def _bulk_analysis_csv_bytes(matches, include_cadences, include_ptypes, include_
     same caveat as reading any DataFrame column of list objects back
     out of a CSV."""
     cadence_frames, ptype_frames, hr_frames = [], [], []
+    density_rows = []
     failed = []
     for i, (label, collection, native_ref) in enumerate(matches):
         if progress_callback:
@@ -1328,6 +1348,13 @@ def _bulk_analysis_csv_bytes(matches, include_cadences, include_ptypes, include_
                 raise RuntimeError(error)
             tag = _browse_row_to_csv_dict(label, collection, native_ref)
             tag_cols = {'collection': tag['collection'], 'composer': tag['composer'], 'label': tag['label']}
+            # {type_label: set of measures touched} for whichever analyses
+            # were actually ATTEMPTED for this piece (present with an
+            # empty set if attempted-but-found-nothing -- a real density
+            # of 0, not a gap; absent entirely if never requested, or
+            # requested but failed -- both correctly left blank in the
+            # output row below, since neither is real data).
+            touched = {}
 
             if include_cadences:
                 cadences, cad_error = _safe_cadences(piece)
@@ -1348,6 +1375,9 @@ def _bulk_analysis_csv_bytes(matches, include_cadences, include_ptypes, include_
                     for col, val in reversed(tag_cols.items()):
                         df.insert(0, col, val)
                     cadence_frames.append(df)
+                    touched['Cadence'] = set(cadences['Measure'])
+                else:
+                    touched['Cadence'] = set()
 
             if include_ptypes:
                 # Guarded individually, same convention as run_pipeline:
@@ -1365,6 +1395,12 @@ def _bulk_analysis_csv_bytes(matches, include_cadences, include_ptypes, include_
                     for col, val in reversed(tag_cols.items()):
                         df.insert(0, col, val)
                     ptype_frames.append(df)
+                    first_entry_measures = ptypes['Measures_Beats'].apply(
+                        lambda mb: int(float(mb[0].split('/')[0]))
+                    )
+                    touched['Points of Imitation'] = set(first_entry_measures)
+                elif ptypes is not None:
+                    touched['Points of Imitation'] = set()
 
             if include_homorhythm:
                 try:
@@ -1376,6 +1412,17 @@ def _bulk_analysis_csv_bytes(matches, include_cadences, include_ptypes, include_
                     for col, val in reversed(tag_cols.items()):
                         df.insert(0, col, val)
                     hr_frames.append(df)
+                    touched['Homorhythm'] = set(hr.index.get_level_values('Measure'))
+                elif hr is not None:
+                    touched['Homorhythm'] = set()
+
+            if touched:
+                total = _total_measures(piece.score)
+                row = dict(tag_cols)
+                for type_label in ('Cadence', 'Points of Imitation', 'Homorhythm'):
+                    if type_label in touched:
+                        row[f'{type_label} density'] = (len(touched[type_label]) / total) if total else None
+                density_rows.append(row)
         except Exception as e:
             failed.append((label, str(e)))
 
@@ -1386,6 +1433,8 @@ def _bulk_analysis_csv_bytes(matches, include_cadences, include_ptypes, include_
         csv_bytes_by_analysis['presentation_types'] = pd.concat(ptype_frames, ignore_index=True).to_csv(index=False).encode('utf-8')
     if hr_frames:
         csv_bytes_by_analysis['homorhythm'] = pd.concat(hr_frames, ignore_index=True).to_csv(index=False).encode('utf-8')
+    if density_rows:
+        csv_bytes_by_analysis['density'] = pd.DataFrame(density_rows).to_csv(index=False).encode('utf-8')
     return csv_bytes_by_analysis, failed
 
 
@@ -1395,6 +1444,7 @@ BULK_ANALYSIS_DOWNLOAD_META = {
     'cadences': ("📄 Download cadence data CSV", "browse_cadences_bulk.csv"),
     'presentation_types': ("📄 Download points-of-imitation data CSV", "browse_presentation_types_bulk.csv"),
     'homorhythm': ("📄 Download homorhythm data CSV", "browse_homorhythm_bulk.csv"),
+    'density': ("📊 Download per-piece density comparison CSV", "browse_density_bulk.csv"),
 }
 
 
@@ -1688,7 +1738,9 @@ with tab_browse:
                 "and hands back CRIM's own raw columns (CadType/Tone/RelTone for cadences, "
                 "Presentation_Type/Soggetti/Voices for points of imitation, hr_voices for "
                 "homorhythm) as one CSV per analysis, ready for your own stats -- not just a "
-                "count of what was found."
+                "count of what was found. Also builds a per-piece density comparison CSV -- "
+                "the same density figure shown after a single-piece Analyze, one row per "
+                "piece, side by side."
             )
             bulk_col_cad, bulk_col_pt, bulk_col_hr = st.columns(3)
             bulk_cadences = bulk_col_cad.checkbox("Cadences", value=True, key="browse_bulk_cadences")

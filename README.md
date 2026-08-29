@@ -68,10 +68,17 @@ cadences, `Presentation_Type`/`Soggetti`/`Voices` for points of
 imitation, `hr_voices` for homorhythm), one CSV per analysis, each row
 tagged with `collection`/`composer`/`label` so pieces stay identifiable
 once every match is concatenated together — ready for your own stats,
-not just a count of what was found. This is real per-piece CRIM
-computation on top of the fetch, so it's capped tighter than the ZIP
-(15 matches) — a provisional cap, not yet benchmarked live the way the
-ZIP's 30 was.
+not just a count of what was found. Also builds a **per-piece density
+comparison CSV** — one row per piece, one column per checked analysis,
+the same density figure (fraction of measures touched — see below) a
+single-piece Analyze shows, so several pieces can be compared side by
+side directly, which the per-event CSVs above don't make easy on their
+own. A blank cell means that analysis wasn't computed for that piece at
+all (never requested, or it failed); a `0` means it genuinely found
+nothing — kept distinct rather than collapsed into one blank. This is
+real per-piece CRIM computation on top of the fetch, so it's capped
+tighter than the ZIP (15 matches) — a provisional cap, not yet
+benchmarked live the way the ZIP's 30 was.
 
 Handy for "give me every Josquin piece across all 7 collections to
 analyze myself" — search "Josquin", download the CSV (or, narrowed
