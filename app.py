@@ -1787,9 +1787,10 @@ with tab_browse:
 
     st.caption(
         "☁️ Composer word cloud across all ~4,300 pieces in this app, sized by piece count "
-        "(all 7 collections merged -- the same composer may appear twice here if spelled "
-        "differently across collections, e.g. CRIM's \"Josquin Des Prez\" vs JRP's \"Josquin "
-        "des Prez\"):"
+        "(all 7 collections merged, with known same-composer name variants folded together -- "
+        "JRP's inverted \"Lastname, Firstname\" order, plus a short manually verified alias list, "
+        "e.g. CRIM's \"Giovanni Pierluigi da Palestrina\" merging into \"Palestrina\". A rarer, "
+        "unverified variant can still show up as two words):"
     )
     st.image(_composer_wordcloud_png_bytes(full_index))
 
