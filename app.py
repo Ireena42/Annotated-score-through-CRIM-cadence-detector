@@ -585,6 +585,29 @@ def score_to_pdf_bytes(score):
     from reportlab.graphics import renderPDF
     from reportlab.pdfgen import canvas as pdf_canvas
 
+    # Real, confirmed root cause of "Verovio couldn't parse" recurring
+    # across arbitrary, otherwise-completely-normal pieces, found from the
+    # deployed app's own server logs (not guessed): Verovio's bundled font/
+    # glyph data (Bravura, Leipzig -- what it needs to even initialize,
+    # before parsing a single note) wasn't being found at all on Streamlit
+    # Cloud -- "Bravura font could not be loaded" / "The data cannot be
+    # loaded because the font resources are not available". This has
+    # nothing to do with any specific piece; every single call was failing
+    # at toolkit startup, which is exactly why it looked like "many
+    # different pieces" all failing the same way with an empty log, and
+    # why nothing ever reproduced locally (this machine's own verovio
+    # install has its data files in the right place; whatever Streamlit
+    # Cloud's installer -- uv, per its own build log -- did with the pip
+    # package's bundled data apparently didn't carry them over correctly).
+    # verovio.__init__.py normally sets this itself via
+    # importlib.resources.files('verovio')/'data' at import time, but that
+    # depends on the installed package actually having its data files
+    # where it expects -- fixed by bundling our OWN copy of that same data
+    # directory in this repo (verovio_data/, ~6MB) and pointing Verovio at
+    # it explicitly, removing the dependency on the installer getting the
+    # pip package's own data bundling right.
+    verovio.setDefaultResourcePath(str(Path(__file__).parent / 'verovio_data'))
+
     xml_bytes = score_to_download_bytes(score)
     tk = verovio.toolkit()
     if not tk.loadData(xml_bytes.decode('utf-8')):
