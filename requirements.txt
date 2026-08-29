@@ -3,3 +3,4 @@ music21==8.3.0
 pandas==2.3.3
 streamlit==1.62.0
 requests==2.31.0
+wordcloud==1.9.6

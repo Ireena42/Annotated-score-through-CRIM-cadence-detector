@@ -34,6 +34,7 @@ import music21 as m21
 import pandas as pd
 import requests
 import streamlit as st
+from wordcloud import WordCloud
 
 # so `from annotate_cadences import ...` finds the file regardless of the
 # directory `streamlit run` was launched from
@@ -1361,6 +1362,27 @@ def _matches_to_csv_bytes(matches):
     return buf.getvalue().encode('utf-8')
 
 
+def _composer_wordcloud_png_bytes(index):
+    """A composer word cloud across the WHOLE corpus, sized by piece
+    count -- reuses _browse_row_to_csv_dict's own composer extraction,
+    same as the composer-count CSV. Unlike that CSV, this merges
+    composers across all 7 collections into one visual rather than
+    breaking them out per-collection -- a deliberate, honest tradeoff:
+    the same composer can appear as two separate words if their name is
+    spelled differently across collections (e.g. CRIM's "Josquin Des
+    Prez" vs JRP's "Josquin des Prez" -- documented at length elsewhere
+    in this file), which a purely illustrative overview can tolerate in
+    a way a precise per-collection count table shouldn't."""
+    counts = Counter(
+        _browse_row_to_csv_dict(row[0], row[1], row[2])['composer'] for row in index
+    )
+    wc = WordCloud(width=900, height=380, background_color=None, mode='RGBA', colormap='plasma')
+    wc.generate_from_frequencies(counts)
+    buf = io.BytesIO()
+    wc.to_image().save(buf, format='PNG')
+    return buf.getvalue()
+
+
 def annotate_by_collection(collection, native_ref, include_cadences=True, include_ptypes=False, include_homorhythm=False):
     """Dispatches to whichever collection's own annotate path applies --
     reuses the exact same functions each dedicated tab already calls, so
@@ -1605,6 +1627,13 @@ with tab_browse:
                      "across collections, since composer spelling isn't consistent between them "
                      "(e.g. CRIM's 'Josquin Des Prez' vs JRP's 'Josquin des Prez').",
             )
+
+            st.caption(
+                "☁️ Composer word cloud (all 7 collections merged, sized by piece count -- unlike "
+                "the CSV above, the same composer may appear twice here if spelled differently "
+                "across collections):"
+            )
+            st.image(_composer_wordcloud_png_bytes(full_index))
 
     if query:
         with st.spinner("Searching (first search after a quiet spell indexes all "
