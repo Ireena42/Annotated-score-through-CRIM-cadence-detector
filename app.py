@@ -101,14 +101,33 @@ st.markdown(
        node), so it isn't affected by Streamlit's own React re-renders.
        Same custos path as the favicon/divider above, inlined as an SVG
        data URI since a CSS background-image can't reference this
-       file's own <symbol> definitions. */
+       file's own <symbol> definitions. Stroke color is the parchment
+       tone (not the dark ink used elsewhere for this same shape):
+       every button that gets this hover is now styled type="primary"
+       (orange fill, light text), so a light custos is what actually
+       reads against that background -- the dark version would have
+       had the same low-contrast problem the ink color was originally
+       fine to avoid on the plain white/secondary buttons this replaced. */
     [data-testid^="stBaseButton"]:hover::after {
         content: "";
         display: inline-block;
         width: 15px; height: 11px;
         margin-left: 7px;
         vertical-align: middle;
-        background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 24'%3E%3Cpath d='M4 20 L14 4 L20 14 L28 4' fill='none' stroke='%233d1620' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 24'%3E%3Cpath d='M4 20 L14 4 L20 14 L28 4' fill='none' stroke='%23fbf3e7' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+    /* The file uploader's own internal "Browse files" button -- has no
+       Python-level type="primary" option (st.file_uploader doesn't
+       expose one), so this is the only way to match it to every other
+       action button now that they're all styled type="primary".
+       Scoped to inside stFileUploaderDropzone specifically (checked
+       directly against this app's real DOM) so it doesn't
+       accidentally widen back out to buttons this rule isn't meant
+       for. */
+    [data-testid="stFileUploaderDropzone"] button {
+        background-color: #a8451f;
+        color: #fbf3e7;
+        border-color: #a8451f;
     }
     </style>
     """,
@@ -1824,7 +1843,7 @@ with tab_browse:
                     f"(this search has {len(matches)}) -- narrow the search to enable it, or use "
                     "the CSV above for the full list."
                 )
-            elif st.button(f"📦 Build a ZIP of all {len(matches)} score(s) (MusicXML)", key="browse_zip_build"):
+            elif st.button(f"📦 Build a ZIP of all {len(matches)} score(s) (MusicXML)", key="browse_zip_build", type="primary"):
                 progress_bar = st.progress(0.0)
                 status = st.empty()
 
@@ -1876,7 +1895,7 @@ with tab_browse:
                 )
             elif not (bulk_cadences or bulk_ptypes or bulk_hr):
                 st.caption("Check at least one analysis above to enable the bulk export.")
-            elif st.button(f"🧮 Build analysis-data CSV(s) for all {len(matches)} piece(s)", key="browse_bulk_analysis_build"):
+            elif st.button(f"🧮 Build analysis-data CSV(s) for all {len(matches)} piece(s)", key="browse_bulk_analysis_build", type="primary"):
                 progress_bar = st.progress(0.0)
                 status = st.empty()
 
