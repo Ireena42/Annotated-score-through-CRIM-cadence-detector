@@ -52,7 +52,26 @@ from corpus_sources import (
 )  # piece-enumeration layer -- see corpus_sources.py's own module docstring for why
   # this moved out of app.py (precompute_finalis.py needs the identical logic too).
 
-st.set_page_config(page_title="Renaissance Polyphony Research Toolkit", layout="centered")
+st.set_page_config(
+    page_title="Renaissance Polyphony Research Toolkit",
+    page_icon="favicon_semibreve.png",  # a void (outline) semibreve -- see this
+    # file's own real notehead shapes below for the manuscript-derived motif.
+    layout="centered",
+)
+st.markdown(
+    """
+    <div style="
+        width: 100%; height: 150px; border-radius: 4px; margin-bottom: 0.75rem;
+        background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Barbireau_illum.jpg/1280px-Barbireau_illum.jpg');
+        background-size: cover; background-position: center 38%;
+    "></div>
+    """,
+    unsafe_allow_html=True,
+)  # A real Sistine Chapel choirbook page (Missa Virgo Parens Christi's
+   # Kyrie, Jacobus Barbireau, early 16th c. -- NOT Palestrina himself,
+   # a slightly earlier composer, but the same manuscript tradition
+   # Palestrina later sang from and composed for) -- public domain, see
+   # the Credits expander below for the full attribution.
 st.title("Renaissance Polyphony Research Toolkit")
 st.caption(
     "This app works with symbolic notation of Renaissance polyphony -- "
@@ -441,6 +460,16 @@ separate tool by the CRIM team themselves). Scores are parsed with
   [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 - **[Lassus's Geistliche Psalmen](https://github.com/WolfgangDrescher/lassus-geistliche-psalmen)** --
   no license file published as of this writing
+
+**The banner image above** is a real manuscript page: the five-voice
+Kyrie of the *Missa Virgo Parens Christi* by Jacobus Barbireau
+(ca. 1420-1491) -- not Palestrina himself, a slightly earlier
+Franco-Flemish composer, but from the Sistine Chapel choir's own
+manuscript archive (Cappella Sistina 160, Vatican), the same tradition
+Palestrina later sang from and composed for. Public domain (faithful
+photographic reproduction of a public-domain work of art), via
+[Wikimedia Commons](https://en.wikipedia.org/wiki/File:Barbireau_illum.jpg),
+sourced from a Library of Congress exhibition.
 
 This app itself is free, non-commercial, and unaffiliated with any of
 the projects above -- consistent with every non-commercial term listed.

@@ -240,8 +240,12 @@ A **Finalis** filter for Browse is planned — full-corpus, not scoped to
 one search — but that needs a Finalis *value* for all ~4,300 pieces
 already sitting somewhere cheap to read, since computing it live would
 mean running real CRIM cadence detection on every piece just to
-populate a filter dropdown. That precompute is built but **not yet run
-even once**:
+populate a filter dropdown. First test run (5 music21 pieces) came back
+clean, including a real check against a hand-verified answer: two of
+the five pieces were *Missa De Beata Marie Virginis (II)/(III)*'s own
+Agnus movements, both correctly returning **G** — matching this
+project's own independently hand-verified finalis for exactly those
+two pieces. The full corpus run is still pending:
 
 - `corpus_sources.py` — the piece-*listing* logic (which pieces exist,
   across all 7 collections) extracted out of `app.py` into its own
@@ -266,13 +270,14 @@ even once**:
   several days, each pass resuming from the last one's committed
   progress, to work through the full corpus.
 
-**Run a small test first** (`--limit 5 --collection music21`, or the
-matching workflow inputs) **before the real run** — this whole pipeline
-was written without a working local Python environment to test it
-against, so a 5-piece test is the way to catch a real bug cheaply
-instead of hours into the full one. Once `data/finalis.jsonl` actually
-exists and looks right, the remaining step — reading it and wiring up
-an actual Finalis filter widget in Browse — hasn't been built yet.
+Now that the 5-piece test has confirmed the pipeline itself works, the
+next step is triggering a full run (blank `limit`, all collections) —
+realistically over several separate `workflow_dispatch` triggers, each
+resuming from the last one's committed progress (see `data/
+finalis.jsonl`'s growing piece count). Once that's done and the numbers
+still look right at scale, the remaining step — reading the file and
+wiring up an actual Finalis filter widget in Browse — hasn't been built
+yet.
 
 ## Credits & licensing
 
@@ -317,6 +322,16 @@ directly against each repo's own license file, not assumed):
 - **[Lassus's Geistliche Psalmen](https://github.com/WolfgangDrescher/lassus-geistliche-psalmen)** —
   no license file published in the repo as of this writing; credited
   here, terms not otherwise specified by the project.
+
+**The app's own header banner** is a real manuscript page: the
+five-voice Kyrie of the *Missa Virgo Parens Christi* by Jacobus
+Barbireau (ca. 1420-1491) — not Palestrina, a slightly earlier
+Franco-Flemish composer, but from the Sistine Chapel choir's own
+manuscript archive (Cappella Sistina 160, Vatican) — the same tradition
+Palestrina later sang from and composed for. Public domain (faithful
+photographic reproduction of a public-domain work of art), via
+[Wikimedia Commons](https://en.wikipedia.org/wiki/File:Barbireau_illum.jpg),
+sourced from a Library of Congress exhibition.
 
 This app is a free, non-commercial side project with no ads or
 monetization, consistent with every non-commercial term above. If
