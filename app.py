@@ -1573,21 +1573,14 @@ with tab_browse:
     # @st.cache_data(ttl=3600)-wrapped call the search box below (and
     # every collection tab) already shares, so this doesn't add a new
     # expensive operation -- it just moves the first hit of it earlier,
-    # to whoever opens this tab first in a given hour, so the word cloud
-    # can render right away rather than waiting behind an extra click.
+    # so the CSV downloads below and the word cloud at the bottom of
+    # this tab are both ready without a separate build step.
     with st.spinner("Loading corpus overview (first visit this hour can take ~15s, instant "
                      "after)..."):
         full_index = build_browse_index()
-    st.caption(
-        "☁️ Composer word cloud across all ~4,300 pieces in this app, sized by piece count "
-        "(all 7 collections merged -- the same composer may appear twice here if spelled "
-        "differently across collections, e.g. CRIM's \"Josquin Des Prez\" vs JRP's \"Josquin "
-        "des Prez\"):"
-    )
-    st.image(_composer_wordcloud_png_bytes(full_index))
 
     query = st.text_input(
-        'Search (partial words OK -- try "josquin missa" or "159")',
+        'Search (partial words OK)',
         key="browse_query",
         help='Matches any text in a result -- composer, title, movement, catalog year, anything '
              'shown. Words don\'t need to be whole or in order ("159" matches any 1590s piece), '
@@ -1722,6 +1715,14 @@ with tab_browse:
             _, collection, native_ref = next(m for m in shown if m[0] == browse_label)
             stem = _browse_piece_filename_stem(collection, native_ref)
             render_preview_and_annotate(collection, native_ref, browse_label, stem, key_prefix='browse')
+
+    st.caption(
+        "☁️ Composer word cloud across all ~4,300 pieces in this app, sized by piece count "
+        "(all 7 collections merged -- the same composer may appear twice here if spelled "
+        "differently across collections, e.g. CRIM's \"Josquin Des Prez\" vs JRP's \"Josquin "
+        "des Prez\"):"
+    )
+    st.image(_composer_wordcloud_png_bytes(full_index))
 
 with tab_upload:
     st.caption("Accepted formats: MusicXML (.xml/.musicxml) or MEI (.mei).")

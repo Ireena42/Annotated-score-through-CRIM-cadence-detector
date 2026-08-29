@@ -64,23 +64,22 @@ Handy for "give me every Josquin piece across all 7 collections to
 analyze myself" — search "Josquin", download the CSV (or, narrowed
 further, the ZIP).
 
-A composer word cloud across all ~4,300 pieces, all 7 collections
-merged, sized by piece count, renders right at the top of this tab —
-no search, no click, no expander needed. It merges composers across
-collections purely for a visual overview, not a precise count (the
-same composer can genuinely appear twice, spelled two different ways —
-visible in the cloud itself, not hidden). Useful for a first sense of
-scope before you've decided what to search for.
-
 No search at all needed for the **whole corpus's metadata** either (not
 the scores themselves): a **"📦 Download the whole corpus metadata"**
 expander sits right below the search box, with a CSV manifest (all
 ~4,300 pieces, all 7 collections at once, same columns as a search
 result's own CSV export), a small per-collection piece-count CSV, and a
 per-collection *composer*-count CSV (how many pieces each composer has
-*within* their own collection — not merged across collections, unlike
-the word cloud above, since this one's meant to be a precise count and
+*within* their own collection — not merged across collections, since
 composer spelling isn't consistent between collections).
+
+At the bottom of this tab, below the search results, a composer word
+cloud across all ~4,300 pieces, all 7 collections merged, sized by
+piece count — no search or click needed, it renders as soon as the tab
+loads. Unlike the composer-count CSV above, this merges composers
+across collections purely for a visual overview, not a precise count
+(the same composer can genuinely appear twice, spelled two different
+ways — visible in the cloud itself, not hidden).
 
 Or pick a piece from one collection directly. Every tab below filters by
 **Composer**, one at a time with an "All composers" default (each
