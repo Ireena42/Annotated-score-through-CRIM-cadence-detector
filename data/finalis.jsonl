@@ -1953,3 +1953,53 @@
 {"label": "[JRP] Du Fay, Guillaume — Missa Se la face ay pale: Agnus", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
 {"label": "[JRP] Du Fay, Guillaume — Ave regina celorum III", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
 {"label": "[JRP] Du Fay, Guillaume — Ave maris stella verse 2  Sumens illud ave: chant", "collection": "jrp", "finalis": "D", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[JRP] Du Fay, Guillaume — Ave maris stella verse 2  Sumens illud ave: hymn", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Du Fay, Guillaume — Nuper rosarum flores  Terribilis est locus iste", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Du Fay, Guillaume — Duf3007.2: Craindre vous vueil doulce dame de pris", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Du Fay, Guillaume — Resvellies vous et faites chiere lye:  ballade", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Du Fay, Guillaume — Se la face ay pale", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Du Fay, Guillaume — Adieu ces bons vins de Lannoys", "collection": "jrp", "finalis": "D", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[JRP] Du Fay, Guillaume — Adieu mamour adieu ma joye", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Du Fay, Guillaume — Adyeu quitte le demeurant", "collection": "jrp", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[JRP] Du Fay, Guillaume — Belle vueillez moy vengier", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Du Fay, Guillaume — Bon jour bon mois bon an et bonne estraine", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Du Fay, Guillaume — Puisque vous estez campieur", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Du Fay, Guillaume — Resvelons nous resvelons amoureux  Alons en bien tos au may", "collection": "jrp", "finalis": "D", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[JRP] Du Fay, Guillaume — Helas mon dueil a ce cop sui je mort", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Du Fay, Guillaume — Malheureulx cueur que vieulx tu faire", "collection": "jrp", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[JRP] Du Fay, Guillaume — Hic iocundus sumit mundus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Frye, Walter — O florens rosa", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Frye, Walter — Tout a par moy", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Févin, Antoine de — Missa Ave Maria: Kyrie", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Févin, Antoine de — Missa Ave Maria: Gloria", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Févin, Antoine de — Missa Ave Maria: Credo", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Févin, Antoine de — Missa Ave Maria: Sanctus", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Févin, Antoine de — Missa Ave Maria: Agnus", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa sine nomine Kyrie", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa sine nomine Gloria", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa sine nomine Credo", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa sine nomine Sanctus", "collection": "jrp", "finalis": "E-", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa sine nomine Agnus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Ave nostra salus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Ave panis angelorum", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — O inextimabilis dilectio", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Ce nest pas sans", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Ave regina celorum: Kyrie", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Ave regina celorum: Gloria", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Ave regina celorum: Credo", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Ave regina celorum: Sanctus", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Ave regina celorum: Agnus", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa O venus bant: Kyrie", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa O venus bant: Gloria", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa O venus bant: Credo", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa O venus bant: Sanctus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa O venus bant: Agnus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Princesse damourettes: Kyrie", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Princesse damourettes: Gloria", "collection": "jrp", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Princesse damourettes: Credo", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Princesse damourettes: Sanctus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Princesse damourettes: Agnus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Se mieulx ne vient: Kyrie", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Se mieulx ne vient: Gloria", "collection": "jrp", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Se mieulx ne vient: Credo", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Gaspar van Weerbeke — Missa Se mieulx ne vient: Sanctus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
