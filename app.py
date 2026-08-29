@@ -84,20 +84,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-st.markdown(
-    """
-    <div style="
-        width: 100%; height: 150px; border-radius: 4px; margin-bottom: 0.75rem;
-        background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Barbireau_illum.jpg/1280px-Barbireau_illum.jpg');
-        background-size: cover; background-position: center 38%;
-    "></div>
-    """,
-    unsafe_allow_html=True,
-)  # A real Sistine Chapel choirbook page (Missa Virgo Parens Christi's
-   # Kyrie, Jacobus Barbireau, early 16th c. -- NOT Palestrina himself,
-   # a slightly earlier composer, but the same manuscript tradition
-   # Palestrina later sang from and composed for) -- public domain, see
-   # the Credits expander below for the full attribution.
 st.title("Renaissance Polyphony Research Toolkit")
 st.caption(
     "This app works with symbolic notation of Renaissance polyphony -- "
@@ -216,6 +202,42 @@ def _append_timeline(stats, measure_values, label, color):
     )
 
 
+def _total_measures(score):
+    """Total measure count for a piece, read from its top staff's own
+    Measure objects -- the same "top staff" convention already used
+    throughout annotate_cadences.py (measure_indices[0], the part
+    labels actually get placed on) rather than a separate rule invented
+    just for this."""
+    return len(score.parts[0].getElementsByClass('Measure'))
+
+
+def _add_density(stats, score):
+    """Folds a density figure into stats['density'] for each analysis
+    type present in stats['timeline'] -- the fraction of the piece's
+    measures that contain at least one detected event of that type
+    (e.g. 0.12 -- cadences fall in 12% of this piece's measures), not a
+    raw event count, so a short piece and a long piece are directly
+    comparable. Uses the SET of unique measure numbers a type's events
+    touch, not len(events), since more than one event can land in the
+    same measure (this matters most for homorhythm: crim_intervals'
+    raw, non-consolidated sliding-window output -- see
+    annotate_homorhythm's own docstring -- naturally produces several
+    rows per real passage, several measures apart or overlapping; the
+    unique-measures count is what actually answers "how much of the
+    piece is homorhythmic," not "how many overlapping windows fired").
+    A no-op if stats has no timeline (nothing was requested, or nothing
+    was found) or the piece has zero measures (guards a division by
+    zero on a degenerate/empty score rather than crashing)."""
+    timeline = stats.get('timeline')
+    total = _total_measures(score)
+    if not timeline or not total:
+        return
+    by_type = {}
+    for row in timeline:
+        by_type.setdefault(row['Type'], set()).add(row['Measure'])
+    stats['density'] = {label: len(measures) / total for label, measures in by_type.items()}
+
+
 def run_pipeline(score, source_label, include_cadences=True, include_ptypes=False, include_homorhythm=False):
     """Shared by both input modes below: given a parsed music21 Score,
     optionally runs each of CRIM's three structural analyses on it and
@@ -309,6 +331,7 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
             stats['hr_colored'] = hr_stats['colored']
             _append_timeline(stats, hr.index.get_level_values('Measure'), 'Homorhythm', HOMORHYTHM_COLOR)
 
+    _add_density(stats, annotated_score)
     return annotated_score, stats, None
 
 
@@ -432,6 +455,23 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
             "anything in this piece. The file below is the unmodified score."
         )
 
+    # Quick numeric summary before the detailed strip plot below -- see
+    # _add_density()'s own docstring for exactly what this measures
+    # (fraction of measures touched, not a raw event count) and why.
+    # Ordered Cadence/Points of Imitation/Homorhythm regardless of dict
+    # insertion order, which depends on which analyses were requested.
+    density = stats.get('density')
+    if density:
+        present = [label for label in ('Cadence', 'Points of Imitation', 'Homorhythm') if label in density]
+        cols = st.columns(len(present))
+        for col, label in zip(cols, present):
+            col.metric(
+                f"{label} density", f"{density[label]:.0%}",
+                help=f"Fraction of this piece's measures with at least one detected "
+                     f"{label.lower()} -- not a raw count, so pieces of different "
+                     "lengths are directly comparable.",
+            )
+
     # One row per detected event across whichever analyses ran -- see
     # _append_timeline(). Only present when `annotated` is True (nothing
     # is ever appended for an empty/unrequested analysis), so no separate
@@ -486,16 +526,6 @@ separate tool by the CRIM team themselves). Scores are parsed with
   [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 - **[Lassus's Geistliche Psalmen](https://github.com/WolfgangDrescher/lassus-geistliche-psalmen)** --
   no license file published as of this writing
-
-**The banner image above** is a real manuscript page: the five-voice
-Kyrie of the *Missa Virgo Parens Christi* by Jacobus Barbireau
-(ca. 1420-1491) -- not Palestrina himself, a slightly earlier
-Franco-Flemish composer, but from the Sistine Chapel choir's own
-manuscript archive (Cappella Sistina 160, Vatican), the same tradition
-Palestrina later sang from and composed for. Public domain (faithful
-photographic reproduction of a public-domain work of art), via
-[Wikimedia Commons](https://en.wikipedia.org/wiki/File:Barbireau_illum.jpg),
-sourced from a Library of Congress exhibition.
 
 This app itself is free, non-commercial, and unaffiliated with any of
 the projects above -- consistent with every non-commercial term listed.
@@ -727,6 +757,7 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
             stats['hr_labeled'] = hr_stats['labeled']
             stats['hr_colored'] = hr_stats['colored']
             _append_timeline(stats, hr.index.get_level_values('Measure'), 'Homorhythm', HOMORHYTHM_COLOR)
+    _add_density(stats, annotated_score)
     return annotated_score, stats, None
 
 

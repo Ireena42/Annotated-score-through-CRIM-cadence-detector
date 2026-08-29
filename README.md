@@ -233,6 +233,16 @@ above is the one to share.
    neither, so there the first voice's own entry measure is parsed out
    of its `Measures_Beats` field instead (the same value this tool
    itself tries first when placing that instance's label on the score).
+8. Right above that plot, a **density** stat tile per analysis —
+   the fraction of the piece's measures that contain at least one
+   detected event of that type (e.g. "Cadence density: 12%"). Deliberately
+   the *fraction of measures touched*, not a raw event count, so a
+   16-measure piece and a 160-measure piece are directly comparable, and
+   so a homorhythm passage spanning several measures (crim_intervals'
+   own `homorhythm()` returns overlapping sliding-window rows per real
+   passage, not one row per passage — see `annotate_homorhythm`'s own
+   docstring) doesn't inflate the count the way a plain `len(events)`
+   would.
 
 ## Finalis precompute (in progress, not yet in the app's UI)
 
@@ -322,16 +332,6 @@ directly against each repo's own license file, not assumed):
 - **[Lassus's Geistliche Psalmen](https://github.com/WolfgangDrescher/lassus-geistliche-psalmen)** —
   no license file published in the repo as of this writing; credited
   here, terms not otherwise specified by the project.
-
-**The app's own header banner** is a real manuscript page: the
-five-voice Kyrie of the *Missa Virgo Parens Christi* by Jacobus
-Barbireau (ca. 1420-1491) — not Palestrina, a slightly earlier
-Franco-Flemish composer, but from the Sistine Chapel choir's own
-manuscript archive (Cappella Sistina 160, Vatican) — the same tradition
-Palestrina later sang from and composed for. Public domain (faithful
-photographic reproduction of a public-domain work of art), via
-[Wikimedia Commons](https://en.wikipedia.org/wiki/File:Barbireau_illum.jpg),
-sourced from a Library of Congress exhibition.
 
 This app is a free, non-commercial side project with no ads or
 monetization, consistent with every non-commercial term above. If
