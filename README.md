@@ -365,6 +365,11 @@ monetization, consistent with every non-commercial term above. If
 you're citing or reusing results from a specific piece, cite that
 piece's own source collection (linked above), not just this app.
 
+**Citing this app itself:** if you use it in published work — beyond
+citing CRIM Intervals/music21 above for the actual analysis methods —
+this repo has a [`CITATION.cff`](CITATION.cff) file; GitHub renders a
+"Cite this repository" button from it (APA/BibTeX) in the sidebar.
+
 ## Notes
 
 - Humdrum (`.krn`) upload isn't offered in the "upload your own file" tab

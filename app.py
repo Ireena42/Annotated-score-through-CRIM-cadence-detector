@@ -671,7 +671,12 @@ This app itself is free, non-commercial, and unaffiliated with any of
 the projects above -- consistent with every non-commercial term listed.
 If you're citing or reusing results from a specific piece, cite that
 piece's own source collection (linked above), not just this app. Full
-source code: [github.com/IreenaK/Renaissance-score-workbench](https://github.com/IreenaK/Renaissance-score-workbench).
+source code: [github.com/vclag/Renaissance-score-workbench](https://github.com/vclag/Renaissance-score-workbench).
+
+**Citing this app itself:** if you use it in published work -- beyond
+citing CRIM Intervals/music21 above for the actual analysis methods --
+this repo has a `CITATION.cff` file; GitHub renders a "Cite this
+repository" button from it (APA/BibTeX) in the repo's own sidebar.
         """
     )
 

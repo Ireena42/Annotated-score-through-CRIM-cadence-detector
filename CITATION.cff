@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: >-
+  If you use this tool in published work, please cite it below,
+  alongside the underlying libraries it's built on (CRIM Intervals and
+  music21 -- see this repo's README/in-app Credits section for those
+  citations, and to cite a specific piece's own source collection).
+type: software
+title: "Renaissance Polyphony Research Toolkit"
+abstract: >-
+  A Streamlit web app that aggregates ~4,300 Renaissance polyphony
+  pieces from 7 sources (a music21-bundled corpus, CRIM Project,
+  Josquin Research Project, 1520s Project, Tasso in Music Project,
+  SEILS, Lassus's Geistliche Psalmen) into one searchable,
+  analysis-ready place, and runs CRIM Intervals' structural analyses
+  (cadences, points of imitation, homorhythm) on them, writing results
+  back onto real notation, plotting them, or exporting them as data.
+authors:
+  - alias: "vclag"
+repository-code: "https://github.com/vclag/Renaissance-score-workbench"
+url: "https://renaissance-polyphony-research-toolkit.streamlit.app/"
+date-released: "2026-08-29"
