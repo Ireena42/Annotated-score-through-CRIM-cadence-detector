@@ -1569,11 +1569,13 @@ with tab_browse:
              'Josquin mass movement.',
     )
 
-    with st.expander("📦 Download the entire corpus, no search needed (all 7 collections)"):
+    with st.expander("📦 Download the whole corpus metadata, no search needed (all 7 collections)"):
         st.caption(
-            "Every piece this app knows about, across all 7 collections, as one CSV -- same "
-            "columns as a search result's own CSV export (collection, composer, label, source "
-            "URL / music21 corpus path) -- plus a small per-collection piece-count table. "
+            "Not the scores themselves -- a manifest of every piece this app knows about, "
+            "across all 7 collections, as one CSV -- same columns as a search result's own "
+            "CSV export (collection, composer, label, source URL / music21 corpus path) -- "
+            "plus a small per-collection piece-count table. To get actual scores for a set of "
+            "pieces, search or filter down to them above and use that tab's ZIP download. "
             "Building this indexes every collection live the first time (~15s cold, instant "
             "after -- same hourly cache Search and every collection tab already share)."
         )
