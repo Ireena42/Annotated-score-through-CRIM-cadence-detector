@@ -3,3 +3,53 @@
 {"label": "[Palestrina] Missa De Beata Marie Virginis (III): Agnus", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[Palestrina] Missa Fratres Ego Enim Accepi: Agnus", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[Palestrina] Missa Gia fu chi m'ebbe cara: Agnus", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Hodie Christus Natus Est: Agnus", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (I): Agnus", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (II): Agnus", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Sicut lilium inter spinas: Agnus", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Sine nomine (Mantuan): Agnus", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Te Deum laudamus: Agnus", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In festis Apostolorum (I): Agnus", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In festis Apostolorum (II): Agnus", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In illo tempore: Agnus", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In semidupl. maj. (I): Agnus", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In semidupl. maj. (II): Agnus", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Memor esto: Agnus", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa O Rex gloriae: Agnus", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa O virgo simul et mater: Agnus", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ad coenam Agni: Agnus I", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ad coenam Agni: Agnus II", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Pro Defunctis: Agnus III", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ecce sacerdos magnus: Agnus III (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ecce sacerdos magnus: Agnus III (part b)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ad fugam: Agnus II", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Aeterna Christi munera: Agnus II", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Alma Redemptoris mater: Agnus II", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ascendo ad Patrem: Agnus II (part a)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ascendo ad Patrem: Agnus II (part b)", "collection": "music21", "finalis": "C", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Palestrina] Missa Aspice Domine: Agnus II", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Assumpta est Maria: Agnus II", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave Maria (1594): Agnus II", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave Maria (1596): Agnus II", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave regina coelorum: Agnus II", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Beatus Laurentius: Agnus II", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Benedicta es: Agnus II (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Benedicta es: Agnus II (part b)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Brevis: Agnus II", "collection": "music21", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Confitebor tibi: Agnus II (part a)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Confitebor tibi: Agnus II (part b)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De beata virgine (1567): Agnus II", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De beata virgine (1570): Agnus II", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De feria: Agnus II", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Descendit angelus Domini: Agnus II", "collection": "music21", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Dies sanctificatus: Agnus II (part a)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Dies sanctificatus: Agnus II (part b)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Dilexi quoniam: Agnus II", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Dum complerentur: Agnus II", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Dum esset summus pontifex: Agnus II", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ecce ego Joannes: Agnus II", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ecce sacerdos magnus: Agnus II", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Emendemus in melius: Agnus II", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Eripe me de inimicis: Agnus II", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Gabriel Archangelus: Agnus II", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Illumina oculos meos: Agnus II", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
