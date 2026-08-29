@@ -1495,6 +1495,155 @@ def annotate_by_collection(collection, native_ref, include_cadences=True, includ
     )
 
 
+def _import_piece_by_collection(collection, native_ref):
+    """Fetches and imports a piece as a crim_intervals ImportedPiece, for
+    the bulk analysis-table export below -- mirrors annotate_by_
+    collection's exact per-collection fetch mechanics (music21 corpus
+    parse, CRIM's own MEI-url import, Humdrum kern fetch+parse) but
+    stops there: no score mutation, no annotate_score/_presentation_
+    types/_homorhythm call. A raw-data export wants CRIM's own
+    DataFrame (cadences()/presentationTypes()/homorhythm()) straight
+    from a piece object, not an annotated score -- running the
+    annotation step too would just waste time coloring/labeling a score
+    nothing here ever reads. Returns (piece, error)."""
+    if collection == 'music21':
+        corpus_key, piece_id = native_ref
+        score = m21.corpus.parse(f"{corpus_key}/{piece_id}")
+        return ci.main_objs.ImportedPiece(score, piece_id), None
+    if collection == 'crim':
+        if not native_ref['mei_links']:
+            return None, "CRIM has this piece catalogued but no MEI file for it yet (a gap in CRIM's own data, not a problem with your search)."
+        piece = ci.importScore(native_ref['mei_links'][0])
+        if piece is None:
+            return None, "CRIM couldn't import this piece (bad MEI file or network issue)."
+        return piece, None
+    raw_url = KERN_COLLECTION_BASE_URLS[collection] + native_ref
+    kern_text = requests.get(raw_url, timeout=20).text
+    score = m21.converter.parse(kern_text)
+    return ci.main_objs.ImportedPiece(score, Path(native_ref).stem), None
+
+
+# Hard cap on Browse's bulk CRIM analysis-table export -- deliberately
+# tighter than BULK_ZIP_MAX_MATCHES below: that cap was set from a real
+# benchmark of fetch+parse+convert ALONE (no CRIM computation). This
+# feature runs actual cadences()/presentationTypes()/homorhythm() on top
+# of that same fetch, which is real, uncharacterized extra cost per
+# piece -- capped conservatively until it's been benchmarked live on the
+# deployed app (not guessed at), same discipline as the ZIP cap
+# originally came from. Revisit once real timing is in.
+BULK_ANALYSIS_MAX_MATCHES = 15
+
+
+def _bulk_analysis_csv_bytes(matches, include_cadences, include_ptypes, include_homorhythm, progress_callback=None):
+    """Runs whichever of CRIM's cadences()/presentationTypes()/
+    homorhythm() are requested across every match, concatenating each
+    analysis's own raw DataFrame across all pieces into one CSV per
+    analysis type -- CRIM's own rich columns (CadType/Tone/RelTone/CVFs
+    for cadences; Presentation_Type/Soggetti/Voices for presentation
+    types; hr_voices/active_voices for homorhythm), not just a summary
+    count, so the result is ready for someone's own stats in pandas/R/
+    whatever, the same "hand over the data, not just a picture of it"
+    reasoning as the plain CSV/ZIP exports above. Three 'collection'/
+    'composer'/'label' columns are prepended to every row so pieces
+    stay identifiable once concatenated.
+
+    Returns (csv_bytes_by_analysis, failed) -- csv_bytes_by_analysis is
+    a dict with only the keys among 'cadences'/'presentation_types'/
+    'homorhythm' that were both requested AND produced at least one row
+    anywhere in the batch (an analysis requested but found nowhere just
+    doesn't appear, rather than handing back an empty file). failed is
+    a list of (label, reason) for any piece that couldn't be
+    fetched/imported/analyzed -- skipped rather than aborting the whole
+    batch, reported rather than silently missing.
+
+    List-valued columns crim_intervals itself produces (e.g.
+    presentationTypes()' Measures_Beats/Voices/Soggetti/Offsets) come
+    out as Python-list-literal text in the CSV (pandas' own
+    to_csv/str() behavior, not something this function reformats) --
+    re-parse with e.g. ast.literal_eval if you need them as real lists,
+    same caveat as reading any DataFrame column of list objects back
+    out of a CSV."""
+    cadence_frames, ptype_frames, hr_frames = [], [], []
+    failed = []
+    for i, (label, collection, native_ref) in enumerate(matches):
+        if progress_callback:
+            progress_callback(i, len(matches), label)
+        try:
+            piece, error = _import_piece_by_collection(collection, native_ref)
+            if error:
+                raise RuntimeError(error)
+            tag = _browse_row_to_csv_dict(label, collection, native_ref)
+            tag_cols = {'collection': tag['collection'], 'composer': tag['composer'], 'label': tag['label']}
+
+            if include_cadences:
+                cadences, cad_error = _safe_cadences(piece)
+                if cad_error:
+                    raise RuntimeError(cad_error)
+                if not cadences.empty:
+                    # PartMap (voice_detail=True, needed elsewhere for
+                    # annotate_score's placement logic) holds actual
+                    # music21 Note objects per voice, not exportable
+                    # data -- dropped here rather than serialized into
+                    # unreadable object-repr text. reset_index() (no
+                    # drop=True) rather than discarding the index: it's
+                    # not one of cadences()'s own documented columns,
+                    # but it's the piece's raw offset -- not confirmed
+                    # redundant with Measure/Beat/Progress, so kept
+                    # rather than silently thrown away.
+                    df = cadences.reset_index().drop(columns=['PartMap'], errors='ignore')
+                    for col, val in reversed(tag_cols.items()):
+                        df.insert(0, col, val)
+                    cadence_frames.append(df)
+
+            if include_ptypes:
+                # Guarded individually, same convention as run_pipeline:
+                # a ptypes-specific failure just skips ptypes for this
+                # piece, it doesn't invalidate the cadences row already
+                # appended above -- catching it at the outer try/except
+                # instead would wrongly mark this whole piece 'failed'
+                # over one optional analysis.
+                try:
+                    ptypes = piece.presentationTypes()
+                except Exception:
+                    ptypes = None
+                if ptypes is not None and not ptypes.empty:
+                    df = ptypes.reset_index(drop=True)
+                    for col, val in reversed(tag_cols.items()):
+                        df.insert(0, col, val)
+                    ptype_frames.append(df)
+
+            if include_homorhythm:
+                try:
+                    hr = piece.homorhythm()
+                except Exception:
+                    hr = None
+                if hr is not None and not hr.empty:
+                    df = hr.reset_index()  # Measure/Beat/Offset are index levels here, not columns -- see _append_timeline
+                    for col, val in reversed(tag_cols.items()):
+                        df.insert(0, col, val)
+                    hr_frames.append(df)
+        except Exception as e:
+            failed.append((label, str(e)))
+
+    csv_bytes_by_analysis = {}
+    if cadence_frames:
+        csv_bytes_by_analysis['cadences'] = pd.concat(cadence_frames, ignore_index=True).to_csv(index=False).encode('utf-8')
+    if ptype_frames:
+        csv_bytes_by_analysis['presentation_types'] = pd.concat(ptype_frames, ignore_index=True).to_csv(index=False).encode('utf-8')
+    if hr_frames:
+        csv_bytes_by_analysis['homorhythm'] = pd.concat(hr_frames, ignore_index=True).to_csv(index=False).encode('utf-8')
+    return csv_bytes_by_analysis, failed
+
+
+# (download button label, file name) per key _bulk_analysis_csv_bytes can
+# return -- shared by the loop that renders whichever download buttons apply.
+BULK_ANALYSIS_DOWNLOAD_META = {
+    'cadences': ("📄 Download cadence data CSV", "browse_cadences_bulk.csv"),
+    'presentation_types': ("📄 Download points-of-imitation data CSV", "browse_presentation_types_bulk.csv"),
+    'homorhythm': ("📄 Download homorhythm data CSV", "browse_homorhythm_bulk.csv"),
+}
+
+
 # Hard cap on Browse's "download all matches as ZIP" -- benchmarked directly
 # against 8 real JRP pieces (fetch + music21 parse + MusicXML conversion, no
 # CRIM at all): 2.6s-7.8s each, 5.25s average. 30 pieces keeps the whole
@@ -1779,6 +1928,62 @@ with tab_browse:
                     mime="application/zip",
                     key="browse_zip_download",
                 )
+
+            st.caption(
+                "🧮 Bulk CRIM analysis-data export -- runs the checked analyses on every match "
+                "and hands back CRIM's own raw columns (CadType/Tone/RelTone for cadences, "
+                "Presentation_Type/Soggetti/Voices for points of imitation, hr_voices for "
+                "homorhythm) as one CSV per analysis, ready for your own stats -- not just a "
+                "count of what was found."
+            )
+            bulk_col_cad, bulk_col_pt, bulk_col_hr = st.columns(3)
+            bulk_cadences = bulk_col_cad.checkbox("Cadences", value=True, key="browse_bulk_cadences")
+            bulk_ptypes = bulk_col_pt.checkbox("Points of imitation", key="browse_bulk_ptypes")
+            bulk_hr = bulk_col_hr.checkbox("Homorhythm", key="browse_bulk_hr")
+
+            if len(matches) > BULK_ANALYSIS_MAX_MATCHES:
+                st.caption(
+                    f"Works for up to {BULK_ANALYSIS_MAX_MATCHES} matches at once (this search has "
+                    f"{len(matches)}) -- narrow the search to enable it. This cap is provisional: "
+                    "unlike the ZIP cap above, real CRIM computation cost per piece hasn't been "
+                    "benchmarked live yet."
+                )
+            elif not (bulk_cadences or bulk_ptypes or bulk_hr):
+                st.caption("Check at least one analysis above to enable the bulk export.")
+            elif st.button(f"🧮 Build analysis-data CSV(s) for all {len(matches)} piece(s)", key="browse_bulk_analysis_build"):
+                progress_bar = st.progress(0.0)
+                status = st.empty()
+
+                def _update_bulk_analysis_progress(i, total, label):
+                    progress_bar.progress(i / total)
+                    status.caption(f"Analyzing {i + 1}/{total}: {label}")
+
+                with st.spinner("Running CRIM analysis on each piece -- real computation, not "
+                                 "just a fetch, so slower than the ZIP above..."):
+                    csv_by_analysis, failed = _bulk_analysis_csv_bytes(
+                        matches, bulk_cadences, bulk_ptypes, bulk_hr,
+                        progress_callback=_update_bulk_analysis_progress,
+                    )
+                progress_bar.progress(1.0)
+                status.empty()
+
+                if failed:
+                    detail = "; ".join(f"{label} ({reason})" for label, reason in failed[:5])
+                    st.warning(
+                        f"{len(failed)} of {len(matches)} piece(s) couldn't be included and were "
+                        f"skipped: {detail}" + (", ..." if len(failed) > 5 else "")
+                    )
+                if not csv_by_analysis:
+                    st.info("None of the checked analyses found anything across these pieces.")
+                for analysis_key, (btn_label, file_name) in BULK_ANALYSIS_DOWNLOAD_META.items():
+                    if analysis_key in csv_by_analysis:
+                        st.download_button(
+                            btn_label,
+                            data=csv_by_analysis[analysis_key],
+                            file_name=file_name,
+                            mime="text/csv",
+                            key=f"browse_bulk_download_{analysis_key}",
+                        )
 
             browse_label = st.selectbox("Pick one", [m[0] for m in shown], key="browse_pick")
             _, collection, native_ref = next(m for m in shown if m[0] == browse_label)

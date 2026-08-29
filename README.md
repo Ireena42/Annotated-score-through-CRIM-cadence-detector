@@ -60,9 +60,22 @@ just the 50 shown in the picker below them:
   A piece that fails to fetch is skipped and reported by name, not
   silently dropped from the count.
 
+A third option below those two, checkboxes and all — **"🧮 Build
+analysis-data CSV(s) for all N piece(s)"** — actually *runs* the checked
+analyses (cadences/points of imitation/homorhythm) across every match
+and hands back CRIM's own raw columns (`CadType`/`Tone`/`RelTone` for
+cadences, `Presentation_Type`/`Soggetti`/`Voices` for points of
+imitation, `hr_voices` for homorhythm), one CSV per analysis, each row
+tagged with `collection`/`composer`/`label` so pieces stay identifiable
+once every match is concatenated together — ready for your own stats,
+not just a count of what was found. This is real per-piece CRIM
+computation on top of the fetch, so it's capped tighter than the ZIP
+(15 matches) — a provisional cap, not yet benchmarked live the way the
+ZIP's 30 was.
+
 Handy for "give me every Josquin piece across all 7 collections to
 analyze myself" — search "Josquin", download the CSV (or, narrowed
-further, the ZIP).
+further, the ZIP or the analysis-data CSVs).
 
 No search at all needed for the **whole corpus's metadata** either (not
 the scores themselves): a **"📦 Download the whole corpus metadata"**
