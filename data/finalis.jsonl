@@ -1353,3 +1353,53 @@
 {"label": "[Monteverdi] Cor mio, non mori? E mori!", "collection": "music21", "finalis": "D", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
 {"label": "[Monteverdi] Sfogava con le stelle", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
 {"label": "[Monteverdi] Volgea l'anima mia soavemente", "collection": "music21", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] Anima mia, perdona", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] Che se tu se'il cor mio: Seconda parte", "collection": "music21", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] Luci serene e chiare", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] Cruda amarilli, che col nome ancora", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] O Mirtillo, Mirtill' Anima Mia", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] ERA L' ANIMA MIA", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] Era L'anima mea", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] PRIMA PARTE", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] Ecco, Silvio, colei che in odio hai tanto", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] Ma, se con la pieta non e in te spenta", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] Dorinda, ah, dirò mia, se mia non sei", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] Madrigal 5.7", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] Ecoo, piegando le genocchie a terra", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] FERIR QUEL PETTO, SILVIO?", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Monteverdi] Ferir quel petto, Silvio?", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Johannes Lupi — Vidi speciosam [Motet]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[CRIM] Thomas Champion — O gente brunette [Chanson]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[CRIM] Anonymous — Missa IX (Cum iubilo) - Kyrie [Ordinarium missae]", "collection": "crim", "finalis": "D", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[CRIM] Anonymous — Missa IX (Cum iubilo) - Gloria [Ordinarium missae]", "collection": "crim", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[CRIM] Anonymous — Credo I [Ordinarium missae]", "collection": "crim", "finalis": "E", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[CRIM] Anonymous — Missa IX (Cum iubilo) - Sanctus [Ordinarium missae]", "collection": "crim", "finalis": "F", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[CRIM] Anonymous — Missa IX (Cum iubilo) - Agnus Dei [Ordinarium missae]", "collection": "crim", "finalis": "F", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[CRIM] Josquin Des Prez — Ave Maria [Motet]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Cadéac — Je suis déshéritée [Chanson]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Claudin de Sermisy — Quare fremuerunt gentes [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Claudin de Sermisy — Tota pulchra es [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Sandrin — Voulant honneur [Chanson]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Passereau — Je n’en puis plus durer [Chanson]", "collection": "crim", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[CRIM] Claudin de Sermisy — Si bona suscepimus [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre de Manchicourt — Quo abiit dilectus tuus [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Josquin Des Prez — Mente Tota (from Vultuum tuum) [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Josquin Des Prez — Benedicta es [Motet]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Josquin Des Prez — Baisez moy [Chanson]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Giovanni Pierluigi da Palestrina — Veni sponsa Christi [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Susanne un jour [Chanson]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Jean Mouton — Benedicta es [Motet]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Notker Balbulus — Benedicta es [Plainchant]", "collection": "crim", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[CRIM] Loyset Piéton — Benedicta es [Motet]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[CRIM] Didier Lupi — Susanne un jour [Chanson]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Cipriano de Rore — Ite, rime dolenti, ite, sospiri [Madrigal]", "collection": "crim", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[CRIM] Le Heurteur, Guillaume — Congratulamini mihi [Motet]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Cipriano de Rore — Quando lieta sperai [Madrigal]", "collection": "crim", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[CRIM] Anonymous — Beata mater [Plainchant]", "collection": "crim", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[CRIM] Nicolas Gombert — Super flumina Babylonis [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Claudin de Sermisy — Tant que vivray [Chanson]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Lupus Hellinck — In te Domine speravi [Motet]", "collection": "crim", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[CRIM] Cristóbal de Morales — Sancta et immaculata virginitas [Motet]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Sandrin — Doulce memoire [Chanson]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Claudin de Sermisy — Il me souffit [Chanson]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Notker Balbulus — Hic est vere martire [Plainchant]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM has this piece catalogued but no MEI file for it yet."}
