@@ -2503,3 +2503,53 @@
 {"label": "[JRP] Josquin des Prez — Dulces exuviae", "collection": "jrp", "finalis": "E", "source": "cadence", "detail": null}
 {"label": "[JRP] Josquin des Prez — El grillo", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
 {"label": "[JRP] Josquin des Prez — Entre je suis", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Fama malum", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Fors seulement II", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Guillaume se va chaufer", "collection": "jrp", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[JRP] Josquin des Prez — In te domine speravi", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Je ris", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Je sey bien dire", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Leal schray tante", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Le villain", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Lhomme arme", "collection": "jrp", "finalis": "D", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[JRP] Josquin des Prez — Lourdault Lourdault", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Mille regretz", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Mon seul plaisir", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Plus nestes ma maistresse", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Plus nulz regrets", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Qui belles amours", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Scaramella", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Se congie prens [Jos2831-Se_congie_prens]", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Se congie prens [Jos3010-Se_congie_prens]", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Si jay perdu", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Tant vous aimme", "collection": "jrp", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[JRP] Josquin des Prez — Tous les regretz", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Une musque de Biscaye", "collection": "jrp", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Vive le roy", "collection": "jrp", "finalis": "C", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[JRP] Josquin des Prez — Vivrai je tousjours", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Textless piece 3", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Textless piece 4", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Fors seulement III", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Cent mille regretz", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Cueur langoreulx", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Cueurs desolez  Plorans ploravit", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Douleur me bat", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Du mien amant", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — En non saichant", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Faulte dargent", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Incessament livre", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Incessament mon povre", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Je me complains", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Je ne me puis tenir daimer", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — La Spagna", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Lamye a tous", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Jos2914.1: Ma bouche rit  a 5", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Jos2914.2: Ma bouche rit  a 6", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Mi lares vous tousjours languir", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Mala se nea", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Nesse pas ung grant deplaisir", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Nymphes des bois  Requiem", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Parfons regretz", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Pleine de dueil", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Plusieurs regretz", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Adieu mes amours:  texted Ave Maria 3 vv. extant", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
