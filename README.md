@@ -243,6 +243,26 @@ above is the one to share.
    passage, not one row per passage — see `annotate_homorhythm`'s own
    docstring) doesn't inflate the count the way a plain `len(events)`
    would.
+9. Before any of that, whether or not an analysis was even requested,
+   a **source edition** panel shows whatever this specific piece's own
+   file actually says about where its encoding comes from — which
+   matters a lot for Renaissance music, where the same "piece" can be
+   edited very differently by different scholars. Not one blanket claim
+   for the whole app: checked directly against real files first, and
+   different collections encode genuinely different things. music21's
+   bundled Palestrina files (and every other Humdrum-`**kern` collection
+   here — JRP, 1520s, Tasso, SEILS, Lassus Psalms) carry `!!!YOR`/`!!!YOO`
+   (the original **print** edition and its publisher, e.g. *"Le Opere
+   Complete, v. 18, p. 126"*) or `!!!SCA` (the modern **critical**
+   edition name, e.g. *"New Josquin Edition 3.1"* for JRP) — read
+   generically off whichever of these `humdrum:XXX` reference-record
+   fields music21's own parser exposes, since different pieces populate
+   different subsets. CRIM's MEI files carry something richer still —
+   the actual editors' names and the original print source (publisher,
+   date, physical repository) — extracted directly from the MEI's own
+   `<respStmt>`/`<manifestation>` elements (one small extra fetch of
+   that same MEI file, since none of this reliably survives music21's
+   own, comparatively thin, MEI import into its Metadata object).
 
 ## Finalis precompute (in progress, not yet in the app's UI)
 

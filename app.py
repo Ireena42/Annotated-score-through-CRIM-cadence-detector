@@ -29,6 +29,7 @@ import zipfile
 from collections import Counter
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from xml.etree import ElementTree as ET
 
 import music21 as m21
 import pandas as pd
@@ -238,6 +239,112 @@ def _add_density(stats, score):
     stats['density'] = {label: len(measures) / total for label, measures in by_type.items()}
 
 
+# Which edition/source a Renaissance encoding derives from matters a lot --
+# see this project's own conversation history (Casimiri vs Jeppesen as
+# editors of Palestrina's Opere Complete: different volumes were edited by
+# different scholars, so no single blanket claim is honest -- surfacing
+# whatever THIS piece's own file actually says is the only reliable
+# option). Codes below checked directly against two real collections
+# before choosing them, not guessed from the Humdrum reference-record
+# spec alone: music21's bundled Palestrina files carry YOR/YOO (the
+# original PRINT edition this encoding derives from, and its publisher --
+# e.g. "Le Opere Complete, v. 18, p. 126" / "Rome, Italy: Fratelli
+# Scalera", confirmed against the actual Agnus_00.krn file on GitHub),
+# while JRP's carry SCA (the modern CRITICAL edition name itself, e.g.
+# "New Josquin Edition 3.1") -- genuinely different fields for genuinely
+# different kinds of source information, and neither collection has both.
+_HUMDRUM_EDITION_FIELDS = [
+    ('humdrum:SCA', 'Critical edition'),
+    ('humdrum:SCT', 'Edition reference'),
+    ('humdrum:YOR', 'Original print edition'),
+    ('humdrum:YOO', 'Original publisher'),
+    ('humdrum:PWK', 'Print/manuscript source'),
+    ('humdrum:RNB', 'Editorial note'),
+]
+
+
+def _humdrum_edition_info(score):
+    """Whatever edition/source fields this piece's own file actually
+    encodes, read generically from music21's parsed Humdrum reference
+    records (every '!!!XXX' record becomes a 'humdrum:XXX' key on
+    Metadata.all() -- the same access pattern already used elsewhere in
+    this project) rather than hard-coded per collection, since
+    different sources populate different subsets of
+    _HUMDRUM_EDITION_FIELDS. Covers every Humdrum-kern-derived
+    collection this app has (music21 corpus, JRP, 1520s, Tasso, SEILS,
+    Lassus Psalms) -- not CRIM, whose MEI files use a completely
+    different, richer scheme (see _crim_edition_info). Returns a list
+    of (label, value) pairs for only the fields actually present, in a
+    fixed order -- empty if this score has no metadata at all, or none
+    of these specific fields (never raises)."""
+    try:
+        meta = dict(score.metadata.all())
+    except Exception:
+        return []
+    return [(label, str(meta[key])) for key, label in _HUMDRUM_EDITION_FIELDS if meta.get(key)]
+
+
+_MEI_NS = {'mei': 'http://www.music-encoding.org/ns/mei'}
+
+
+def _crim_edition_info(mei_url):
+    """CRIM's own MEI files carry genuinely richer source documentation
+    than a plain music21 Metadata parse surfaces (checked directly
+    against two real CRIM pieces' actual MEI files before writing this):
+    the real editors' names (<respStmt><persName role="editor">) and the
+    original print source this transcription is based on -- title,
+    publisher, date, physical repository, all under <manifestation>.
+    None of this reliably lands in music21's own Metadata object after
+    MEI import (MEI support there is comparatively thin, unlike
+    Humdrum's), so this re-fetches the same MEI file's raw text
+    (already fetched once by ci.importScore internally, but not exposed
+    as text there) and parses just these specific elements directly --
+    a real, small extra network request per CRIM piece, not free, but
+    the only way to get at this. Returns a list of (label, value)
+    pairs, empty (never raises) if the fetch fails or none of these
+    elements are present."""
+    try:
+        response = requests.get(mei_url, timeout=15)
+        response.raise_for_status()
+        root = ET.fromstring(response.content)
+    except Exception:
+        return []
+
+    info = []
+    editors = [
+        el.text.strip() for el in root.findall('.//mei:respStmt/mei:persName[@role="editor"]', _MEI_NS)
+        if el.text and el.text.strip()
+    ]
+    if editors:
+        info.append(('Editors (this encoding)', ', '.join(editors)))
+
+    manifestation = root.find('.//mei:manifestation', _MEI_NS)
+    if manifestation is not None:
+        title_el = manifestation.find('.//mei:titleStmt/mei:title', _MEI_NS)
+        if title_el is not None and title_el.text and title_el.text.strip():
+            info.append(('Original print source', title_el.text.strip()))
+
+        pub_name_el = manifestation.find('.//mei:pubStmt/mei:publisher/mei:persName', _MEI_NS)
+        date_el = manifestation.find('.//mei:pubStmt/mei:date', _MEI_NS)
+        pub_bits = [
+            el.text.strip() for el in (pub_name_el, date_el)
+            if el is not None and el.text and el.text.strip()
+        ]
+        if pub_bits:
+            info.append(('Original publisher/date', ', '.join(pub_bits)))
+
+        corp_el = manifestation.find('.//mei:physLoc/mei:repository/mei:corpName', _MEI_NS)
+        geog_el = manifestation.find('.//mei:physLoc/mei:repository/mei:geogName', _MEI_NS)
+        loc_bits = [
+            el.text.strip() for el in (corp_el, geog_el)
+            if el is not None and el.text and el.text.strip()
+        ]
+        if loc_bits:
+            info.append(('Source location', ', '.join(loc_bits)))
+
+    return info
+
+
 def run_pipeline(score, source_label, include_cadences=True, include_ptypes=False, include_homorhythm=False):
     """Shared by both input modes below: given a parsed music21 Score,
     optionally runs each of CRIM's three structural analyses on it and
@@ -281,7 +388,11 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
     anything.
     """
     if not (include_cadences or include_ptypes or include_homorhythm):
-        return score, {}, None
+        stats = {}
+        edition = _humdrum_edition_info(score)
+        if edition:
+            stats['edition'] = edition
+        return score, stats, None
 
     # ci.ImportedPiece normally comes from ci.importScore(path_or_text),
     # which re-parses from scratch internally -- but it also accepts an
@@ -332,6 +443,9 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
             _append_timeline(stats, hr.index.get_level_values('Measure'), 'Homorhythm', HOMORHYTHM_COLOR)
 
     _add_density(stats, annotated_score)
+    edition = _humdrum_edition_info(annotated_score)
+    if edition:
+        stats['edition'] = edition
     return annotated_score, stats, None
 
 
@@ -411,6 +525,20 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
     onto it. include_cadences/ptypes/homorhythm are only used to build
     the methods-section blurb below -- see _build_methods_blurb().
     """
+    # Shown unconditionally, before anything analysis-specific -- which
+    # print edition (or, for CRIM, which modern critical edition and
+    # editorial team) an encoding derives from matters for Renaissance
+    # music specifically (different editors made different musica ficta/
+    # barring choices for the "same" piece), and matters whether or not
+    # any analysis was even requested. See _humdrum_edition_info/
+    # _crim_edition_info for exactly what's shown and why no single
+    # blanket claim about "the edition" would be honest here.
+    edition = stats.get('edition')
+    if edition:
+        st.caption("📖 Source edition, from this piece's own encoded metadata:")
+        for label, value in edition:
+            st.caption(f"**{label}:** {value}")
+
     if 'labeled' in stats:
         st.success(
             f"{stats['labeled'] + stats['missed_label']} cadences found -- "
@@ -716,7 +844,11 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
     piece.score.metadata.composer = piece.metadata.get('composer') or piece.score.metadata.composer
 
     if not (include_cadences or include_ptypes or include_homorhythm):
-        return piece.score, {}, None
+        stats = {}
+        edition = _crim_edition_info(mei_url)
+        if edition:
+            stats['edition'] = edition
+        return piece.score, stats, None
 
     annotated_score, stats = piece.score, {}
     if include_cadences:
@@ -758,6 +890,9 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
             stats['hr_colored'] = hr_stats['colored']
             _append_timeline(stats, hr.index.get_level_values('Measure'), 'Homorhythm', HOMORHYTHM_COLOR)
     _add_density(stats, annotated_score)
+    edition = _crim_edition_info(mei_url)
+    if edition:
+        stats['edition'] = edition
     return annotated_score, stats, None
 
 
