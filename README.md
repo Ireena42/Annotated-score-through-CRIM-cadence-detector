@@ -270,18 +270,30 @@ above is the one to share.
    `<respStmt>`/`<manifestation>` elements (one small extra fetch of
    that same MEI file, since none of this reliably survives music21's
    own, comparatively thin, MEI import into its Metadata object).
-10. A few small, deliberately restrained visual touches: the Analyze/
-    Download button's spinner shows a random line from a short,
-    hand-picked set of real music-theory terms ("Untangling
-    counterpoint...", "Splitting the comma..." — meantone temperament's
-    actual mechanism, not a generic "tuning" reference — "Coloring the
-    breves...", etc.) instead of generic "loading..." text; a one-time
-    note-shape flourish marks the boundary between the intro/Credits
-    section and the tabs (placed *once*, not scattered — a decorative
-    element repeated throughout a page reads as clutter fast, which is
-    also why a "featured piece" widget idea raised alongside these was
-    dropped); and every button shows a small custos (the manuscript
-    guide-mark) on hover, via a pure-CSS `::after` pseudo-element.
+10. A few small, deliberately restrained visual touches. Every spinner
+    that's actually running CRIM analysis (Preview's quick check, the
+    single-piece Analyze/Download button, the Upload tab, the bulk
+    analysis-data export) shows a random line from a short, hand-picked
+    set of real music-theory terms — "Untangling counterpoint...",
+    "Splitting the comma..." (meantone temperament's actual mechanism,
+    not a generic "tuning" reference), "Coloring the breves...", etc. —
+    instead of generic "loading..." text. Spinners where nothing is
+    actually being analyzed yet (Browse's corpus index loading, the
+    bulk ZIP export) deliberately draw from a *separate*,
+    fetching/cataloguing-themed pool instead ("Gathering the
+    partbooks...", "Cataloguing the collections...") rather than reuse
+    the analysis lines — the ZIP export in particular explicitly
+    documents that it runs no analysis at all, so a counterpoint joke
+    there would undercut that real clarity, not just be an off-theme
+    whimsy. A one-time note-shape flourish marks the boundary between
+    the intro/Credits section and the tabs (placed *once*, not
+    scattered — a decorative element repeated throughout a page reads
+    as clutter fast, which is also why a "featured piece" widget idea
+    raised alongside these was dropped); every button shows a small
+    custos (the manuscript guide-mark) on hover, via a pure-CSS
+    `::after` pseudo-element; and the Preview/Analyze/Download/every
+    download button use Streamlit's own `type="primary"` styling, which
+    pulls its color directly from `.streamlit/config.toml`.
 
 ## Finalis precompute (in progress, not yet in the app's UI)
 

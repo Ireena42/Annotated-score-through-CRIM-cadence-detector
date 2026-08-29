@@ -655,6 +655,7 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
         data=xml_bytes,
         file_name=f"{filename_stem}_annotated.xml" if annotated else f"{filename_stem}.xml",
         mime="application/vnd.recordare.musicxml+xml",
+        type="primary",
     )
 
 
@@ -1563,6 +1564,29 @@ def _random_loading_message():
     return random.choice(_ANALYZE_LOADING_MESSAGES)
 
 
+# Separate, deliberately different pool for spinners where nothing is
+# actually being analyzed yet -- just listed or fetched (Browse's index
+# load, the bulk ZIP export). Reusing _ANALYZE_LOADING_MESSAGES here
+# would misdescribe what's really happening -- "Untangling
+# counterpoint..." while literally no CRIM analysis runs (the ZIP
+# export deliberately, explicitly documents that it runs none) would
+# undercut a real clarity choice made earlier in this project, not
+# just be a harmless whimsy mismatch.
+_FETCH_LOADING_MESSAGES = [
+    "Gathering the partbooks...",
+    "Fetching from the archives...",
+    "Cataloguing the collections...",
+    "Assembling the choirbooks...",
+]
+
+
+def _random_fetch_message():
+    """Same idea as _random_loading_message(), for the fetching/
+    cataloguing spinners instead of the analysis ones -- see
+    _FETCH_LOADING_MESSAGES for why these are a separate pool."""
+    return random.choice(_FETCH_LOADING_MESSAGES)
+
+
 def render_preview_and_annotate(collection, native_ref, piece_label, filename_stem, key_prefix=None):
     """Two-column Preview/Download buttons -- shared by every dedicated
     collection tab AND Browse (same layout, same underlying calls), so a
@@ -1605,7 +1629,7 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
     # using .streamlit/config.toml's primaryColor (the same orange from
     # the identity-review mockup) directly, not a custom CSS override.
     if col1.button("Preview", key=f"preview_{key_prefix}", type="primary"):
-        with st.spinner("Checking..."):
+        with st.spinner(_random_loading_message()):
             voices, has_text, note = preview_piece(collection, native_ref)
         st.write(f"**Voices:** {voices if voices is not None else 'unknown'}")
         has_text_display = 'yes' if has_text else ('no' if has_text is False else 'unknown')
@@ -1688,8 +1712,8 @@ with tab_browse:
     # expensive operation -- it just moves the first hit of it earlier,
     # so the CSV downloads below and the word cloud at the bottom of
     # this tab are both ready without a separate build step.
-    with st.spinner("Loading corpus overview (first visit this hour can take ~15s, instant "
-                     "after)..."):
+    with st.spinner(f"{_random_fetch_message()} (first visit this hour can take ~15s, "
+                     "instant after)"):
         full_index = build_browse_index()
 
     with st.expander("📦 Download the whole corpus metadata, no search needed (all 7 collections)"):
@@ -1706,6 +1730,7 @@ with tab_browse:
             file_name="full_corpus.csv",
             mime="text/csv",
             key="browse_full_csv_download",
+            type="primary",
         )
         counts = Counter(row[1] for row in full_index)
         overview_buf = io.StringIO()
@@ -1719,6 +1744,7 @@ with tab_browse:
             file_name="corpus_overview.csv",
             mime="text/csv",
             key="browse_overview_csv_download",
+            type="primary",
         )
 
         # Per-COLLECTION composer counts -- not merged across
@@ -1743,6 +1769,7 @@ with tab_browse:
             file_name="composer_overview.csv",
             mime="text/csv",
             key="browse_composer_overview_csv_download",
+            type="primary",
             help="How many pieces each composer has WITHIN their own collection -- not merged "
                  "across collections, since composer spelling isn't consistent between them "
                  "(e.g. CRIM's 'Josquin Des Prez' vs JRP's 'Josquin des Prez').",
@@ -1785,6 +1812,7 @@ with tab_browse:
                 file_name="browse_results.csv",
                 mime="text/csv",
                 key="browse_csv_download",
+                type="primary",
                 help="A manifest of every match (not just the 50 shown below) -- collection, "
                      "composer, and a source URL or music21 corpus path for each, ready to "
                      "load with pandas and fetch/parse in your own script.",
@@ -1804,8 +1832,8 @@ with tab_browse:
                     progress_bar.progress(i / total)
                     status.caption(f"Fetching {i + 1}/{total}: {label}")
 
-                with st.spinner("Building ZIP -- fetching, parsing, and converting each "
-                                 "piece to MusicXML, no analysis run on any of them..."):
+                with st.spinner(f"{_random_fetch_message()} Converting each piece to "
+                                 "MusicXML -- no analysis run on any of them."):
                     zip_bytes, failed = _bulk_zip_bytes(matches, progress_callback=_update_zip_progress)
                 progress_bar.progress(1.0)
                 status.empty()
@@ -1822,6 +1850,7 @@ with tab_browse:
                     file_name="browse_results.zip",
                     mime="application/zip",
                     key="browse_zip_download",
+                    type="primary",
                 )
 
             st.caption(
@@ -1855,8 +1884,7 @@ with tab_browse:
                     progress_bar.progress(i / total)
                     status.caption(f"Analyzing {i + 1}/{total}: {label}")
 
-                with st.spinner("Running CRIM analysis on each piece -- real computation, not "
-                                 "just a fetch, so slower than the ZIP above..."):
+                with st.spinner(_random_loading_message()):
                     csv_by_analysis, failed = _bulk_analysis_csv_bytes(
                         matches, bulk_cadences, bulk_ptypes, bulk_hr,
                         progress_callback=_update_bulk_analysis_progress,
@@ -1880,6 +1908,7 @@ with tab_browse:
                             file_name=file_name,
                             mime="text/csv",
                             key=f"browse_bulk_download_{analysis_key}",
+                            type="primary",
                         )
 
             browse_label = st.selectbox("Pick one", [m[0] for m in shown], key="browse_pick")
