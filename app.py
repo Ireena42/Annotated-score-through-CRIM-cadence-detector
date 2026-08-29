@@ -129,6 +129,27 @@ st.markdown(
         color: #fbf3e7;
         border-color: #a8451f;
     }
+    /* The rule above only set the button's resting color -- Streamlit's own
+       secondary-button hover/active rules (a near-transparent tan tint,
+       meant for the plain white button this replaced) have higher CSS
+       specificity and were still winning on hover/click, which is what made
+       the button visibly flash instead of darkening like the type="primary"
+       buttons elsewhere (confirmed by reading this button's real CSSOM rules
+       on the deployed app, not guessed). Fixed by pinning :hover/:active to
+       the exact colors Streamlit computes for its own primary buttons (read
+       the same way), so this button now darkens identically instead of
+       reverting to its native secondary look. */
+    [data-testid="stFileUploaderDropzone"] button:hover,
+    [data-testid="stFileUploaderDropzone"] button:focus-visible {
+        background-color: #672b13;
+        border-color: #672b13;
+        color: #fbf3e7;
+    }
+    [data-testid="stFileUploaderDropzone"] button:active {
+        background-color: #a8451f;
+        border-color: #672b13;
+        color: #fbf3e7;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -1930,6 +1951,12 @@ with tab_browse:
                             type="primary",
                         )
 
+            st.divider()
+            st.markdown(
+                "**One piece at a time** -- pick a single match below to preview it or run "
+                "the full analysis interactively (the bulk options above cover every match "
+                "at once)."
+            )
             browse_label = st.selectbox("Pick one", [m[0] for m in shown], key="browse_pick")
             _, collection, native_ref = next(m for m in shown if m[0] == browse_label)
             stem = _browse_piece_filename_stem(collection, native_ref)
