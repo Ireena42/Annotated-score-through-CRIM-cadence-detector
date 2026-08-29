@@ -66,9 +66,12 @@ further, the ZIP).
 
 No search at all needed for the **whole** corpus: a **"📦 Download the
 entire corpus"** expander sits right below the search box, with the
-same CSV manifest (all ~4,300 pieces, all 7 collections at once) plus a
-small per-collection piece-count CSV — useful for scoping a study before
-you've decided what to search for.
+same CSV manifest (all ~4,300 pieces, all 7 collections at once), a
+small per-collection piece-count CSV, and a per-collection *composer*-count
+CSV (how many pieces each composer has *within* their own collection —
+not merged across collections, since composer spelling isn't consistent
+between them) — useful for scoping a study before you've decided what
+to search for.
 
 Or pick a piece from one collection directly. Every tab below filters by
 **Composer**, one at a time with an "All composers" default (each

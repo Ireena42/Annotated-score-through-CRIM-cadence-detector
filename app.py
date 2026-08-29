@@ -1579,6 +1579,33 @@ with tab_browse:
                 key="browse_overview_csv_download",
             )
 
+            # Per-COLLECTION composer counts -- not merged across
+            # collections (composer naming isn't consistent across them,
+            # see build_browse_index's docstring), just how many pieces
+            # each composer has within their own collection. Reuses
+            # _browse_row_to_csv_dict's own composer extraction (already
+            # built and tested for the manifest CSV) rather than a third
+            # copy of the same per-collection parsing logic.
+            composer_counts = Counter(
+                (row[1], _browse_row_to_csv_dict(row[0], row[1], row[2])['composer'])
+                for row in full_index
+            )
+            composer_buf = io.StringIO()
+            writer = csv.writer(composer_buf)
+            writer.writerow(['collection', 'composer', 'piece_count'])
+            for (collection, composer), count in sorted(composer_counts.items(), key=lambda kv: -kv[1]):
+                writer.writerow([collection, composer, count])
+            st.download_button(
+                "🎼 Download per-collection composer counts as CSV",
+                data=composer_buf.getvalue().encode('utf-8'),
+                file_name="composer_overview.csv",
+                mime="text/csv",
+                key="browse_composer_overview_csv_download",
+                help="How many pieces each composer has WITHIN their own collection -- not merged "
+                     "across collections, since composer spelling isn't consistent between them "
+                     "(e.g. CRIM's 'Josquin Des Prez' vs JRP's 'Josquin des Prez').",
+            )
+
     if query:
         with st.spinner("Searching (first search after a quiet spell indexes all "
                          "collections, can take up to ~15s -- instant after that)..."):
