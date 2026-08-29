@@ -553,3 +553,53 @@
 {"label": "[Palestrina] Missa Sine nomine (Mantuan): Credo (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[Palestrina] Missa Sine nomine (Mantuan): Credo (part b)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
 {"label": "[Palestrina] Missa Sine nomine (Mantuan): Credo (part c)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Spem In Alium: Credo (part a)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Spem In Alium: Credo (part b)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Spem In Alium: Credo (part c)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Spem In Alium: Credo (part d)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Spem In Alium: Credo (part e)", "collection": "music21", "finalis": "B-", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Palestrina] Missa Spem In Alium: Credo (part f)", "collection": "music21", "finalis": "C#", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Te Deum laudamus: Credo (part a)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Te Deum laudamus: Credo (part b)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Te Deum laudamus: Credo (part c)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Te Deum laudamus: Credo (part d)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Te Deum laudamus: Credo (part e)", "collection": "music21", "finalis": "E", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Palestrina] Missa Te Deum laudamus: Credo (part f)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Tu es pastor ovium: Credo (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Tu es pastor ovium: Credo (part b)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Tu es pastor ovium: Credo (part c)", "collection": "music21", "finalis": "D", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Palestrina] Missa Tu es pastor ovium: Credo (part d)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Tu es Petrus (1601): Credo (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Tu es Petrus (1601): Credo (part b)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Tu es Petrus (1601): Credo (part c)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Tu es Petrus (1887): Credo (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Tu es Petrus (1887): Credo (part b)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Tu es Petrus (1887): Credo (part c)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ut re mi fa sol la: Credo (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ut re mi fa sol la: Credo (part b)", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ut re mi fa sol la: Credo (part c)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Veni creator Spiritus: Credo (part a)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Veni creator Spiritus: Credo (part b)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Veni creator Spiritus: Credo (part c)", "collection": "music21", "finalis": "F", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Palestrina] Missa Veni creator Spiritus: Credo (part d)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Veni creator Spiritus: Credo (part e)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Veni Sancte Spiritus: Credo (part a) [Credo_61_a]", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Veni Sancte Spiritus: Credo (part a) [Credo_62_a]", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Veni Sancte Spiritus: Credo (part b) [Credo_61_b]", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Veni Sancte Spiritus: Credo (part b) [Credo_62_b]", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Veni Sancte Spiritus: Credo (part c) [Credo_61_c]", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Veni Sancte Spiritus: Credo (part c) [Credo_62_c]", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Vestiva i colli: Credo (part a)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Vestiva i colli: Credo (part b)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Vestiva i colli: Credo (part c)", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Vestiva i colli: Credo (part d)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Virtute magna: Credo (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Virtute magna: Credo (part b)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Virtute magna: Credo (part c)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In festis Apostolorum (I): Credo (part a)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In festis Apostolorum (I): Credo (part b)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In festis Apostolorum (I): Credo (part c)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In festis Apostolorum (I): Credo (part d)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In festis Apostolorum (I): Credo (part e)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In festis Apostolorum (I): Credo (part f)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In festis Apostolorum (I): Credo (part g)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
