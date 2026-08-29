@@ -1328,12 +1328,35 @@ def _browse_row_to_csv_dict(label, collection, native_ref):
     build_browse_index's git history) isn't a problem here the way it
     was for a filter dropdown -- a CSV column showing both spellings
     as data is just honest, not confusing.
+
+    Two fixes on top of that raw split, both reused from elsewhere in
+    this file rather than left half-applied here:
+    - lassus_psalms's own labels are just a psalm title with no
+      'Composer — Title' prefix at all (see fetch_lassus_psalms_pieces
+      -- single-composer collection, nothing to split on), so the
+      generic branch below would wrongly treat the whole title as the
+      composer -- confirmed directly, e.g. "Beatus vir" ending up as a
+      50-row-strong fake "composer". Matches CRIM's own spelling for the
+      same person ("Roland de Lassus" -- confirmed against this app's
+      real composer data) so the two collections' counts merge instead
+      of colliding.
+    - A trailing '(YYYY)' (Tasso's own convention, see
+      _composer_from_collection_label) is stripped here too -- that
+      function only ever ran on the per-collection filter dropdown, not
+      this CSV/word-cloud path, so Tasso's composer counts here were
+      still fragmenting by publication year (confirmed directly: e.g.
+      five separate "Cifra (....)" rows in the real composer-count CSV,
+      all the same person). Same regex, same reasoning, just applied
+      here too.
     """
     if collection == 'music21':
         composer = label.split('] ', 1)[0].lstrip('[')
+    elif collection == 'lassus_psalms':
+        composer = 'Roland de Lassus'
     else:
         inner = label.split('] ', 1)[1] if '] ' in label else label
         composer = inner.partition(' — ')[0]
+    composer = re.sub(r'\s*\(\d{4}\)$', '', composer)
 
     row = {'collection': collection, 'composer': composer, 'label': label,
            'source_url': '', 'music21_corpus_path': ''}
@@ -1371,19 +1394,65 @@ def _matches_to_csv_bytes(matches):
     return buf.getvalue().encode('utf-8')
 
 
+_COMPOSER_WORDCLOUD_ALIASES = {
+    # Same real person, a genuinely different name form -- not fixable
+    # by the comma-flip in _normalize_composer_for_wordcloud() below.
+    # Checked directly against this app's real composer-count data
+    # before adding either entry (fetched live: 1318 music21 pieces
+    # under "Palestrina", 52 CRIM pieces under the full name; 476 JRP
+    # pieces under one Josquin capitalization, 5-6 CRIM under the
+    # other) -- not guessed from the names alone. Deliberately short:
+    # other real variants turned up in that same check (e.g. "Jean
+    # Richafort" vs "Johannes Richafort" post-flip -- French vs
+    # Latinized given name, 68 vs 1 pieces) were left out rather than
+    # guessed at, since a wrong merge here is worse than a small
+    # duplicate word.
+    'Giovanni Pierluigi da Palestrina': 'Palestrina',
+    'Josquin Des Prez': 'Josquin des Prez',
+}
+
+
+def _normalize_composer_for_wordcloud(composer):
+    """Folds known same-composer name variants together, for the word
+    cloud ONLY -- the per-collection composer-count CSV deliberately
+    stays raw and unmerged (see its own help= text: it's meant to be a
+    precise count, and composer spelling isn't consistent between
+    collections; this function's job is a fairer illustrative picture,
+    not a corrected precise count).
+
+    Two passes:
+    1. JRP's own metadata (and a few CRIM entries) name composers
+       "Lastname, Firstname" -- every other collection uses "Firstname
+       Lastname". Flipping any comma-containing name to that order is
+       safe here: checked directly against every one of the 25 comma-
+       containing composer strings in this app's real corpus before
+       relying on it (all JRP/CRIM, all genuinely "Last, First"), not
+       assumed from the convention alone -- worth re-checking if a
+       collection using a comma for some other reason is ever added.
+    2. _COMPOSER_WORDCLOUD_ALIASES (above) for the remaining cases the
+       flip can't reach -- genuinely different name forms, not just
+       reordered.
+    """
+    if ',' in composer:
+        last, _, first = composer.partition(',')
+        composer = f"{first.strip()} {last.strip()}"
+    return _COMPOSER_WORDCLOUD_ALIASES.get(composer, composer)
+
+
 def _composer_wordcloud_png_bytes(index):
     """A composer word cloud across the WHOLE corpus, sized by piece
     count -- reuses _browse_row_to_csv_dict's own composer extraction,
-    same as the composer-count CSV. Unlike that CSV, this merges
-    composers across all 7 collections into one visual rather than
-    breaking them out per-collection -- a deliberate, honest tradeoff:
-    the same composer can appear as two separate words if their name is
-    spelled differently across collections (e.g. CRIM's "Josquin Des
-    Prez" vs JRP's "Josquin des Prez" -- documented at length elsewhere
-    in this file), which a purely illustrative overview can tolerate in
-    a way a precise per-collection count table shouldn't."""
+    same as the composer-count CSV, then folds known same-composer name
+    variants together via _normalize_composer_for_wordcloud() (see that
+    function for exactly what is and isn't merged, and why). Unlike the
+    composer-count CSV, this also merges composers across all 7
+    collections into one visual rather than breaking them out per-
+    collection -- a rarer, unverified spelling variant can still show up
+    as two words here, which a purely illustrative overview can tolerate
+    in a way a precise per-collection count table shouldn't."""
     counts = Counter(
-        _browse_row_to_csv_dict(row[0], row[1], row[2])['composer'] for row in index
+        _normalize_composer_for_wordcloud(_browse_row_to_csv_dict(row[0], row[1], row[2])['composer'])
+        for row in index
     )
     wc = WordCloud(width=900, height=380, background_color=None, mode='RGBA', colormap='plasma')
     wc.generate_from_frequencies(counts)

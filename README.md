@@ -77,9 +77,17 @@ At the bottom of this tab, below the search results, a composer word
 cloud across all ~4,300 pieces, all 7 collections merged, sized by
 piece count — no search or click needed, it renders as soon as the tab
 loads. Unlike the composer-count CSV above, this merges composers
-across collections purely for a visual overview, not a precise count
-(the same composer can genuinely appear twice, spelled two different
-ways — visible in the cloud itself, not hidden).
+across collections for a visual overview rather than a precise count,
+and folds known same-composer name variants together first: JRP's (and
+some CRIM entries') "Lastname, Firstname" order is flipped to match
+everyone else's, and a short, manually verified alias list catches the
+rest the flip can't — e.g. CRIM's "Giovanni Pierluigi da Palestrina"
+merging into music21's "Palestrina" (1318 + 52 pieces, previously shown
+as two separate words), or a capitalization difference in "Josquin
+Des/des Prez". A rarer, unverified variant can still show up as two
+words — a wrong merge would be worse than that, so only checked cases
+went in (see `_normalize_composer_for_wordcloud`'s docstring for what
+was found and deliberately left out).
 
 Or pick a piece from one collection directly. Every tab below filters by
 **Composer**, one at a time with an "All composers" default (each
