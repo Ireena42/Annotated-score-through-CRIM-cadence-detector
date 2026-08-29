@@ -353,3 +353,53 @@
 {"label": "[Palestrina] Missa Ad coenam Agni: Benedictus (part b)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[Palestrina] Missa Ad fugam: Credo", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[Palestrina] Missa Aeterna Christi munera: Credo (part a)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Aeterna Christi munera: Credo (part b)", "collection": "music21", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Palestrina] Missa Aeterna Christi munera: Credo (part c)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Alma Redemptoris mater: Credo (part a)", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Alma Redemptoris mater: Credo (part b)", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Alma Redemptoris mater: Credo (part c)", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Alma Redemptoris mater: Credo (part d)", "collection": "music21", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ascendo ad Patrem: Credo (part a)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ascendo ad Patrem: Credo (part b)", "collection": "music21", "finalis": "B", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ascendo ad Patrem: Credo (part c)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ascendo ad Patrem: Credo (part d)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Aspice Domine: Credo (part a)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Aspice Domine: Credo (part b)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Aspice Domine: Credo (part c)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (II): Credo (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (II): Credo (part b)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (II): Credo (part c)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (II): Credo (part d)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (II): Credo (part e)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (II): Credo (part f)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (II): Credo (part g)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (II): Credo (part h)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (II): Credo (part i)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Assumpta est Maria: Credo (part a)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Assumpta est Maria: Credo (part b)", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Assumpta est Maria: Credo (part c)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave Maria (1594): Credo (part a)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave Maria (1594): Credo (part b)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave Maria (1594): Credo (part c)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave Maria (1596): Credo (part a)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave Maria (1596): Credo (part b)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave Maria (1596): Credo (part c)", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (III): Credo (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (III): Credo (part b)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (III): Credo (part c)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (III): Credo (part d)", "collection": "music21", "finalis": "F#", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (III): Credo (part e)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (III): Credo (part f)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (III): Credo (part g)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (III): Credo (part h)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De Beata Marie Virginis (III): Credo (part i)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave regina coelorum: Credo (part a)", "collection": "music21", "finalis": "C#", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave regina coelorum: Credo (part b)", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave regina coelorum: Credo (part c)", "collection": "music21", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Palestrina] Missa Ave regina coelorum: Credo (part d)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ave regina coelorum: Credo (part e)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Beatus Laurentius: Credo (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Beatus Laurentius: Credo (part b)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Beatus Laurentius: Credo (part c)", "collection": "music21", "finalis": "A", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Palestrina] Missa Beatus Laurentius: Credo (part d)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De beata virgine (1567): Credo (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
