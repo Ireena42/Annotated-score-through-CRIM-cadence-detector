@@ -260,13 +260,23 @@ def _add_density(stats, score):
 # while JRP's carry SCA (the modern CRITICAL edition name itself, e.g.
 # "New Josquin Edition 3.1") -- genuinely different fields for genuinely
 # different kinds of source information, and neither collection has both.
+#
+# humdrum:RNB was tried here and removed: despite the generic Humdrum
+# label, this corpus's own files actually use it for something entirely
+# different -- a "Cadence finals: D" (or, on a real piece checked
+# directly, "Cadence finals: G,C,A") summary, not a note about the
+# SOURCE at all. Showing it as an "Editorial note" here was actively
+# misleading, not just off-topic -- this exact field's meaning is
+# already flagged elsewhere in this project as unverified (possibly
+# describing the underlying cantus firmus/model chant, not the actual
+# polyphonic setting), so it doesn't belong in a "where does this
+# encoding come from" panel even under a better label.
 _HUMDRUM_EDITION_FIELDS = [
     ('humdrum:SCA', 'Critical edition'),
     ('humdrum:SCT', 'Edition reference'),
     ('humdrum:YOR', 'Original print edition'),
     ('humdrum:YOO', 'Original publisher'),
     ('humdrum:PWK', 'Print/manuscript source'),
-    ('humdrum:RNB', 'Editorial note'),
 ]
 
 
@@ -600,12 +610,7 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
         present = [label for label in ('Cadence', 'Points of Imitation', 'Homorhythm') if label in density]
         cols = st.columns(len(present))
         for col, label in zip(cols, present):
-            col.metric(
-                f"{label} density", f"{density[label]:.0%}",
-                help=f"Fraction of this piece's measures with at least one detected "
-                     f"{label.lower()} -- not a raw count, so pieces of different "
-                     "lengths are directly comparable.",
-            )
+            col.metric(f"{label} density", f"{density[label]:.0%}")
 
     # One row per detected event across whichever analyses ran -- see
     # _append_timeline(). Only present when `annotated` is True (nothing
