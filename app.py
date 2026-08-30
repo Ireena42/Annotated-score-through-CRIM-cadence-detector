@@ -20,6 +20,7 @@ interaction (button click, dropdown change, etc.) -- that's normal for
 Streamlit, not a bug; it's why there's no explicit event-loop code below.
 
 """
+import base64
 import csv
 import html
 import io
@@ -894,6 +895,7 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
     # only the real download button (or the error) shows, so a successful
     # build doesn't leave a redundant "Download PDF" sitting above the
     # actual download button.
+    just_built_key = f"{pdf_cache_key}_just_built"
     if pdf_cache_key not in st.session_state:
         if st.button(
             "📄 Download annotated PDF" if annotated else "📄 Download PDF",
@@ -903,6 +905,12 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
             with st.spinner(_random_loading_message()):
                 try:
                     st.session_state[pdf_cache_key] = {'bytes': score_to_pdf_bytes(annotated_score), 'error': None}
+                    # One-shot flag, consumed below on this same rerun --
+                    # triggers the actual browser download automatically
+                    # (see the components.html injection below) so clicking
+                    # "Download PDF" once is the whole interaction: no second
+                    # button to click once it's built.
+                    st.session_state[just_built_key] = True
                 except Exception as exc:
                     st.session_state[pdf_cache_key] = {'bytes': None, 'error': str(exc)}
 
@@ -915,10 +923,31 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
                 "in MuseScore, Finale, or Dorico instead."
             )
         else:
+            file_name = f"{filename_stem}_annotated.pdf" if annotated else f"{filename_stem}.pdf"
+            if st.session_state.pop(just_built_key, False):
+                # Streamlit's own st.download_button can't trigger a
+                # download by itself -- it IS the click that starts one, so
+                # there's no built-in "compute, then auto-save" widget. This
+                # is the standard workaround: an invisible <a download> tied
+                # to the PDF as a base64 data URI, auto-clicked by its own
+                # <script> the instant this component renders (i.e. on the
+                # exact rerun right after the trigger button above was
+                # clicked) -- the browser saves the file with no further
+                # click needed. components.html renders in its own iframe,
+                # which is fine for this: the click and the data: URI it
+                # downloads are self-contained within that snippet.
+                b64 = base64.b64encode(cached_pdf['bytes']).decode('ascii')
+                st.components.v1.html(
+                    f'<a id="pdf-autodl" href="data:application/pdf;base64,{b64}" '
+                    f'download="{file_name}"></a>'
+                    '<script>document.getElementById("pdf-autodl").click();</script>',
+                    height=0,
+                )
+                st.caption("📄 Downloaded automatically. If your browser blocked it, use the button below instead.")
             st.download_button(
                 "Download annotated PDF" if annotated else "Download PDF",
                 data=cached_pdf['bytes'],
-                file_name=f"{filename_stem}_annotated.pdf" if annotated else f"{filename_stem}.pdf",
+                file_name=file_name,
                 mime="application/pdf",
                 key=f"{pdf_cache_key}_download",
                 type="primary",
