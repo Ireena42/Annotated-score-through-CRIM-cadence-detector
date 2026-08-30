@@ -3848,3 +3848,53 @@
 {"label": "[Tasso] Monte (1591) — Disdegno e gelosia", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
 {"label": "[Tasso] DIndia (1615) — Donna quanto piu a dentro", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
 {"label": "[Tasso] Hassler (1596) — A chi creder deggio", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Luzzaschi (1576) — Geloso amante apro millocchi e giro", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Vittori (1649) — Geloso amante apro millocchi e giro", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1587) — Arsi gran tempo e del mio foco indegno", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gabella (1585) — Tre gran donne vidio chin esser belle", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Stivori (1585) — Con la saetta da la punta doro", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Virchi (1584) — Non fonte o fiume od aura", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Bozi (1591) — Non fonte o fiume od aura", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Villani (1591) — Messaggera de lalba", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dueto (1586) — Ecco mormorar londe", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dueto (1586) — Ore fermate il volo", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Pallavicino (1604) — Voi mi chiedeste il core", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dueto (1584) — Sa sdegno voi prendete", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1584) — Se limagine vostra", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Clemsee (1613) — Donna nel mio ritorno", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Veggio (1574) — Daria un tempo nudrimmi e cibo e vita", "collection": "tasso", "finalis": "B", "source": "cadence", "detail": null}
+{"label": "[Tasso] Feliciani (1579) — Daria un tempo nudrimmi e cibo e vita", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Capilupi (1608) — Poi che non spira al mio soave foco", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Barbarino (1616) — Vuol che lami costei ma duro freno", "collection": "tasso", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dueto (1584) — Vorrei lagnarmi a pieno", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1584) — Vorrei lagnarmi a pieno", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Bozi (1591) — Vorrei lagnarmi a pieno", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1591) — Vorrei lagnarmi a pieno", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dueto (1584) — Se taccio il duol savanza", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1584) — Se taccio il duol savanza", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1591) — Se taccio il duol savanza", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gesualdo (1594) — Se taccio il duol savanza", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Pozzo (1600) — Se taccio il duol savanza", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] IlVerso (1600) — Se taccio il duol savanza", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Nenna (1613) — Se taccio il duol savanza", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1584) — Donna quella saetta", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Pozzo (1585) — Or che laura mia dolce altrove spira", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Verso (1605) — Vaghe Ninfe del Po Ninfe sorelle", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] DallaGostena (1582) — Di nettare amoroso ebro la mente", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1587) — Di nettare amoroso ebro la mente", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Zanotti (1589) — Di nettare amoroso ebro la mente", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1591) — Di nettare amoroso ebro la mente", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cirullo (1598) — Di nettare amoroso ebro la mente", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gabella (1588) — Eran velati i crespi e biondi crini", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Tosone (1590) — Secco e larbor gentile", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1590) — Fummo felici un tempo", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Virchi (1582) — Arsi mentre a voi piacque", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Tosone (1590) — Arsi mentre mamaste", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Malpigli (1598) — Arsi mentre mamaste", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Naldi (1589) — La giovinetta scorza", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Belli (1589) — Sovra le verdi chiome", "collection": "tasso", "finalis": "C", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Virchi (1583) — Felice primavera", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1584) — Felice primavera", "collection": "tasso", "finalis": "F#", "source": "cadence", "detail": null}
+{"label": "[Tasso] Vecoli (1586) — Chi la felice pianta dOriente", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Agostini (1582) — Picciola verga e bella", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1600) — Giamai piu dolce raggio", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
