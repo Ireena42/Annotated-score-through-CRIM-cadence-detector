@@ -3903,3 +3903,53 @@
 {"label": "[Tasso] Nielsen (1606) — Mentre i dipinti augelli", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[Tasso] Zenaro (1589) — Sovra lherbette e i fiori", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
 {"label": "[Tasso] Eremita (1589) — Fuggia di poggio in poggio", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Virchi (1584) — Qual cervo errando suole", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1595) — Al lume delle stelle", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Borelli (1599) — Al lume delle stelle", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1607) — Al lume delle stelle", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1584) — Io vidi gia sotto lardente sole", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1590) — Io vidi gia sotto lardente sole", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1584) — Vita de la mia vita", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1590) — Vita de la mia vita", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Genvino (1605) — Vita de la mia vita", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Milleville (1584) — Amor chaspro tormento", "collection": "tasso", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Tasso] Giovannelli (1599) — Mentre in grembo a la madre un giorno", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Tresti (1590) — Amor che qui dintorno", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Nanino (1599) — Amor che qui dintorno", "collection": "tasso", "finalis": "A", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Monte (1588) — Ardi Amor se ti piace", "collection": "tasso", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1595) — Soletto Amor tendea", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Macque (1610) — Mentre volgea il mio sole", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Hassler (1596) — Mentre la donna mia cangiando aspetto", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Virchi (1591) — Dolcissimi colori", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Zenaro (1589) — Bella non e costei", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gastoldi (1588) — Occhi leggiadri e belli", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Recalchi (1588) — O via piu bianca e fredda", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Bacchini (1588) — Piu che Diana e bella e piu mi piace", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cantino (1588) — Perche la mia Diana anzi il mio sole", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1591) — Al discioglier dun groppo", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Unknown composer — Questa vostra pietate", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Morari (1587) — Questa vostra pietate", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1591) — Questa vostra-pietate", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dentice (1598) — Questa vostra pietate", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] DiCostanzo (1604) — Questa vostra pietate", "collection": "tasso", "finalis": "A", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Luzzaschi (1604) — Questa vostra pietate", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Civita (1616) — Questa vostra pietate", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Giovannelli (1586) — Amatemi ben mio", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Macque (1589) — Amatemi ben mio", "collection": "tasso", "finalis": "A", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Bozi (1591) — Amatemi ben mio", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1591) — Amatemi ben mio", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Montella (1595) — Amatemi ben mio", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Sabbatini (1629) — Amatemi ben mio", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Bonini (1591) — Gia tu volasti quattro volte e sei", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Vecchi (1580) — Sel vostro volto e dun aria gentile", "collection": "tasso", "finalis": "A", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Borsaro (1587) — Sel vostro volto e dun aria gentile", "collection": "tasso", "finalis": "C", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Cortellini (1584) — Mentrio mirava fiso", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Felix (1591) — Siepe cha gli orti vaghi", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Felix (1591) — Sarai termine ancora", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1584) — Ne i vostri dolci baci", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dueto (1585) — Ne i vostri dolci baci", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Nanterni (1585) — Ne i vostri dolci baci", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Torelli (1594) — Ne i vostri dolci baci", "collection": "tasso", "finalis": "A", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Montella (1602) — Ne i vostri dolci baci", "collection": "tasso", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Tasso] DiCostanzo (1604) — Ne i vostri dolci baci", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Zenaro (1589) — Non sono in queste rive", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
