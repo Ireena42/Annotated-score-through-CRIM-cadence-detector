@@ -24,6 +24,7 @@ import base64
 import csv
 import html
 import io
+import json
 import random
 import re
 import sys
@@ -223,6 +224,78 @@ def _composer_filter_widget(pieces_by_label, key):
     return {
         label: ref for label, ref in pieces_by_label.items()
         if _composer_from_collection_label(label) == selected
+    }
+
+
+@st.cache_data
+def _load_finalis_index():
+    """{browse_label: finalis_pitch_class} for every piece with a
+    successfully computed Finalis -- see scripts/precompute_finalis.py's
+    own module docstring for the heuristic (last detected cadence's goal
+    pitch, falling back to crim_intervals' cruder .final() only when a
+    piece has zero detected cadences). Loaded from data/finalis.jsonl,
+    which ships IN this repo -- a local file read, not a network fetch
+    the way every other collection's own piece data is, since this file
+    is this app's own precomputed output, committed alongside the code.
+    Skips the ~50 pieces recorded with finalis=None (a real, disclosed
+    gap -- precompute couldn't determine one at all for those, nothing
+    to filter by) rather than mapping them to some placeholder value.
+    browse_label is exactly build_browse_index()'s own prefixed label
+    (e.g. "[CRIM] Palestrina — ... [Mass]"), the same string
+    precompute_finalis.py recorded each result under -- see
+    _finalis_filter_widget for how a per-collection tab's own bare label
+    gets turned back into that same prefixed form to look itself up here.
+    """
+    path = Path(__file__).parent / 'data' / 'finalis.jsonl'
+    index = {}
+    if not path.exists():
+        return index
+    with path.open('r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if record.get('finalis'):
+                index[record['label']] = record['finalis']
+    return index
+
+
+def _finalis_filter_widget(pieces_by_label, label_prefix, key):
+    """Renders a "Finalis" multiselect (several pitch classes at once,
+    unlike _composer_filter_widget's single-select -- picking e.g. both
+    G and D pieces at once is a genuinely useful comparison a Renaissance-
+    modality question would actually ask, not just noise the way mixing
+    composers together was) scoped to one collection's own {label:
+    native_ref} dict, and returns it filtered accordingly -- unchanged if
+    nothing is checked, or if nothing in this dict has a recorded Finalis
+    at all (no widget shown in that case -- an empty multiselect with
+    nothing to offer isn't worth displaying).
+
+    label_prefix is exactly the bracketed tag build_browse_index() uses
+    for this same collection (e.g. "CRIM", "JRP", or a music21 composer
+    name for the corpus tab) -- needed because data/finalis.jsonl is
+    keyed by Browse's own prefixed label (see _load_finalis_index), not
+    each tab's bare one; reconstructing that same prefix here is what
+    lets a single shared precomputed index serve every tab without a
+    second, tab-specific copy of it.
+    """
+    finalis_index = _load_finalis_index()
+    available = sorted({
+        finalis_index[f'[{label_prefix}] {label}'] for label in pieces_by_label
+        if f'[{label_prefix}] {label}' in finalis_index
+    })
+    if not available:
+        return pieces_by_label
+    chosen = st.multiselect("Finalis", available, key=key)
+    if not chosen:
+        return pieces_by_label
+    return {
+        label: ref for label, ref in pieces_by_label.items()
+        if finalis_index.get(f'[{label_prefix}] {label}') in chosen
     }
 
 
@@ -2200,6 +2273,20 @@ with tab_browse:
         terms = query.lower().split()
         matches = [row for row in index if all(term in row[0].lower() for term in terms)]
 
+        # Browse's own labels are already build_browse_index()'s full
+        # prefixed form (e.g. "[CRIM] ..."), the exact same string
+        # data/finalis.jsonl is keyed by -- unlike each per-collection
+        # tab's own _finalis_filter_widget call, no prefix reconstruction
+        # is needed here, so this looks matches up directly rather than
+        # reusing that helper (built for a {label: ref} dict, not this
+        # list of (label, collection, ref) tuples).
+        finalis_index = _load_finalis_index()
+        available_finalis = sorted({finalis_index[m[0]] for m in matches if m[0] in finalis_index})
+        if available_finalis:
+            chosen_finalis = st.multiselect("Filter by Finalis", available_finalis, key="browse_finalis_filter")
+            if chosen_finalis:
+                matches = [m for m in matches if finalis_index.get(m[0]) in chosen_finalis]
+
         if not matches:
             st.info("No matches.")
         else:
@@ -2437,9 +2524,13 @@ with tab_corpus:
     composer_name = st.selectbox("Composer", sorted(CORPUS_COMPOSERS.keys()))
     corpus_key = CORPUS_COMPOSERS[composer_name]
     piece_options = list_pieces_for_composer(corpus_key)
-    piece_label = st.selectbox("Piece", sorted(piece_options.keys()))
-    piece_id = piece_options[piece_label]
-    render_preview_and_annotate('music21', (corpus_key, piece_id), piece_label, piece_id)
+    piece_options = _finalis_filter_widget(piece_options, label_prefix=composer_name, key="corpus_finalis_filter")
+    if not piece_options:
+        st.info("No pieces match that Finalis filter.")
+    else:
+        piece_label = st.selectbox("Piece", sorted(piece_options.keys()))
+        piece_id = piece_options[piece_label]
+        render_preview_and_annotate('music21', (corpus_key, piece_id), piece_label, piece_id)
 
 with tab_crim:
     st.caption(
@@ -2483,6 +2574,7 @@ with tab_crim:
         f"{p['composer']['name']} — {p['full_title']} [{p['genre']['name']}]": p
         for p in crim_pieces
     }
+    crim_options = _finalis_filter_widget(crim_options, label_prefix="CRIM", key="crim_finalis_filter")
     if not crim_options:
         st.info("No pieces match that filter.")
     else:
@@ -2498,6 +2590,7 @@ with tab_jrp:
     )
     jrp_pieces = fetch_jrp_pieces()
     jrp_pieces = _composer_filter_widget(jrp_pieces, key="jrp_composer_filter")
+    jrp_pieces = _finalis_filter_widget(jrp_pieces, label_prefix="JRP", key="jrp_finalis_filter")
     if not jrp_pieces:
         st.info("No pieces match that composer filter.")
     else:
@@ -2513,6 +2606,7 @@ with tab_1520s:
     )
     p1520_pieces = fetch_1520s_pieces()
     p1520_pieces = _composer_filter_widget(p1520_pieces, key="p1520_composer_filter")
+    p1520_pieces = _finalis_filter_widget(p1520_pieces, label_prefix="1520s", key="p1520_finalis_filter")
     if not p1520_pieces:
         st.info("No pieces match that composer filter.")
     else:
@@ -2528,6 +2622,7 @@ with tab_tasso:
     )
     tasso_pieces = fetch_tasso_pieces()
     tasso_pieces = _composer_filter_widget(tasso_pieces, key="tasso_composer_filter")
+    tasso_pieces = _finalis_filter_widget(tasso_pieces, label_prefix="Tasso", key="tasso_finalis_filter")
     if not tasso_pieces:
         st.info("No pieces match that composer filter.")
     else:
@@ -2551,6 +2646,15 @@ with tab_smaller:
     # composer, so this correctly shows nothing for that collection and a
     # real filter for SEILS, with no special-casing needed here.
     small_pieces = _composer_filter_widget(small_pieces, key="small_composer_filter")
+    # build_browse_index()'s own prefix per collection key -- 'SEILS' /
+    # 'Lassus Psalms', not collection_key itself ('seils'/'lassus_psalms'),
+    # which is why this needs its own small lookup rather than reusing
+    # collection_key directly the way the other tabs reuse their own
+    # already-matching variable.
+    SMALLER_FINALIS_PREFIXES = {'seils': 'SEILS', 'lassus_psalms': 'Lassus Psalms'}
+    small_pieces = _finalis_filter_widget(
+        small_pieces, label_prefix=SMALLER_FINALIS_PREFIXES[collection_key], key="small_finalis_filter",
+    )
     if not small_pieces:
         st.info("No pieces match that composer filter.")
     else:

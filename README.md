@@ -372,8 +372,22 @@ two pieces. The full corpus run is still pending:
 
 The full corpus (4,314 pieces across all 7 collections) finished
 precomputing on 2026-08-30 — `data/finalis.jsonl` has one record per
-piece. The remaining step — reading that file and wiring up an actual
-Finalis filter widget in Browse — hasn't been built yet.
+piece (4,262 with a real pitch class; the other 52 are recorded as
+`finalis: null` rather than a silent guess — precompute genuinely
+couldn't determine one for those).
+
+That data now powers a **"Finalis"** multiselect (several pitch classes
+at once, e.g. both G and D — a real Renaissance-modality comparison,
+unlike the single-composer pickers elsewhere) everywhere a piece gets
+picked: Browse's search results, and each of the six collection-specific
+tabs, narrowing that tab's own Composer → Piece selection the same way.
+It's read straight from `data/finalis.jsonl` as a local file (this app's
+own precomputed output, shipped in the repo — not fetched over the
+network the way every other collection's piece data is), keyed by
+Browse's own prefixed label (`[CRIM] ...`, `[Palestrina] ...`, etc.),
+which each tab reconstructs from its own bare label to look itself up in
+the same shared index. The widget doesn't appear at all for a
+collection/composer with nothing recorded to filter by.
 
 ## Credits & licensing
 
