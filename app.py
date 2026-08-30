@@ -264,6 +264,17 @@ def _load_finalis_index():
     return index
 
 
+def _format_finalis(pitch_class):
+    """Display-only: music21's own pitch notation ('-' for flat, '#' for
+    sharp -- chosen internally so it stays unambiguous plain ASCII even for
+    double-flats/-sharps like '--') isn't how a reader expects to see a
+    note name. Swaps in the actual flat/sharp symbols for display; every
+    st.multiselect using this passes format_func=_format_finalis, which
+    only changes what's rendered -- the value used for filtering/matching
+    against data/finalis.jsonl stays music21's own convention throughout."""
+    return pitch_class.replace('-', '♭').replace('#', '♯')
+
+
 def _finalis_filter_widget(pieces_by_label, label_prefix, key):
     """Renders a "Finalis" multiselect (several pitch classes at once,
     unlike _composer_filter_widget's single-select -- picking e.g. both
@@ -290,7 +301,7 @@ def _finalis_filter_widget(pieces_by_label, label_prefix, key):
     })
     if not available:
         return pieces_by_label
-    chosen = st.multiselect("Finalis", available, key=key)
+    chosen = st.multiselect("Finalis", available, key=key, format_func=_format_finalis)
     if not chosen:
         return pieces_by_label
     return {
@@ -2283,7 +2294,7 @@ with tab_browse:
         finalis_index = _load_finalis_index()
         available_finalis = sorted({finalis_index[m[0]] for m in matches if m[0] in finalis_index})
         if available_finalis:
-            chosen_finalis = st.multiselect("Filter by Finalis", available_finalis, key="browse_finalis_filter")
+            chosen_finalis = st.multiselect("Filter by Finalis", available_finalis, key="browse_finalis_filter", format_func=_format_finalis)
             if chosen_finalis:
                 matches = [m for m in matches if finalis_index.get(m[0]) in chosen_finalis]
 

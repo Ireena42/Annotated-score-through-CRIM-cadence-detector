@@ -387,7 +387,11 @@ network the way every other collection's piece data is), keyed by
 Browse's own prefixed label (`[CRIM] ...`, `[Palestrina] ...`, etc.),
 which each tab reconstructs from its own bare label to look itself up in
 the same shared index. The widget doesn't appear at all for a
-collection/composer with nothing recorded to filter by.
+collection/composer with nothing recorded to filter by. Displayed pitch
+classes use real flat/sharp symbols (♭/♯) rather than music21's own
+internal ASCII notation (`-`/`#`) — a display-only swap via
+`format_func`; the underlying value matched against `data/finalis.jsonl`
+is unchanged.
 
 ## Credits & licensing
 
