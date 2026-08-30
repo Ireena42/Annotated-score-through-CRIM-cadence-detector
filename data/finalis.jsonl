@@ -1648,3 +1648,53 @@
 {"label": "[CRIM] Padovano, Annibale — Missa Domina, a lingua dolosa: Sanctus [Mass movement]", "collection": "crim", "finalis": "A", "source": "cadence", "detail": null}
 {"label": "[CRIM] Padovano, Annibale — Missa Domina, a lingua dolosa: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "A", "source": "cadence", "detail": null}
 {"label": "[CRIM] Padovano, Annibale — Missa Ultimi mieie sospiri: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Padovano, Annibale — Missa Ultimi mieie sospiri: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Padovano, Annibale — Missa Ultimi mieie sospiri: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Padovano, Annibale — Missa Ultimi mieie sospiri: Sanctus [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Padovano, Annibale — Missa Ultimi mieie sospiri: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Cipriano de Rore — Missa Praeter rerum: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Cipriano de Rore — Missa Praeter rerum: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Cipriano de Rore — Missa Praeter rerum: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "part_duration_mismatch", "detail": "low-confidence: parts' own encoded durations disagree (would otherwise be 'cadence' -> G)"}
+{"label": "[CRIM] Cipriano de Rore — Missa Praeter rerum: Sanctus [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Cipriano de Rore — Missa Praeter rerum: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Entre vous filles: Kyrie [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Entre vous filles: Gloria [Mass movement]", "collection": "crim", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Entre vous filles: Credo [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Entre vous filles: Sanctus [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Entre vous filles: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Domine dominus noster: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Domine dominus noster: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Domine dominus noster: Credo [Mass movement]", "collection": "crim", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Domine dominus noster: Sanctus [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Domine dominus noster: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Leonhard Lechner — Missa Domine dominus noster: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Leonhard Lechner — Missa Domine dominus noster: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Leonhard Lechner — Missa Domine dominus noster: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Leonhard Lechner — Missa Domine dominus noster: Sanctus [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Leonhard Lechner — Missa Domine dominus noster: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Claudio Merulo — Missa Susanne un jour: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Claudio Merulo — Missa Susanne un jour: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Claudio Merulo — Missa Susanne un jour: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Claudio Merulo — Missa Susanne un jour: Sanctus [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Claudio Merulo — Missa Susanne un jour: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Ludwig Daser — Missa Ecce nunc benedicite: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Ludwig Daser — Missa Ecce nunc benedicite: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Ludwig Daser — Missa Ecce nunc benedicite: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Ludwig Daser — Missa Ecce nunc benedicite: Sanctus [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Ludwig Daser — Missa Ecce nunc benedicite: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Ecce nunc benedicite: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Ecce nunc benedicite: Gloria [Mass movement]", "collection": "crim", "finalis": "B", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Ecce nunc benedicite: Credo [Mass movement]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Ecce nunc benedicite: Sanctus [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Ecce nunc benedicite: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa O magnum mysterium: Kyrie [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa O magnum mysterium: Gloria [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa O magnum mysterium: Credo [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa O magnum mysterium: Sanctus [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa O magnum mysterium: Agnus Dei [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Dum complerentur: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Dum complerentur: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Dum complerentur: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Dum complerentur: Sanctus [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Dum complerentur: Agnus Dei [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Missa Ascendens Christus: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
