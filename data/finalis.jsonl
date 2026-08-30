@@ -1398,3 +1398,53 @@
 {"label": "[CRIM] Anonymous — Beata mater [Plainchant]", "collection": "crim", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
 {"label": "[CRIM] Nicolas Gombert — Super flumina Babylonis [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[CRIM] Claudin de Sermisy — Tant que vivray [Chanson]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Lupus Hellinck — In te Domine speravi [Motet]", "collection": "crim", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[CRIM] Cristóbal de Morales — Sancta et immaculata virginitas [Motet]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Sandrin — Doulce memoire [Chanson]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Claudin de Sermisy — Il me souffit [Chanson]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Notker Balbulus — Hic est vere martire [Plainchant]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM has this piece catalogued but no MEI file for it yet."}
+{"label": "[CRIM] Victoria, Tomás Luis de — O quam gloriosum [Motet]", "collection": "crim", "finalis": "B", "source": "cadence", "detail": null}
+{"label": "[CRIM] Padovano, Annibale — Domina, a lingua dolosa [Motet]", "collection": "crim", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[CRIM] Verdelot, Philippe — Ultimi miei sospiri [Madrigal]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Courtois, Jean — Inviolata integra [Motet]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[CRIM] Verdelot, Philippe — Gabriel archangelus [Motet]", "collection": "crim", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[CRIM] Mantua, Jachet de — Spem in alium [Motet]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Richafort, Johannes — Quem dicunt [Motet]", "collection": "crim", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[CRIM] Josquin Des Prez — Praeter rerum [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Giovan Leonardo Primavera — Nasce la gioia mia [Madrigal]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Domenico Ferrabosco — Io mi son giovenetta [Madrigal]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Cipriano de Rore — Alla dolc'ombra [Madrigal]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Jean Lhéritier — Nigra sum [Motet]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Giovanni Pierluigi da Palestrina — Sicut lilium [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Jacob Clemens non Papa — Entre vous filles [Chanson]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Domine Dominus noster [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Ludwig Daser — Ecce nunc benedicite [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — O magnum mysterium [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Dum complerentur [Motet]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Ascendens Christus [Motet]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Ave Regina [Motet]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Victoria, Tomás Luis de — Quam pulchri sunt [Motet]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Salve Regina [Motet]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM couldn't import this piece (bad MEI file or network issue)."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Trahe mi [Motet]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM has this piece catalogued but no MEI file for it yet."}
+{"label": "[CRIM] Victoria, Tomás Luis de — Vidi speciosam [Motet]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Colin — Missa Confitemini: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Colin — Missa Confitemini: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Colin — Missa Confitemini: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Colin — Missa Confitemini: Sanctus [Mass movement]", "collection": "crim", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Colin — Missa Confitemini: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Mathieu Sohier — Missa Vidi speciosam: Kyrie [Mass movement]", "collection": "crim", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[CRIM] Mathieu Sohier — Missa Vidi speciosam: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Mathieu Sohier — Missa Vidi speciosam: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Mathieu Sohier — Missa Vidi speciosam: Sanctus [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Mathieu Sohier — Missa Vidi speciosam: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolas De Marle — Missa O gente brunette: Kyrie [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolas De Marle — Missa O gente brunette: Gloria [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolas De Marle — Missa O gente brunette: Credo [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolas De Marle — Missa O gente brunette: Sanctus [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolas De Marle — Missa O gente brunette: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Clereau — Missa Virginis Mariae: Kyrie [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Clereau — Missa Virginis Mariae: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Clereau — Missa Virginis Mariae: Credo [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Clereau — Missa Virginis Mariae: Sanctus [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pierre Clereau — Missa Virginis Mariae: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Antoine de Févin — Missa Ave Maria: Kyrie [Mass movement]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
