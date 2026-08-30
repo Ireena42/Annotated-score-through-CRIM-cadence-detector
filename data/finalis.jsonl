@@ -2198,3 +2198,53 @@
 {"label": "[JRP] Josquin des Prez — Missa Allez regretz II: Sanctus", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
 {"label": "[JRP] Josquin des Prez — Missa Allez regretz II: Agnus", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
 {"label": "[JRP] Josquin des Prez — Missa Dung aultre amer: Kyrie", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Dung aultre amer: Gloria", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Dung aultre amer: Credo", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Jos0703c.b: Missa Dung aultre amer Credo  Jena 31", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Dung aultre amer: Sanctus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Dung aultre amer: Agnus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Faisant regretz: Kyrie", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Faisant regretz: Gloria", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Faisant regretz: Credo", "collection": "jrp", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Faisant regretz: Sanctus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Faisant regretz: Agnus", "collection": "jrp", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Fortuna desperata: Kyrie", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Fortuna desperata: Gloria", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Fortuna desperata: Credo", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Fortuna desperata: Sanctus", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Fortuna desperata: Agnus", "collection": "jrp", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Malheur me bat: Kyrie", "collection": "jrp", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Malheur me bat: Gloria", "collection": "jrp", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Malheur me bat: Credo", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Malheur me bat: Sanctus", "collection": "jrp", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Malheur me bat: Agnus", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Mon seul plaisir: Kyrie", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Mon seul plaisir: Gloria", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Mon seul plaisir: Credo", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Mon seul plaisir: Sanctus", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Mon seul plaisir: Agnus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Di dadi: Kyrie", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Di dadi: Gloria", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Di dadi: Credo", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Di dadi: Sanctus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Di dadi: Agnus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Rosina: Kyrie", "collection": "jrp", "finalis": "E", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[JRP] Josquin des Prez — Missa Rosina: Gloria", "collection": "jrp", "finalis": "E", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[JRP] Josquin des Prez — Missa Rosina: Credo", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Rosina: Sanctus", "collection": "jrp", "finalis": "E", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[JRP] Josquin des Prez — Missa Rosina: Agnus", "collection": "jrp", "finalis": "E", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[JRP] Josquin des Prez — Missa Mater patris: Kyrie", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Mater patris: Gloria", "collection": "jrp", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Mater patris: Credo", "collection": "jrp", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Mater patris: Sanctus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Mater patris: Agnus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Missus est Gabriel Angelus: Kyrie", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Missus est Gabriel Angelus: Gloria", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Missus est Gabriel Angelus: Credo", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Missus est Gabriel Angelus: Sanctus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Missus est Gabriel Angelus: Agnus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Quem dicunt homines: Kyrie", "collection": "jrp", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Quem dicunt homines: Gloria", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Quem dicunt homines: Credo", "collection": "jrp", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Quem dicunt homines: Sanctus", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Josquin des Prez — Missa Quem dicunt homines: Agnus", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
