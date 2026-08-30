@@ -45,53 +45,58 @@ runs the checked analyses and shows the results before the file), or
 plain **Download** when none are (nothing runs, you just get the piece
 back).
 
-Every search also gets two bulk downloads, covering *every* match, not
-just the 50 shown in the picker below them:
-- **"📄 Download all N match(es) as CSV"** — a manifest (collection,
-  composer, the display label, and a source URL or `music21` corpus
-  path for each) meant to be loaded with `pandas` and fetched/parsed
-  directly in your own script, no dependency on this app at all. Any
-  number of matches, always available.
-- **"📦 Build a ZIP of all N score(s) (MusicXML)"** — actually fetches,
-  parses, and converts every match to a real MusicXML file and zips
-  them, no CRIM analysis run on any of them. Capped at 30 matches at a
-  time (benchmarked directly at ~5s/piece — past 30 it's a bad wait for
-  a single click, and the CSV is a better fit for a bigger set anyway).
-  A piece that fails to fetch is skipped and reported by name, not
-  silently dropped from the count.
+Every search gets a CSV manifest of *every* match (not just the 50 shown
+in the picker below), always available:
+**"📄 Download all N match(es) as CSV"** — collection, composer, the
+display label, and a source URL or `music21` corpus path for each,
+meant to be loaded with `pandas` and fetched/parsed directly in your own
+script, no dependency on this app at all.
 
-A third option below those two, checkboxes and all — **"🧮 Build
-analysis-data CSV(s) for all N piece(s)"** — actually *runs* the checked
-analyses (cadences/points of imitation/homorhythm) across every match
-and hands back CRIM's own raw columns (`CadType`/`Tone`/`RelTone` for
-cadences, `Presentation_Type`/`Soggetti`/`Voices` for points of
-imitation, `hr_voices` for homorhythm), one CSV per analysis, each row
-tagged with `collection`/`composer`/`label` so pieces stay identifiable
-once every match is concatenated together — ready for your own stats,
-not just a count of what was found. Also builds a **per-piece density
-comparison CSV** — one row per piece, one column per checked analysis,
-the same density figure (fraction of measures touched — see below) a
-single-piece Analyze shows, so several pieces can be compared side by
-side directly, which the per-event CSVs above don't make easy on their
-own. A blank cell means that analysis wasn't computed for that piece at
-all (never requested, or it failed); a `0` means it genuinely found
-nothing — kept distinct rather than collapsed into one blank. This is
-real per-piece CRIM computation on top of the fetch, so it's capped
-tighter than the ZIP (15 matches) — a provisional cap, not yet
-benchmarked live the way the ZIP's 30 was.
+Everything heavier lives inside one **"📦 Bulk downloads"** expander,
+kept collapsed by default since most searches just want the CSV above.
+Inside, one set of checkboxes (Cadences/Points of imitation/Homorhythm —
+the same three the single-piece Analyze uses) governs all three exports
+below it at once: leave everything unchecked for plain, unmodified
+files, or check any of the three to get annotated ones — either version
+is one click away without re-checking anything:
+- **MusicXML** — fetches, parses, and converts every match to a real
+  MusicXML file (annotated with the checked analyses, or plain if none
+  are checked) and zips them. Capped at 30 matches at a time
+  (benchmarked directly at ~5s/piece for the plain case — past 30 it's a
+  bad wait for a single click, and the CSV is a better fit for a bigger
+  set anyway).
+- **PDF** — renders each match to PDF via the same
+  [Verovio](https://www.verovio.org/) path the single-piece "Download
+  PDF" button uses (annotated or plain, same rule as MusicXML above),
+  then zips them together. Real analysis *and* a real render per piece
+  when annotated, so it's capped tighter (10 matches) — provisional, not
+  yet benchmarked live.
+- **Analysis data (CSV)** — the one export that genuinely needs at least
+  one analysis checked (there's no "plain" version of analysis data):
+  runs the checked analyses across every match and hands back CRIM's own
+  raw columns (`CadType`/`Tone`/`RelTone` for cadences,
+  `Presentation_Type`/`Soggetti`/`Voices` for points of imitation,
+  `hr_voices` for homorhythm), one CSV per analysis, each row tagged
+  with `collection`/`composer`/`label` so pieces stay identifiable once
+  every match is concatenated together — ready for your own stats, not
+  just a count of what was found. Also builds a **per-piece density
+  comparison CSV** — one row per piece, one column per checked analysis,
+  the same density figure (fraction of measures touched — see below) a
+  single-piece Analyze shows, so several pieces can be compared side by
+  side directly, which the per-event CSVs above don't make easy on their
+  own. A blank cell means that analysis wasn't computed for that piece
+  at all (never requested, or it failed); a `0` means it genuinely found
+  nothing — kept distinct rather than collapsed into one blank. Capped
+  at 15 matches (real per-piece CRIM computation on top of the fetch) —
+  also provisional.
 
-Right below that, using the exact same checkboxes (a PDF is a picture of
-whatever got annotated, so it shares what "checked" means with the CSV
-export rather than asking twice) — **"📄 Build a ZIP of all N piece(s)
-as annotated PDFs"** — runs the checked analyses and renders each match
-to PDF via the same [Verovio](https://www.verovio.org/) path the
-single-piece "Download PDF" button uses, then zips them all together.
-Real analysis *and* a real render per piece, so it's capped tighter
-still (10 matches) — also provisional, not yet benchmarked live.
+Any of these that fails to fetch/analyze/render for one particular piece
+is skipped and reported by name, not silently dropped from the count.
 
 Handy for "give me every Josquin piece across all 7 collections to
-analyze myself" — search "Josquin", download the CSV (or, narrowed
-further, the ZIP, the analysis-data CSVs, or the annotated PDFs).
+analyze myself" — search "Josquin", download the CSV manifest above, or
+open the bulk downloads expander for the ZIP (plain or annotated), the
+analysis-data CSVs, or the PDFs.
 
 No search at all needed for the **whole corpus's metadata** either (not
 the scores themselves): a **"📦 Download the whole corpus metadata"**

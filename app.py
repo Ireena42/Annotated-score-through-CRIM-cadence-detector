@@ -1856,26 +1856,32 @@ BULK_ZIP_MAX_MATCHES = 30
 BROWSE_PICKER_MAX_SHOWN = 200
 
 
-def _bulk_zip_bytes(matches, progress_callback=None):
-    """Fetches + parses + converts every match to MusicXML -- no CRIM
-    analysis at all (the same "all three flags off" path already used
-    for single-piece unannotated downloads, see run_pipeline's
-    docstring) -- and zips them into one in-memory archive. Returns
-    (zip_bytes, failed) where `failed` is a list of (label, reason) for
-    any piece that couldn't be fetched/parsed -- skipped rather than
-    aborting the whole batch, but reported explicitly rather than
-    silently missing from the zip. progress_callback(index, total,
-    label), if given, is called right before each piece starts."""
+def _bulk_zip_bytes(matches, include_cadences=False, include_ptypes=False, include_homorhythm=False, progress_callback=None):
+    """Fetches + parses + converts every match to MusicXML and zips them
+    into one in-memory archive. include_cadences/ptypes/homorhythm all
+    default to False (the original behavior: no CRIM analysis at all,
+    the same "all three flags off" path already used for single-piece
+    unannotated downloads -- see run_pipeline's docstring), but Browse
+    passes through whatever the shared analysis checkboxes are actually
+    set to, same convention as _bulk_pdf_zip_bytes/_bulk_analysis_csv_bytes,
+    so this ZIP can hold either plain or annotated scores depending on
+    what's checked, not just plain ones. Returns (zip_bytes, failed) where
+    `failed` is a list of (label, reason) for any piece that couldn't be
+    fetched/parsed -- skipped rather than aborting the whole batch, but
+    reported explicitly rather than silently missing from the zip.
+    progress_callback(index, total, label), if given, is called right
+    before each piece starts."""
     buf = io.BytesIO()
     failed = []
+    annotated = include_cadences or include_ptypes or include_homorhythm
     with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
         for i, (label, collection, native_ref) in enumerate(matches):
             if progress_callback:
                 progress_callback(i, len(matches), label)
             try:
                 score, _stats, error = annotate_by_collection(
-                    collection, native_ref, include_cadences=False,
-                    include_ptypes=False, include_homorhythm=False,
+                    collection, native_ref, include_cadences=include_cadences,
+                    include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
                 )
                 if error:
                     raise RuntimeError(error)
@@ -1884,7 +1890,7 @@ def _bulk_zip_bytes(matches, progress_callback=None):
                 failed.append((label, str(e)))
                 continue
             stem = _browse_piece_filename_stem(collection, native_ref)
-            zf.writestr(f'{stem}.xml', xml_bytes)
+            zf.writestr(f'{stem}_annotated.xml' if annotated else f'{stem}.xml', xml_bytes)
     return buf.getvalue(), failed
 
 
@@ -2189,140 +2195,153 @@ with tab_browse:
                      "load with pandas and fetch/parse in your own script.",
             )
 
-            if len(matches) > BULK_ZIP_MAX_MATCHES:
+            with st.expander(f"📦 Bulk downloads for all {len(matches)} match(es) -- MusicXML, PDF, or analysis data"):
                 st.caption(
-                    f"📦 Bulk ZIP download works for up to {BULK_ZIP_MAX_MATCHES} matches at once "
-                    f"(this search has {len(matches)}) -- narrow the search to enable it, or use "
-                    "the CSV above for the full list."
+                    "**Which analyses to include** -- leave everything unchecked below for "
+                    "plain, unmodified files; check any of the three to get annotated ones "
+                    "instead. The same choice applies to the MusicXML and PDF exports below, "
+                    "so either version is one click away without re-checking anything."
                 )
-            elif st.button(f"📦 Build a ZIP of all {len(matches)} score(s) (MusicXML)", key="browse_zip_build", type="primary"):
-                progress_bar = st.progress(0.0)
-                status = st.empty()
+                bulk_col_cad, bulk_col_pt, bulk_col_hr = st.columns(3)
+                bulk_cadences = bulk_col_cad.checkbox("Cadences", value=True, key="browse_bulk_cadences")
+                bulk_ptypes = bulk_col_pt.checkbox("Points of imitation", key="browse_bulk_ptypes")
+                bulk_hr = bulk_col_hr.checkbox("Homorhythm", key="browse_bulk_hr")
+                bulk_annotated = bulk_cadences or bulk_ptypes or bulk_hr
 
-                def _update_zip_progress(i, total, label):
-                    progress_bar.progress(i / total)
-                    status.caption(f"Fetching {i + 1}/{total}: {label}")
-
-                with st.spinner(f"{_random_fetch_message()} Converting each piece to "
-                                 "MusicXML -- no analysis run on any of them."):
-                    zip_bytes, failed = _bulk_zip_bytes(matches, progress_callback=_update_zip_progress)
-                progress_bar.progress(1.0)
-                status.empty()
-
-                if failed:
-                    detail = "; ".join(f"{label} ({reason})" for label, reason in failed[:5])
-                    st.warning(
-                        f"{len(failed)} of {len(matches)} piece(s) couldn't be included and were "
-                        f"skipped: {detail}" + (", ..." if len(failed) > 5 else "")
+                st.markdown("**MusicXML**")
+                if len(matches) > BULK_ZIP_MAX_MATCHES:
+                    st.caption(
+                        f"Works for up to {BULK_ZIP_MAX_MATCHES} matches at once (this search has "
+                        f"{len(matches)}) -- narrow the search to enable it, or use the CSV above "
+                        "for the full list."
                     )
-                st.download_button(
-                    f"Download ZIP ({len(matches) - len(failed)} score(s))",
-                    data=zip_bytes,
-                    file_name="browse_results.zip",
-                    mime="application/zip",
-                    key="browse_zip_download",
-                    type="primary",
-                )
+                elif st.button(
+                    f"📦 Build a ZIP of all {len(matches)} {'annotated ' if bulk_annotated else ''}score(s) (MusicXML)",
+                    key="browse_zip_build", type="primary",
+                ):
+                    progress_bar = st.progress(0.0)
+                    status = st.empty()
 
-            st.caption(
-                "🧮 Bulk CRIM analysis-data export -- runs the checked analyses on every match "
-                "and hands back CRIM's own raw columns (CadType/Tone/RelTone for cadences, "
-                "Presentation_Type/Soggetti/Voices for points of imitation, hr_voices for "
-                "homorhythm) as one CSV per analysis, ready for your own stats -- not just a "
-                "count of what was found. Also builds a per-piece density comparison CSV -- "
-                "the same density figure shown after a single-piece Analyze, one row per "
-                "piece, side by side."
-            )
-            bulk_col_cad, bulk_col_pt, bulk_col_hr = st.columns(3)
-            bulk_cadences = bulk_col_cad.checkbox("Cadences", value=True, key="browse_bulk_cadences")
-            bulk_ptypes = bulk_col_pt.checkbox("Points of imitation", key="browse_bulk_ptypes")
-            bulk_hr = bulk_col_hr.checkbox("Homorhythm", key="browse_bulk_hr")
+                    def _update_zip_progress(i, total, label):
+                        progress_bar.progress(i / total)
+                        status.caption(f"{'Analyzing' if bulk_annotated else 'Fetching'} {i + 1}/{total}: {label}")
 
-            if len(matches) > BULK_ANALYSIS_MAX_MATCHES:
-                st.caption(
-                    f"Works for up to {BULK_ANALYSIS_MAX_MATCHES} matches at once (this search has "
-                    f"{len(matches)}) -- narrow the search to enable it. This cap is provisional: "
-                    "unlike the ZIP cap above, real CRIM computation cost per piece hasn't been "
-                    "benchmarked live yet."
-                )
-            elif not (bulk_cadences or bulk_ptypes or bulk_hr):
-                st.caption("Check at least one analysis above to enable the bulk export.")
-            elif st.button(f"🧮 Build analysis-data CSV(s) for all {len(matches)} piece(s)", key="browse_bulk_analysis_build", type="primary"):
-                progress_bar = st.progress(0.0)
-                status = st.empty()
-
-                def _update_bulk_analysis_progress(i, total, label):
-                    progress_bar.progress(i / total)
-                    status.caption(f"Analyzing {i + 1}/{total}: {label}")
-
-                with st.spinner(_random_loading_message()):
-                    csv_by_analysis, failed = _bulk_analysis_csv_bytes(
-                        matches, bulk_cadences, bulk_ptypes, bulk_hr,
-                        progress_callback=_update_bulk_analysis_progress,
-                    )
-                progress_bar.progress(1.0)
-                status.empty()
-
-                if failed:
-                    detail = "; ".join(f"{label} ({reason})" for label, reason in failed[:5])
-                    st.warning(
-                        f"{len(failed)} of {len(matches)} piece(s) couldn't be included and were "
-                        f"skipped: {detail}" + (", ..." if len(failed) > 5 else "")
-                    )
-                if not csv_by_analysis:
-                    st.info("None of the checked analyses found anything across these pieces.")
-                for analysis_key, (btn_label, file_name) in BULK_ANALYSIS_DOWNLOAD_META.items():
-                    if analysis_key in csv_by_analysis:
-                        st.download_button(
-                            btn_label,
-                            data=csv_by_analysis[analysis_key],
-                            file_name=file_name,
-                            mime="text/csv",
-                            key=f"browse_bulk_download_{analysis_key}",
-                            type="primary",
+                    with st.spinner(_random_fetch_message() if not bulk_annotated else _random_loading_message()):
+                        zip_bytes, failed = _bulk_zip_bytes(
+                            matches, bulk_cadences, bulk_ptypes, bulk_hr,
+                            progress_callback=_update_zip_progress,
                         )
+                    progress_bar.progress(1.0)
+                    status.empty()
 
-            # Same checkboxes as the CSV export above, not a separate set --
-            # a PDF only makes sense as a picture of what got annotated onto
-            # it, so it shares exactly what "checked" means with the CSV
-            # export rather than asking the same question twice.
-            if len(matches) > BULK_PDF_ZIP_MAX_MATCHES:
+                    if failed:
+                        detail = "; ".join(f"{label} ({reason})" for label, reason in failed[:5])
+                        st.warning(
+                            f"{len(failed)} of {len(matches)} piece(s) couldn't be included and were "
+                            f"skipped: {detail}" + (", ..." if len(failed) > 5 else "")
+                        )
+                    st.download_button(
+                        f"Download ZIP ({len(matches) - len(failed)} score(s))",
+                        data=zip_bytes,
+                        file_name="browse_results.zip",
+                        mime="application/zip",
+                        key="browse_zip_download",
+                        type="primary",
+                    )
+
+                st.markdown("**PDF**")
+                if len(matches) > BULK_PDF_ZIP_MAX_MATCHES:
+                    st.caption(
+                        f"Works for up to {BULK_PDF_ZIP_MAX_MATCHES} matches at once (this search "
+                        f"has {len(matches)}) -- narrow the search to enable it."
+                    )
+                elif st.button(
+                    f"📄 Build a ZIP of all {len(matches)} piece(s) as {'annotated ' if bulk_annotated else 'plain '}PDFs",
+                    key="browse_pdf_zip_build", type="primary",
+                ):
+                    progress_bar = st.progress(0.0)
+                    status = st.empty()
+
+                    def _update_pdf_zip_progress(i, total, label):
+                        progress_bar.progress(i / total)
+                        status.caption(f"Rendering {i + 1}/{total}: {label}")
+
+                    with st.spinner(_random_loading_message()):
+                        pdf_zip_bytes, failed = _bulk_pdf_zip_bytes(
+                            matches, bulk_cadences, bulk_ptypes, bulk_hr,
+                            progress_callback=_update_pdf_zip_progress,
+                        )
+                    progress_bar.progress(1.0)
+                    status.empty()
+
+                    if failed:
+                        detail = "; ".join(f"{label} ({reason})" for label, reason in failed[:5])
+                        st.warning(
+                            f"{len(failed)} of {len(matches)} piece(s) couldn't be included and were "
+                            f"skipped: {detail}" + (", ..." if len(failed) > 5 else "")
+                        )
+                    st.download_button(
+                        f"Download ZIP ({len(matches) - len(failed)} PDF(s))",
+                        data=pdf_zip_bytes,
+                        file_name="browse_results_pdfs.zip",
+                        mime="application/zip",
+                        key="browse_pdf_zip_download",
+                        type="primary",
+                    )
+
+                st.markdown("**Analysis data (CSV)**")
                 st.caption(
-                    f"📄 Bulk PDF export works for up to {BULK_PDF_ZIP_MAX_MATCHES} matches at "
-                    f"once (this search has {len(matches)}) -- narrow the search to enable it."
+                    "Runs the checked analyses on every match and hands back CRIM's own raw "
+                    "columns (CadType/Tone/RelTone for cadences, Presentation_Type/Soggetti/"
+                    "Voices for points of imitation, hr_voices for homorhythm) as one CSV per "
+                    "analysis, ready for your own stats -- not just a count of what was found. "
+                    "Also builds a per-piece density comparison CSV, one row per piece, side by "
+                    "side. Unlike MusicXML/PDF above, this one genuinely needs at least one "
+                    "analysis checked -- there's no 'plain' version of an analysis-data export."
                 )
-            elif not (bulk_cadences or bulk_ptypes or bulk_hr):
-                st.caption("Check at least one analysis above to enable the bulk PDF export.")
-            elif st.button(f"📄 Build a ZIP of all {len(matches)} piece(s) as annotated PDFs", key="browse_pdf_zip_build", type="primary"):
-                progress_bar = st.progress(0.0)
-                status = st.empty()
-
-                def _update_pdf_zip_progress(i, total, label):
-                    progress_bar.progress(i / total)
-                    status.caption(f"Rendering {i + 1}/{total}: {label}")
-
-                with st.spinner(_random_loading_message()):
-                    pdf_zip_bytes, failed = _bulk_pdf_zip_bytes(
-                        matches, bulk_cadences, bulk_ptypes, bulk_hr,
-                        progress_callback=_update_pdf_zip_progress,
+                if len(matches) > BULK_ANALYSIS_MAX_MATCHES:
+                    st.caption(
+                        f"Works for up to {BULK_ANALYSIS_MAX_MATCHES} matches at once (this search has "
+                        f"{len(matches)}) -- narrow the search to enable it. This cap is provisional: "
+                        "unlike the ZIP cap above, real CRIM computation cost per piece hasn't been "
+                        "benchmarked live yet."
                     )
-                progress_bar.progress(1.0)
-                status.empty()
+                elif not bulk_annotated:
+                    st.caption("Check at least one analysis above to enable this export.")
+                elif st.button(f"🧮 Build analysis-data CSV(s) for all {len(matches)} piece(s)", key="browse_bulk_analysis_build", type="primary"):
+                    progress_bar = st.progress(0.0)
+                    status = st.empty()
 
-                if failed:
-                    detail = "; ".join(f"{label} ({reason})" for label, reason in failed[:5])
-                    st.warning(
-                        f"{len(failed)} of {len(matches)} piece(s) couldn't be included and were "
-                        f"skipped: {detail}" + (", ..." if len(failed) > 5 else "")
-                    )
-                st.download_button(
-                    f"Download ZIP ({len(matches) - len(failed)} PDF(s))",
-                    data=pdf_zip_bytes,
-                    file_name="browse_results_pdfs.zip",
-                    mime="application/zip",
-                    key="browse_pdf_zip_download",
-                    type="primary",
-                )
+                    def _update_bulk_analysis_progress(i, total, label):
+                        progress_bar.progress(i / total)
+                        status.caption(f"Analyzing {i + 1}/{total}: {label}")
+
+                    with st.spinner(_random_loading_message()):
+                        csv_by_analysis, failed = _bulk_analysis_csv_bytes(
+                            matches, bulk_cadences, bulk_ptypes, bulk_hr,
+                            progress_callback=_update_bulk_analysis_progress,
+                        )
+                    progress_bar.progress(1.0)
+                    status.empty()
+
+                    if failed:
+                        detail = "; ".join(f"{label} ({reason})" for label, reason in failed[:5])
+                        st.warning(
+                            f"{len(failed)} of {len(matches)} piece(s) couldn't be included and were "
+                            f"skipped: {detail}" + (", ..." if len(failed) > 5 else "")
+                        )
+                    if not csv_by_analysis:
+                        st.info("None of the checked analyses found anything across these pieces.")
+                    for analysis_key, (btn_label, file_name) in BULK_ANALYSIS_DOWNLOAD_META.items():
+                        if analysis_key in csv_by_analysis:
+                            st.download_button(
+                                btn_label,
+                                data=csv_by_analysis[analysis_key],
+                                file_name=file_name,
+                                mime="text/csv",
+                                key=f"browse_bulk_download_{analysis_key}",
+                                type="primary",
+                            )
 
             st.divider()
             st.markdown(
