@@ -376,6 +376,29 @@ piece (4,262 with a real pitch class; the other 52 are recorded as
 `finalis: null` rather than a silent guess — precompute genuinely
 couldn't determine one for those).
 
+**Known data-quality issue, found 2026-08-30 by a user spot-checking a
+result:** Monteverdi's "O Mirtillo, Mirtill' Anima Mia" was recorded as
+finalis E, but the piece actually ends on D. Root cause traced directly
+(not guessed): this specific bundled music21 corpus file has
+desynchronized voice-parts — Canto and Continuo's own encoded content
+runs out at offset 276 (quarter notes) and Quinto's at 288, while the
+piece's real ending (confirmed by ear, and matching `piece.final()`) is
+at offset 340. For the whole final ~16 measures, several voices simply
+aren't present in the data at all — not resting, their streams have no
+further content, notes or rests. Both the cadence detector (which needs
+a real complementary voice-pair to recognize a cadential pattern) and
+`piece.final()` end up reading a texture silently missing most of its
+real voices. Sampling 6 Monteverdi pieces found this in 2 of them, so
+it's a real, recurring defect in a meaningful slice of the corpus, not
+a one-off. Fixed by adding a cheap check (`_parts_desynced` in
+`scripts/precompute_finalis.py`): when a piece's own parts don't all
+reach the same total duration (tolerance: one measure, 4 quarter
+notes, to allow a genuine pickup-measure difference), its finalis is
+still recorded as a best guess but tagged `source: "part_duration_mismatch"`
+instead of `"cadence"`/`"final_fallback"` — flagged low-confidence
+rather than presented at face value. A full corpus recompute with this
+fix is (planned/in progress as of this writing).
+
 That data now powers a **"Finalis"** multiselect (several pitch classes
 at once, e.g. both G and D — a real Renaissance-modality comparison,
 unlike the single-composer pickers elsewhere) everywhere a piece gets

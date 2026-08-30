@@ -18,8 +18,11 @@ method does. Falls back to .final() only when a piece has zero
 detected cadences at all (a real, non-rare case -- see _safe_cadences's
 own docstring in app.py for the crim_intervals bug this already guards
 against elsewhere). Every record notes which of the two produced its
-Finalis (`source`: 'cadence' or 'final_fallback'), or records an
-`error` with no guess at all rather than a silently wrong one.
+Finalis (`source`: 'cadence' or 'final_fallback'), 'part_duration_mismatch'
+when the piece's own encoded voice-parts don't all reach the same total
+duration (see _parts_desynced -- found 2026-08-30 when a user spot-checked
+a real result and caught it wrong), or records an `error` with no guess
+at all rather than a silently wrong one.
 
 Run three times so far, each confirmed against real GitHub state (commit
 history, run/job timing) rather than just the green checkmark:
@@ -48,6 +51,21 @@ history, run/job timing) rather than just the green checkmark:
    fixes stay in place), but it's a fully sufficient explanation on its
    own for everything observed in run 2, and is the more likely one of
    the two given how precisely the timestamps line up.
+4. The full corpus finished (2026-08-30), but a user spot-checking a
+   real result caught Monteverdi's "O Mirtillo, Mirtill' Anima Mia"
+   recorded as finalis E when the piece actually ends on D. Traced
+   directly (not guessed) to a real data-quality defect: this specific
+   music21-corpus file has desynchronized voice-parts -- several
+   voices' own encoded content runs out tens of measures before the
+   piece's true end, so both the cadence detector and .final() end up
+   reading a texture silently missing most of its real voices for the
+   whole closing passage. Sampling 6 Monteverdi pieces found this in 2
+   of them -- a real, recurring defect, not a one-off. Fixed by adding
+   _parts_desynced as a cheap pre-check; affected pieces still get a
+   best-guess finalis, but tagged low-confidence (source =
+   'part_duration_mismatch') rather than presented at face value. A
+   fresh full-corpus recompute with this fix is needed to know how many
+   other pieces were silently affected the same way.
 
 This is a genuinely long-running job for the full corpus -- likely many
 hours, almost certainly longer than a single GitHub Actions job's
@@ -165,17 +183,55 @@ def _pitch_class(note_name):
     return m.group(1) if m else None
 
 
+# One measure's worth of quarter notes in common time -- generous
+# enough that a real anacrusis/pickup-measure difference between parts
+# never trips this, but nowhere near the tens-of-quarter-notes spread
+# actually observed in the broken pieces this guards against (see
+# _parts_desynced's own docstring).
+PART_DESYNC_TOLERANCE = 4.0
+
+
+def _parts_desynced(piece):
+    """True if this piece's own encoded voice-parts don't all reach the
+    same total duration -- a real, confirmed data-quality defect in a
+    meaningful slice of this corpus (sampled 6 Monteverdi pieces: 2
+    showed it), not a compositional device. Concretely found on
+    "O Mirtillo, Mirtill' Anima Mia" (monteverdi/madrigal.5.2): Canto
+    and Continuo's own encoded content runs out at offset 276 and
+    Quinto's at 288, while the piece's real ending (confirmed by ear,
+    and matching piece.final()) is at offset 340 -- so for the whole
+    final ~16 measures, several voices simply aren't present in the
+    data at all (not resting -- their streams have no more content,
+    notes or rests, past that point). Both the cadence detector (which
+    needs a real complementary voice-pair to recognize a cadential
+    pattern) and piece.final() end up reading a texture silently
+    missing most of its real voices -- neither method's answer should
+    be trusted at face value when this is true.
+    """
+    parts = piece.score.parts
+    if len(parts) < 2:
+        return False
+    times = [p.highestTime for p in parts]
+    return (max(times) - min(times)) > PART_DESYNC_TOLERANCE
+
+
 def compute_finalis(piece):
     """Returns (finalis_pitch_class_or_None, source, detail).
 
     source is 'cadence' (the last detected cadence's Low column -- see
     this script's own module docstring for why that's the primary
-    method) or 'final_fallback' (piece.final(), used only when zero
-    cadences were detected at all). source == 'error' with finalis ==
-    None means neither method produced a usable pitch -- recorded
-    explicitly, never silently guessed. Never raises: a real crash in
-    either crim_intervals call is caught and folded into the returned
-    detail string, same discipline as app.py's own _safe_cadences.
+    method), 'final_fallback' (piece.final(), used only when zero
+    cadences were detected at all), or 'part_duration_mismatch' (see
+    _parts_desynced) -- this last one still carries a best-guess
+    finalis (whatever cadence/final_fallback would have returned), but
+    flagged low-confidence rather than presented at face value, since
+    the piece's own encoding is missing voices for its whole closing
+    passage. source == 'error' with finalis == None means neither
+    method produced a usable pitch -- recorded explicitly, never
+    silently guessed. Never raises: a real crash in either
+    crim_intervals call (or in reading piece.score.parts) is caught and
+    folded into the returned detail string, same discipline as
+    app.py's own _safe_cadences.
     """
     try:
         cadences = piece.cadences(voice_detail=True, include_final=True)
@@ -184,20 +240,35 @@ def compute_finalis(piece):
         cadences = None
         cadence_error = f"cadences() failed: {type(e).__name__}: {e}"
 
+    pc, source, detail = None, None, None
     if cadences is not None and not cadences.empty:
-        pc = _pitch_class(cadences.iloc[-1]['Low'])
-        if pc:
-            return pc, 'cadence', None
+        candidate = _pitch_class(cadences.iloc[-1]['Low'])
+        if candidate:
+            pc, source, detail = candidate, 'cadence', None
+
+    if pc is None:
+        try:
+            candidate = _pitch_class(piece.final())
+            if candidate:
+                pc, source, detail = candidate, 'final_fallback', cadence_error
+        except Exception as e:
+            detail = f"final() also failed: {type(e).__name__}: {e}"
+            return None, 'error', f"{cadence_error}; {detail}" if cadence_error else detail
+
+    if pc is None:
+        return None, 'error', cadence_error or "cadences() found nothing and final() returned nothing usable"
 
     try:
-        pc = _pitch_class(piece.final())
-        if pc:
-            return pc, 'final_fallback', cadence_error
+        desynced = _parts_desynced(piece)
     except Exception as e:
-        detail = f"final() also failed: {type(e).__name__}: {e}"
-        return None, 'error', f"{cadence_error}; {detail}" if cadence_error else detail
+        desynced = False
+        detail = f"{detail + '; ' if detail else ''}_parts_desynced check itself failed: {type(e).__name__}: {e}"
 
-    return None, 'error', cadence_error or "cadences() found nothing and final() returned nothing usable"
+    if desynced:
+        detail = f"low-confidence: parts' own encoded durations disagree (would otherwise be {source!r} -> {pc})" + (f"; {detail}" if detail else "")
+        return pc, 'part_duration_mismatch', detail
+
+    return pc, source, detail
 
 
 def load_existing(out_path):
