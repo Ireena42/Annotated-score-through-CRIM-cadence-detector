@@ -4103,3 +4103,53 @@
 {"label": "[Tasso] Malpigli (1598) — Questa lieve zanzara", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[Tasso] Gherardini (1585) — Tu moristi in quel seno", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
 {"label": "[Tasso] Pallavicino (1588) — Passa la nave tua che porta il core", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Vignali (1640) — Tu bianca e vaga luna", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cortellini (1587) — Qui dove fan le piante", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cirullo (1598) — Ferro in ferir pietoso", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gastoldi (1587) — Anime sante e belle", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1584) — Padre del cielo or chaltra nube il calle", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dueto (1586) — Padre del cielo or chatra nube il calle", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1589) — Padre del cielo or chatra nube il calle", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Lambardi (1614) — Occhi leggiadri e belli", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Persone (1628) — Ahi lagrime ahi dolore", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Bellanda (1599) — O musa tu che di caduchi allori", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Priuli (1604) — O musa tu che di caduchi allori", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Priuli (1604) — Sai che la corre il mondo ove piu versi", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazzocchi (1640) — Dunque ove tu signor di mille rivi", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] DIndia (1615) — Argo non mai non vide Cipro o Delo", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cifra (1615) — Fa nove crespe laura al crin disciolto", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] DIndia (1615) — Fa nove crespe laura al crin disciolto", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1603) — Era la notte el suo stellato velo", "collection": "tasso", "finalis": "C", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Cifra (1614) — Era la notte el tuo stellato velo", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1603) — Poi rimirando il campo ella dicea", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cifra (1614) — Poi rimirando il campo ella dicea", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1603) — Raccogliete in me dunque e in voi si trove", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Wert (1586) — Sovente allor che su gli estivi ardori", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] DIndia (1609) — Sovente allor che su gli estivi ardori", "collection": "tasso", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cifra (1614) — Sovente allor che su gli estivi ardori", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Ghizzolo (1621) — Sovente allor che su gli estivi ardori", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Wert (1586) — Indi dicea piangendo In voi serbate", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] DIndia (1609) — Indi dicea piangendo in voi serbate", "collection": "tasso", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cifra (1614) — Indi dicea piangendo In voi serbate", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Ghizzolo (1621) — Indi dicea piangendo In voi serbate", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] DIndia (1609) — Forse avverra sel ciel benigno ascolta", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Massaino (1587) — Segue egli la vittoria e la trafitta", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Massaino (1587) — -Amico hai vinto io ti perdon perdona", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1619) — Amico hai vinto io ti perdon perdona", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] DIndia (1621) — Amico hai vinto io ti perdon perdona", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1619) — Poco quindi lontan nel sen del monte", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] DIndia (1621) — Poco quindi lontan nel sen del monte", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1619) — Non mori gia che sue virtuti accolse", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] DIndia (1621) — Non mori gia che sue virtuti accolse", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1619) — Dun bel pallore ha il bianco volto asperso", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1619) — Io vivo Io spiro ancora E gli odiosi", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cifra (1617) — Passa pur questo petto e feri scempi", "collection": "tasso", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1619) — Passa pur questo petto e feri scempi", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monteverdi (1592) — Vivro fra i miei tormenti e le mie cure", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1619) — Vivro fra i miei tormenti e le mie cure", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Boschetti (1621) — Vivro fra i miei tormenti e fra le cure", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monteverdi (1592) — Ma-dove o lasso me dove restaro", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monteverdi (1592) — Io pur verro la dove sete e voi", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] DIndia (1618) — O bella destra chel soave sdegno", "collection": "tasso", "finalis": "A", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Cifra (1615) — Lei nel partir lei nel tornar del sole", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1584) — Giunto a la tomba ove al suo spirto vivo", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
