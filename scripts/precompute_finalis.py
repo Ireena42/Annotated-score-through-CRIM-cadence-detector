@@ -79,6 +79,7 @@ Usage:
 """
 import argparse
 import json
+import os
 import re
 import signal
 import subprocess
@@ -364,8 +365,22 @@ def main():
     if args.commit_every and done_this_run:
         git_commit_progress(out_path, len(existing) + done_this_run, len(rows))
 
+    total_recorded = len(existing) + done_this_run
     print(f"Done. {done_this_run} piece(s) computed this run; "
-          f"{len(existing) + done_this_run}/{len(rows)} total recorded.", flush=True)
+          f"{total_recorded}/{len(rows)} total recorded.", flush=True)
+
+    # Lets the calling workflow decide whether to trigger another run
+    # without re-fetching/re-counting anything itself (build_browse_index()
+    # is a real, network-dependent call across all 7 collections -- this
+    # avoids the workflow paying that cost a second time just to check).
+    # $GITHUB_OUTPUT is a GitHub Actions-only file path (unset when run
+    # locally or anywhere else), so this is a no-op outside CI.
+    github_output = os.environ.get('GITHUB_OUTPUT')
+    if github_output:
+        with open(github_output, 'a', encoding='utf-8') as f:
+            f.write(f"total_recorded={total_recorded}\n")
+            f.write(f"total_rows={len(rows)}\n")
+            f.write(f"complete={'true' if total_recorded >= len(rows) else 'false'}\n")
 
 
 if __name__ == '__main__':

@@ -359,21 +359,21 @@ two pieces. The full corpus run is still pending:
   to be resumable across many separate runs (reads what's already
   there, skips it) and to commit its own progress periodically, not
   just at the end.
-- `.github/workflows/precompute_finalis.yml` — manually triggered
-  (`workflow_dispatch`, from the Actions tab), since a full run is a
+- `.github/workflows/precompute_finalis.yml` — triggered manually
+  (`workflow_dispatch`, from the Actions tab) since a full run is a
   genuinely multi-hour job, almost certainly longer than one workflow
-  run's own time limit — expect to trigger this several times over
-  several days, each pass resuming from the last one's committed
-  progress, to work through the full corpus.
+  run's own time limit. An unrestricted run (blank `limit`, blank
+  `collection` — the "whole remaining corpus" mode) self-chains: if the
+  corpus still isn't fully recorded by the time its own run ends, it
+  automatically queues another run of itself, so working through the
+  full corpus doesn't need someone to notice each run stopped and
+  re-trigger it by hand. A deliberately scoped run (`limit` and/or
+  `collection` given) never self-chains — those stay one-off.
 
-Now that the 5-piece test has confirmed the pipeline itself works, the
-next step is triggering a full run (blank `limit`, all collections) —
-realistically over several separate `workflow_dispatch` triggers, each
-resuming from the last one's committed progress (see `data/
-finalis.jsonl`'s growing piece count). Once that's done and the numbers
-still look right at scale, the remaining step — reading the file and
-wiring up an actual Finalis filter widget in Browse — hasn't been built
-yet.
+The full corpus (4,314 pieces across all 7 collections) finished
+precomputing on 2026-08-30 — `data/finalis.jsonl` has one record per
+piece. The remaining step — reading that file and wiring up an actual
+Finalis filter widget in Browse — hasn't been built yet.
 
 ## Credits & licensing
 

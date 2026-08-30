@@ -5,6 +5,14 @@ name: Precompute Finalis
 # cap for the full corpus), not something that should fire on every
 # push. Trigger it from the Actions tab -> "Precompute Finalis" ->
 # "Run workflow", optionally filling in the test-run inputs below.
+#
+# Self-chaining: an unrestricted run (no limit, no collection -- the
+# "give me the whole remaining corpus" mode) automatically queues
+# another run of itself at the end if the corpus still isn't fully
+# recorded, so finishing the full ~4,300-piece corpus doesn't need
+# someone to notice each run stopped and manually re-trigger it. A
+# deliberately scoped run (--limit or --collection given) never
+# self-chains -- those are one-off, intentionally partial invocations.
 on:
   workflow_dispatch:
     inputs:
@@ -17,10 +25,24 @@ on:
         required: false
         default: ""
 
-# Needed for the script's own `git push` (see scripts/precompute_finalis.py's
-# git_commit_progress) to succeed with the default GITHUB_TOKEN.
+# contents: write -- the script's own `git push` (see
+# scripts/precompute_finalis.py's git_commit_progress) needs this.
+# actions: write -- needed for the self-chaining step below to dispatch
+# another run of this same workflow via `gh workflow run`.
 permissions:
   contents: write
+  actions: write
+
+# Never let two precompute runs execute at once (a manual re-trigger
+# landing while a self-chained one is already running would mean two
+# runners committing to the same data/finalis.jsonl concurrently --
+# survivable thanks to the pull --rebase retry in git_commit_progress,
+# but better avoided outright). cancel-in-progress: false queues the new
+# run to start after the current one finishes, rather than killing
+# whichever is already underway.
+concurrency:
+  group: precompute-finalis
+  cancel-in-progress: false
 
 jobs:
   precompute:
@@ -30,9 +52,9 @@ jobs:
     # longer than this (likely, at ~4,300 pieces each needing a real
     # crim_intervals cadences() call), this job gets cut off -- the
     # script's own periodic commits (--commit-every, default 50 pieces)
-    # mean that's a stopped run, not a lost one: re-trigger this same
-    # workflow again and it resumes from the last committed progress
-    # (see scripts/precompute_finalis.py's own module docstring).
+    # mean that's a stopped run, not a lost one: the self-chaining step
+    # below re-triggers automatically (or re-trigger by hand, same as
+    # ever, if you'd rather control the pace yourself).
     timeout-minutes: 340
     steps:
       - uses: actions/checkout@v4
@@ -61,7 +83,22 @@ jobs:
             ${{ inputs.collection != '' && format('--collection {0}', inputs.collection) || '' }}
 
       - name: Run precompute (full remaining corpus, if no 'limit' was given)
+        id: precompute_full
         if: ${{ inputs.limit == '' }}
         run: |
           python scripts/precompute_finalis.py \
             ${{ inputs.collection != '' && format('--collection {0}', inputs.collection) || '' }}
+
+      # Only for the fully-unrestricted mode (no limit, no collection) --
+      # a deliberately scoped run is a one-off by design and shouldn't
+      # queue anything after itself. steps.precompute_full.outputs.complete
+      # comes from the script's own $GITHUB_OUTPUT write (see its main()) --
+      # not re-derived here, so this doesn't pay for another full corpus
+      # listing just to check.
+      - name: Queue another run if the corpus isn't fully recorded yet
+        if: ${{ inputs.limit == '' && inputs.collection == '' && steps.precompute_full.outputs.complete != 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Not done yet (${{ steps.precompute_full.outputs.total_recorded }}/${{ steps.precompute_full.outputs.total_rows }} recorded) -- queuing another run."
+          gh workflow run precompute_finalis.yml --repo "${{ github.repository }}"
