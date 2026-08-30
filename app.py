@@ -619,14 +619,20 @@ def score_to_pdf_bytes(score):
         raise RuntimeError(
             "Verovio couldn't parse this piece's MusicXML" + (f": {log}" if log else ".")
         )
-    tk.setOptions({"adjustPageHeight": True, "pageWidth": 1500, "scale": 40})
+    # adjustPageHeight only -- Verovio's own default page width/scale (A4-
+    # proportioned, 100%) is what's actually well-tuned for a normal-looking
+    # printed page. An earlier version overrode both (pageWidth 1500, scale
+    # 40, picked without a real visual check at the time) -- confirmed
+    # directly to be the cause of the "huge edge" complaint: at that scale,
+    # content occupies a small fraction of the page relative to its margins.
+    tk.setOptions({"adjustPageHeight": True})
     page_count = tk.getPageCount()
 
     buffer = io.BytesIO()
     canvas = None
     for page in range(1, page_count + 1):
-        svg = tk.renderToSVG(page)
-        drawing = svg2rlg(io.BytesIO(svg.encode('utf-8')))
+        svg = _flatten_svg_text_elements(tk.renderToSVG(page).encode('utf-8'))
+        drawing = svg2rlg(io.BytesIO(svg))
         if canvas is None:
             canvas = pdf_canvas.Canvas(buffer, pagesize=(drawing.width, drawing.height))
         else:
@@ -635,6 +641,73 @@ def score_to_pdf_bytes(score):
         canvas.showPage()
     canvas.save()
     return buffer.getvalue()
+
+
+_SVG_NS = 'http://www.w3.org/2000/svg'
+
+
+def _flatten_svg_text_elements(svg_bytes):
+    """Verovio nests <tspan> elements for styled text (page title, part
+    labels, cadence/point-of-imitation/homorhythm labels) several levels
+    deep, and -- confirmed directly, not assumed -- puts the actual x/y/
+    text-anchor position on the FIRST NESTED <tspan> rather than the outer
+    <text> element itself whenever that text has its own inner styling
+    (the page title is the clearest example: <text font-size="0px"> with
+    no position of its own, wrapping a positioned <tspan>). svglib reads
+    position only from the outer <text> tag and silently defaults to
+    (0, 0) when it isn't there -- confirmed by inspecting the resulting
+    reportlab String objects directly: the title collapsed to x=0,y=0
+    while simpler single-level labels (e.g. "Soprano") kept their real
+    position. That's exactly what "the title isn't centered, just a few
+    letters on the left" was: a title anchored "middle" at the literal
+    left edge of the page, not a genuine layout/centering bug in Verovio
+    itself (its own SVG marks the title text-anchor="middle" at the
+    correct x correctly).
+
+    Rewrites every <text> element into the same simple, single-level
+    shape svglib already handles correctly: one <tspan> holding all of
+    that element's visible text (concatenated from whatever depth it was
+    at), with position/anchor promoted from wherever they actually were
+    (the <text> itself, or its first positioned descendant <tspan>) onto
+    the <text> element directly. Also drops each <title> sub-element's
+    own text (an accessibness label Verovio embeds for screen readers,
+    not visible content -- concatenating it in would have prepended the
+    literal word "title" to on-page text).
+    """
+    ET.register_namespace('', _SVG_NS)
+    root = ET.fromstring(svg_bytes)
+    for text_el in root.iter(f'{{{_SVG_NS}}}text'):
+        pos_source = text_el
+        if not any(k in text_el.attrib for k in ('x', 'y', 'text-anchor')):
+            for tspan in text_el.iter(f'{{{_SVG_NS}}}tspan'):
+                if any(k in tspan.attrib for k in ('x', 'y', 'text-anchor')):
+                    pos_source = tspan
+                    break
+        x, y = pos_source.attrib.get('x'), pos_source.attrib.get('y')
+        anchor = pos_source.attrib.get('text-anchor')
+
+        content = ''.join(
+            (node.text or '') for node in text_el.iter(f'{{{_SVG_NS}}}tspan')
+        ).strip()
+        font_size = None
+        for tspan in text_el.iter(f'{{{_SVG_NS}}}tspan'):
+            if 'font-size' in tspan.attrib:
+                font_size = tspan.attrib['font-size']
+
+        for child in list(text_el):
+            text_el.remove(child)
+        text_el.text = None
+        if x:
+            text_el.set('x', x)
+        if y:
+            text_el.set('y', y)
+        if anchor:
+            text_el.set('text-anchor', anchor)
+        new_tspan = ET.SubElement(text_el, f'{{{_SVG_NS}}}tspan')
+        if font_size:
+            new_tspan.set('font-size', font_size)
+        new_tspan.text = content
+    return ET.tostring(root)
 
 
 # One sentence per analysis, written to read naturally whether one or all
