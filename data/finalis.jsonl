@@ -1798,3 +1798,53 @@
 {"label": "[JRP] Anonymous — Les tres des plus heureulx du monde:  rondeau", "collection": "jrp", "finalis": "E", "source": "cadence", "detail": null}
 {"label": "[JRP] Anonymous — Mon cueur a demy se depart:  rondeau", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[JRP] Anonymous — Nesse pas bien pour departir:  rondeau", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Nul ne me doit de ce blamer:  rondeau", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — O infame desleaute:  rondeau", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Ostez la moi de mon oreille:  virelai", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Par Dieu ma dame cest a tort:  virelai", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Ravy damours despourveu de bon sens:  rondeau", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Jay pris amours a ma devise:  prob orig version", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Ano3131.2: Jay pris amours a ma devise  version with low Ct", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Jay pris deux poux a ma chemise:  rondeau  Dijon Chansonnier", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Jen ay le deul et vous la joie:  rondeau  Dijon Chansonnier", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Jamais nul jour de ma vie:  rondeau  Dijon Chansonnier", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Je ne suis plus si esbatant:  rondeau  Dijon Chansonnier", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Joyeulx espoir et bon vouloir:  rondeau  Dijon Chansonnier", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Laumosne au povre desireulx:  rondeau  Dijon Chansonnier", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Helas mon cueur tu mocciras:  Leuven Chansonnier", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Oublie oublie:  Leuven Chansonnier", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Par malle bouche:  Leuven Chansonnier", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Escu dennuy:  Leuven Chansonnier", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Si vous voullez:  Leuven Chansonnier", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Ou beau chastel:  Leuven Chansonnier", "collection": "jrp", "finalis": "A-", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — De sartor nui sian maestri:  Canto dei sartori Perugia G.20", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Anonymous — Ben venga Maggio:  Libro primo delle laudi spirituali", "collection": "jrp", "finalis": "C", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[JRP] Anonymous — Ano3238.1: Eccol Messia  Lauda on Ben venga Maggio  Libro primo delle laudi spirituali", "collection": "jrp", "finalis": "C", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[JRP] Anonymous — Ano3238.2: Che fai qui core  Lauda on Ben venga Maggio", "collection": "jrp", "finalis": "C", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[JRP] Anonymous — Visin visin visin:  Canto degli spazzacamini", "collection": "jrp", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[JRP] Anonymous — Ano3239.1: Jesu Jesu Jesu  Lauda on Visin visin visin", "collection": "jrp", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[JRP] Anonymous — Ano7131.2: Jay pris amours a ma devise  version with low Ct", "collection": "jrp", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[JRP] Binchois, Gilles — Je ne vis onques la pareille", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Brumel, Antoine — Missa Et ecce terre motus: Kyrie", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Brumel, Antoine — Missa Et ecce terre motus: Gloria", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Brumel, Antoine — Missa Et ecce terre motus: Credo", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Brumel, Antoine — Missa Et ecce terre motus: Sanctus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Brumel, Antoine — Missa Et ecce terre motus: Agnus", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Brumel, Antoine — Missa Pro defunctis: Dies irae Sequence", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Missa Lhomme arme: Kyrie", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Missa Lhomme arme: Gloria", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Missa Lhomme arme: Credo", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Missa Lhomme arme: Sanctus", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Missa Lhomme arme: Agnus", "collection": "jrp", "finalis": "E-", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Anima mea liquefacta est  Stirips Jesse", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Anthoni usque limina", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — In hydraulis", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Acordes moy", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Advegne que venir pourra", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Amors nous traite  Je men voy", "collection": "jrp", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — A qui vens tu tes coquilles", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Au gre de mes ieulx", "collection": "jrp", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — A une dame", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Au povre par necessite", "collection": "jrp", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — A vous sans aultre", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[JRP] Busnoys, Antoine — Bel Acueil le sergent dAmours", "collection": "jrp", "finalis": "D", "source": "cadence", "detail": null}
