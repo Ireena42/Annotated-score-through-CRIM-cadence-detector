@@ -3403,3 +3403,53 @@
 {"label": "[1520s] Jean Richafort — Missa Veni sponsa Christi: Agnus", "collection": "1520s", "finalis": "F", "source": "cadence", "detail": null}
 {"label": "[1520s] Jean Richafort — Sufficiebat", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[1520s] Jean Richafort — Consolator captivorum", "collection": "1520s", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Veni sponsa Christi", "collection": "1520s", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Emendemus in melius", "collection": "1520s", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Miseremini mei", "collection": "1520s", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Philomena praevia", "collection": "1520s", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Cognoscimus Domine", "collection": "1520s", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Christus resurgens", "collection": "1520s", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Exaudiat te Dominus", "collection": "1520s", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Pater noster", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Gloriosi principes", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Jam non dicam", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Quem dicunt homines", "collection": "1520s", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — O beata infantia", "collection": "1520s", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Salve regina [Ric2015-Salve_regina]", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Salve regina [Ric2034-Salve_regina]", "collection": "1520s", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Jerusalem luge", "collection": "1520s", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Ego sum qui sum", "collection": "1520s", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Homo quidam", "collection": "1520s", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Misereatur mei", "collection": "1520s", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Peccata mea Domine", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Christe toitus dominator", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — O presul egregie", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — O quam dulcis", "collection": "1520s", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Magnificat octavi toni", "collection": "1520s", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Veni electa mea", "collection": "1520s", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Ave maria", "collection": "1520s", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Sancta Maria succurre miseris:  London 19583", "collection": "1520s", "finalis": "D", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[1520s] Jean Richafort — Letamini in Domino:  Selectissimarum mutetarum", "collection": "1520s", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Saulus adhuc spirans:  Konigsberg 7", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Magnificat sexti toni", "collection": "1520s", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Fecit potentiam", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Sicut locutus est", "collection": "1520s", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Non turbetur cor vestrum", "collection": "1520s", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Ave virgo gloriosa:  Joannis Richafort", "collection": "1520s", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Hoc signum crucis:  Regensburg 2 3", "collection": "1520s", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Gloria laus et honor:  Liber primus", "collection": "1520s", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Damours je suis desheritee", "collection": "1520s", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Ne vous chaille mon cueur", "collection": "1520s", "finalis": "B", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — De mon triste et desplaisir", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Sur tous regretz", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Le temps qui court", "collection": "1520s", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Cuidez vous que Dieu nous faille", "collection": "1520s", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Je fus lautrier:  La Couronne", "collection": "1520s", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Navez point veu mal assenee", "collection": "1520s", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Qui est celuy qui a dit mal du con:  La Couronne", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Tru tru trut avant", "collection": "1520s", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Hors de plaisir", "collection": "1520s", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Il nest si doulce vie", "collection": "1520s", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Jay veu que souloye:  Recueil des fleurs", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Jean Richafort — Gentilz gallans", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[1520s] Cipriano de Rore — Cantai mentre chii arsi del mio foco", "collection": "1520s", "finalis": "G", "source": "cadence", "detail": null}
