@@ -4048,3 +4048,53 @@
 {"label": "[Tasso] Alberti (1603) — Tarquinia se rimiri", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
 {"label": "[Tasso] Spano (1608) — Mentre mia stella miri", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[Tasso] Civita (1616) — Tarquinia se rimiri", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1584) — Se lalma e prigioniera", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dueto (1585) — Se lalma egrave prigioniera", "collection": "tasso", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gesualdo (1594) — Se da si nobil mano", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1600) — Se da si nobil mano", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1588) — Negli anni acerbi tuoi purpurea rosa", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Merulo (1577) — Caro amoroso neo", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1590) — Caro amoroso neo", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Effrem (1591) — Caro amoroso neo", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gesualdo (1594) — Caro amoroso neo", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Corfini (1575) — La bella pargoletta", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dragoni (1575) — La bella pargoletta", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Feliciani (1575) — La bella pargoletta", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Isnardi (1577) — La bella pargoletta", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Bellaver (1587) — La bella pargoletta", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1591) — La bella pargoletta", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Porta (1573) — Del puro lume onde i celesti giri", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Pordenon (1573) — Al vostro dolce azzurro", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Felis (1579) — Al vostro dolce azzurro", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Ingegneri (1579) — Al vostro dolce azzurro", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1590) — Al vostro dolce azzurro", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Unknown composer — Al vostro dolce azzurro", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1586) — Al tuo vago pallore", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Macque (1589) — Al tuo vago pallore", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Verdonck--1601 — Laura con armonia dolce e soave", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Agostini (1582) — Tra Giove in cielo el mio signor in terra", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dueto (1586) — ANGIOLETTA cortese", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gesualdo (1594) — Bella ANGIOLETTA da le vaghe piume", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Ferrabosco (1587) — Quantio sono infelice", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Verdonck (1603) — Ne di feconda conca in ricco mare", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Belli (1583) — Portano laltre il velo", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Raval (1593) — La bella e vaga man che le sonore corde", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1590) — Deh perche amar chi voi con pari affetto", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Bonelli (1596) — Ben puo ritrar le sue fattezze conte", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Felis (1591) — Forse e cagion laurora", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Giovannelli (1593) — O timida lepretta", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Zenaro (1589) — O fuggitiva e timidetta fiera", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Wert (1588) — Mesola il Po da lati el mare a fronte", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Wert (1588) — Ha ninfe adorne e belle", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gabella (1588) — Le amare notti in chio maffliggo e doglio", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1595) — La dove sono i pargoletti Amori", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Felis (1591) — Voi sete bella ma fugace e presta", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1601) — Voi sete bella ma fugace e presta", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Giovannelli (1592) — Tu nascesti di furto", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Guami (1588) — Queste note io vi dono", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Zenaro (1589) — Queste note son nove e queste Amore", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Bozi (1599) — Queste note son nove e queste Amore", "collection": "tasso", "finalis": "D", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Virchi (1591) — Ha gigli e rose ed ha rubini ed oro", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Philips (1603) — Deh ferma ferma il tuo ribello Amore", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Roinci (1596) — Che soave rapina", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Bozi (1599) — Che soave rapina", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
