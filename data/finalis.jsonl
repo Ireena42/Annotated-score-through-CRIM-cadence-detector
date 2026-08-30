@@ -3748,3 +3748,53 @@
 {"label": "[Tasso] Marotta (1600) — La semplicetta Silvia", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
 {"label": "[Tasso] Marotta (1600) — Ne lapi dalcun fiore", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
 {"label": "[Tasso] Marotta (1600) — Ma mentre al cor scendeva", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Picciola e lape e fa col picciol morso", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Vorro veder cio che Tirsi avra fatto", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marotta (1600) — Vorro veder cio che Tirsi avra fatto", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Nove Aminta tannuncio di conforto", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marotta (1600) — Nove Aminta tannuncio di conforto", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Qual ardir mi bisogna e ncontra a cui", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Bisogna a maggior prova ardir piu grande", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Orsu scuoprimi il tutto Odi Di tosto", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marotta (1600) — Orsu scuoprimi il tutto Odi Di tosto", "collection": "tasso", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Dura conclusion che tutte affosca", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Sa mio senno farai sarai felice", "collection": "tasso", "finalis": "C", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Balsamino (1594) — Non sara dunque ver chin quanto io posso", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Dunque tu lameresti a suo dispetto", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Perche dunque non osi oltra sua voglia", "collection": "tasso", "finalis": "B-", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Balsamino (1594) — Gia per lungo uso a ragionar damore", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Dunque andar non vogliamo Andare io voglio", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Credi tu dunque sciocco che mai Dafne", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — E sella vuol che l tuo diletto sia", "collection": "tasso", "finalis": "F", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Balsamino (1594) — Ecco tu chiedi pur quella certezza", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Balsamino (1594) — Tu taci tu sei vinto Ora confessa", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] DIndia (1615) — Dispietata pietate", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marotta (1600) — Dolor che si mi crucii", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Massaino (1604) — Dolor che si mi crucii", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marotta (1600) — Bello e dolce morir fu certo allora", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Massaino (1604) — Bello e dolce morir fu certo allora", "collection": "tasso", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Tasso] Ghizzolo (1608) — Misero Aminta", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marotta (1600) — Silvia io ti seguo io vengo", "collection": "tasso", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[Tasso] Massaino (1604) — Pastor di che piangete", "collection": "tasso", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Tasso] Boschetti (1613) — Cio che morte rallenta Amor restringi", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Boschetti (1613) — Non sono ire la su gli umani ingegni", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Ghizzolo (1608) — Oh fortunato Aminta oh te felice", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Ghizzolo (1608) — Ma come Silvia il riconobbe e vide", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Boschetti (1613) — Non so se il molto amaro", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Belli (1593) — Chiaro sol che rotando esci del Gange", "collection": "tasso", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monteverdi (1603) — Piange sospira e quando i caldi raggi", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Coma (1588) — Di che cantar deggio", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Tresti (1590) — Che qual tenera rosa", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Wert (1586) — Non sospirar pastor non sospirare", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Stivori (1590) — Lasso dicea perche venisti Amore", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Felis (1591) — Tu perfido signor tu disleale", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cavatoni (1572) — Su lampia fronte il crespo oro lucente", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1585) — Su lampia fronte il crespo oro lucente", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gabella (1588) — Io non posso gioire", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1590) — Io non posso gioire", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Felis (1591) — Io non posso gioire", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Nanino (1599) — Io non posso gioire", "collection": "tasso", "finalis": "D", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Pallavicino (1612) — Io non posso gioire", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Felis (1591) — Gia non son io contento", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Tresti (1596) — Come vivro ne le mie pene Amore", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Pallavicino (1600) — Come vivro ne le mie pene Amore", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
