@@ -1662,20 +1662,29 @@ def _import_piece_by_collection(collection, native_ref):
     return ci.main_objs.ImportedPiece(score, Path(native_ref).stem), None
 
 
-# One shared cap for every bulk export in Browse (MusicXML ZIP, PDF ZIP,
-# analysis-data CSV) -- previously three separate, smaller numbers (30/
-# 15/10) that didn't line up with each other for no real reason the user
-# could see, and didn't account for the fact that the MusicXML ZIP can
-# now ALSO be annotated (same request), not just plain. Sized to the
-# single worst case across all three uses: PDF rendering, the heaviest
-# per-piece cost by far (real CRIM analysis PLUS a Verovio render PLUS
-# reportlab page-assembly -- measured directly on a real piece earlier
-# this project at ~5-6s for a modest 4-page score, more for larger ones),
-# not the cheaper plain-MusicXML-only case the original 30 came from.
-# Still provisional/not benchmarked live at this exact number -- same
-# honesty as the caps it replaces -- but a real, disclosed expansion
-# from all three of them, not just a guess upward.
-BULK_EXPORT_MAX_MATCHES = 25
+# Per-export caps, each actually benchmarked (not guessed) against a real,
+# realistic 25-piece mixed sample (20 music21-bundled + 5 JRP, matching
+# how a real Browse search looks -- not an artificially-easy all-local
+# set) run locally right before landing on these numbers:
+#   MusicXML (annotated): 187.3s / 25 pieces = 7.49s/piece
+#   PDF (annotated):       506.9s / 25 pieces = 20.28s/piece
+#   Analysis CSV:          100.6s / 25 pieces = 4.02s/piece
+# A single shared cap (tried first, at 25) turned out NOT to be the best
+# way to maximize how many files someone can get at once: PDF is ~2.7x
+# the cost of MusicXML and ~5x the cost of the CSV export, so any one
+# number is either painfully slow for PDF (25 matches there would be
+# ~8.5 minutes) or needlessly conservative for the two cheaper exports.
+# Each cap below targets roughly the same ~2.5-3 minute worst-case wait
+# instead, so all three get to go as high as their own real cost allows.
+# MusicXML sizes to its OWN worst case (annotated, since the same button
+# now covers both plain and annotated) rather than the cheaper plain-only
+# case an earlier version of this cap was set from. Still just one real
+# run on this machine, not an exhaustive benchmark across many pieces or
+# on the actual deployed environment -- a solid starting point, not a
+# guarantee, same honesty as every other cap in this app.
+BULK_XML_MAX_MATCHES = 25
+BULK_PDF_MAX_MATCHES = 8
+BULK_CSV_MAX_MATCHES = 40
 
 
 def _bulk_pdf_zip_bytes(matches, include_cadences, include_ptypes, include_homorhythm, progress_callback=None):
@@ -2225,9 +2234,9 @@ with tab_browse:
                 bulk_annotated = bulk_cadences or bulk_ptypes or bulk_hr
 
                 st.markdown("**MusicXML**")
-                if len(matches) > BULK_EXPORT_MAX_MATCHES:
+                if len(matches) > BULK_XML_MAX_MATCHES:
                     st.caption(
-                        f"Works for up to {BULK_EXPORT_MAX_MATCHES} matches at once (this search has "
+                        f"Works for up to {BULK_XML_MAX_MATCHES} matches at once (this search has "
                         f"{len(matches)}) -- narrow the search to enable it, or use the CSV above "
                         "for the full list."
                     )
@@ -2266,9 +2275,9 @@ with tab_browse:
                     )
 
                 st.markdown("**PDF**")
-                if len(matches) > BULK_EXPORT_MAX_MATCHES:
+                if len(matches) > BULK_PDF_MAX_MATCHES:
                     st.caption(
-                        f"Works for up to {BULK_EXPORT_MAX_MATCHES} matches at once (this search "
+                        f"Works for up to {BULK_PDF_MAX_MATCHES} matches at once (this search "
                         f"has {len(matches)}) -- narrow the search to enable it."
                     )
                 elif st.button(
@@ -2315,9 +2324,9 @@ with tab_browse:
                     "side. Unlike MusicXML/PDF above, this one genuinely needs at least one "
                     "analysis checked -- there's no 'plain' version of an analysis-data export."
                 )
-                if len(matches) > BULK_EXPORT_MAX_MATCHES:
+                if len(matches) > BULK_CSV_MAX_MATCHES:
                     st.caption(
-                        f"Works for up to {BULK_EXPORT_MAX_MATCHES} matches at once (this search has "
+                        f"Works for up to {BULK_CSV_MAX_MATCHES} matches at once (this search has "
                         f"{len(matches)}) -- narrow the search to enable it."
                     )
                 elif not bulk_annotated:
