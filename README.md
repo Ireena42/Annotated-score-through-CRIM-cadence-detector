@@ -58,19 +58,19 @@ Inside, one set of checkboxes (Cadences/Points of imitation/Homorhythm —
 the same three the single-piece Analyze uses) governs all three exports
 below it at once: leave everything unchecked for plain, unmodified
 files, or check any of the three to get annotated ones — either version
-is one click away without re-checking anything:
+is one click away without re-checking anything. All three share **one
+cap, 25 matches at a time** — sized to the heaviest of the three (a real
+render, not just analysis) so the same number is honest for whichever
+one you pick, rather than three different, unexplained limits:
 - **MusicXML** — fetches, parses, and converts every match to a real
   MusicXML file (annotated with the checked analyses, or plain if none
-  are checked) and zips them. Capped at 30 matches at a time
-  (benchmarked directly at ~5s/piece for the plain case — past 30 it's a
-  bad wait for a single click, and the CSV is a better fit for a bigger
-  set anyway).
+  are checked) and zips them.
 - **PDF** — renders each match to PDF via the same
   [Verovio](https://www.verovio.org/) path the single-piece "Download
   PDF" button uses (annotated or plain, same rule as MusicXML above),
-  then zips them together. Real analysis *and* a real render per piece
-  when annotated, so it's capped tighter (10 matches) — provisional, not
-  yet benchmarked live.
+  then zips them together. The most expensive of the three per piece
+  (real analysis *and* a real render when annotated), which is what the
+  shared cap is actually sized around.
 - **Analysis data (CSV)** — the one export that genuinely needs at least
   one analysis checked (there's no "plain" version of analysis data):
   runs the checked analyses across every match and hands back CRIM's own
@@ -86,12 +86,13 @@ is one click away without re-checking anything:
   side directly, which the per-event CSVs above don't make easy on their
   own. A blank cell means that analysis wasn't computed for that piece
   at all (never requested, or it failed); a `0` means it genuinely found
-  nothing — kept distinct rather than collapsed into one blank. Capped
-  at 15 matches (real per-piece CRIM computation on top of the fetch) —
-  also provisional.
+  nothing — kept distinct rather than collapsed into one blank.
 
-Any of these that fails to fetch/analyze/render for one particular piece
-is skipped and reported by name, not silently dropped from the count.
+The 25-match cap is still provisional (not benchmarked live at this
+exact number), same honesty as the three separate, smaller caps it
+replaces. Any of these that fails to fetch/analyze/render for one
+particular piece is skipped and reported by name, not silently dropped
+from the count.
 
 Handy for "give me every Josquin piece across all 7 collections to
 analyze myself" — search "Josquin", download the CSV manifest above, or

@@ -1662,24 +1662,20 @@ def _import_piece_by_collection(collection, native_ref):
     return ci.main_objs.ImportedPiece(score, Path(native_ref).stem), None
 
 
-# Hard cap on Browse's bulk CRIM analysis-table export -- deliberately
-# tighter than BULK_ZIP_MAX_MATCHES below: that cap was set from a real
-# benchmark of fetch+parse+convert ALONE (no CRIM computation). This
-# feature runs actual cadences()/presentationTypes()/homorhythm() on top
-# of that same fetch, which is real, uncharacterized extra cost per
-# piece -- capped conservatively until it's been benchmarked live on the
-# deployed app (not guessed at), same discipline as the ZIP cap
-# originally came from. Revisit once real timing is in.
-BULK_ANALYSIS_MAX_MATCHES = 15
-
-# Tighter than BULK_ANALYSIS_MAX_MATCHES: a PDF isn't just CRIM analysis,
-# it's analysis PLUS a real Verovio render + reportlab page-assembly per
-# piece (measured directly on a single real piece earlier this project:
-# ~5-6s for a modest 4-page score, more for larger ones) -- meaningfully
-# heavier than the CSV export's per-piece cost, which is just dataframe
-# work. Also provisional/not benchmarked live at this exact number, same
-# honesty as the CSV cap above.
-BULK_PDF_ZIP_MAX_MATCHES = 10
+# One shared cap for every bulk export in Browse (MusicXML ZIP, PDF ZIP,
+# analysis-data CSV) -- previously three separate, smaller numbers (30/
+# 15/10) that didn't line up with each other for no real reason the user
+# could see, and didn't account for the fact that the MusicXML ZIP can
+# now ALSO be annotated (same request), not just plain. Sized to the
+# single worst case across all three uses: PDF rendering, the heaviest
+# per-piece cost by far (real CRIM analysis PLUS a Verovio render PLUS
+# reportlab page-assembly -- measured directly on a real piece earlier
+# this project at ~5-6s for a modest 4-page score, more for larger ones),
+# not the cheaper plain-MusicXML-only case the original 30 came from.
+# Still provisional/not benchmarked live at this exact number -- same
+# honesty as the caps it replaces -- but a real, disclosed expansion
+# from all three of them, not just a guess upward.
+BULK_EXPORT_MAX_MATCHES = 25
 
 
 def _bulk_pdf_zip_bytes(matches, include_cadences, include_ptypes, include_homorhythm, progress_callback=None):
@@ -1868,15 +1864,6 @@ BULK_ANALYSIS_DOWNLOAD_META = {
     'density': ("📊 Download per-piece density comparison CSV", "browse_density_bulk.csv"),
 }
 
-
-# Hard cap on Browse's "download all matches as ZIP" -- benchmarked directly
-# against 8 real JRP pieces (fetch + music21 parse + MusicXML conversion, no
-# CRIM at all): 2.6s-7.8s each, 5.25s average. 30 pieces keeps the whole
-# operation under ~3 minutes; past that, sitting through a single Streamlit
-# progress bar is a bad way to wait, and the CSV export (instant, any size)
-# is the better fit for a bigger result set anyway -- not a silent truncation,
-# the UI refuses outright and says why (see tab_browse below).
-BULK_ZIP_MAX_MATCHES = 30
 
 # How many of Browse's matches populate the "Pick one" selectbox -- purely a
 # UI-rendering concern (Streamlit itself handles large dropdowns fine with
@@ -2238,9 +2225,9 @@ with tab_browse:
                 bulk_annotated = bulk_cadences or bulk_ptypes or bulk_hr
 
                 st.markdown("**MusicXML**")
-                if len(matches) > BULK_ZIP_MAX_MATCHES:
+                if len(matches) > BULK_EXPORT_MAX_MATCHES:
                     st.caption(
-                        f"Works for up to {BULK_ZIP_MAX_MATCHES} matches at once (this search has "
+                        f"Works for up to {BULK_EXPORT_MAX_MATCHES} matches at once (this search has "
                         f"{len(matches)}) -- narrow the search to enable it, or use the CSV above "
                         "for the full list."
                     )
@@ -2279,9 +2266,9 @@ with tab_browse:
                     )
 
                 st.markdown("**PDF**")
-                if len(matches) > BULK_PDF_ZIP_MAX_MATCHES:
+                if len(matches) > BULK_EXPORT_MAX_MATCHES:
                     st.caption(
-                        f"Works for up to {BULK_PDF_ZIP_MAX_MATCHES} matches at once (this search "
+                        f"Works for up to {BULK_EXPORT_MAX_MATCHES} matches at once (this search "
                         f"has {len(matches)}) -- narrow the search to enable it."
                     )
                 elif st.button(
@@ -2328,12 +2315,10 @@ with tab_browse:
                     "side. Unlike MusicXML/PDF above, this one genuinely needs at least one "
                     "analysis checked -- there's no 'plain' version of an analysis-data export."
                 )
-                if len(matches) > BULK_ANALYSIS_MAX_MATCHES:
+                if len(matches) > BULK_EXPORT_MAX_MATCHES:
                     st.caption(
-                        f"Works for up to {BULK_ANALYSIS_MAX_MATCHES} matches at once (this search has "
-                        f"{len(matches)}) -- narrow the search to enable it. This cap is provisional: "
-                        "unlike the ZIP cap above, real CRIM computation cost per piece hasn't been "
-                        "benchmarked live yet."
+                        f"Works for up to {BULK_EXPORT_MAX_MATCHES} matches at once (this search has "
+                        f"{len(matches)}) -- narrow the search to enable it."
                     )
                 elif not bulk_annotated:
                     st.caption("Check at least one analysis above to enable this export.")
