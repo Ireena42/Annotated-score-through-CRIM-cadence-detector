@@ -3953,3 +3953,53 @@
 {"label": "[Tasso] Montella (1602) — Ne i vostri dolci baci", "collection": "tasso", "finalis": "E", "source": "cadence", "detail": null}
 {"label": "[Tasso] DiCostanzo (1604) — Ne i vostri dolci baci", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
 {"label": "[Tasso] Zenaro (1589) — Non sono in queste rive", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Narducci (1596) — Non sono in queste rive", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Masnelli (1596) — Soavissimo bacio", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1595) — O verdi selve o dolci fonti o rivi", "collection": "tasso", "finalis": "B-", "source": "cadence", "detail": null}
+{"label": "[Tasso] DallaCasa (1590) — Perche di seno in seno", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Nenna (1607) — Quella candida mano", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1585) — Sovra un lucido rio", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Zenaro (1589) — Sovra un lucido rio", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gastoldi (1588) — Non puo langusto loco", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] DIndia (1616) — Donna lunge da voi", "collection": "tasso", "finalis": "B", "source": "cadence", "detail": null}
+{"label": "[Tasso] Garzi (1629) — Lontano dal mio core", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Virchi (1588) — O dolci lagrimette", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Salzilli (1611) — O dolci lagrimette", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dentice (1607) — Lunge da gli occhi vostri", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Bellasio (1590) — Come cristallo in monte", "collection": "tasso", "finalis": "C#", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Bellasio (1578) — Gelo ha Madonna il seno", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Merulo (1579) — Gelo ha Madonna il seno", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Unknown composer — Gelo ha Madonna il seno", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1590) — Gelo ha madonna il seno", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1590) — Gelo ha madonna il seno", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gesualdo (1594) — Gelo ha Madonna il seno", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Nanino (1599) — Gelo ha Madonna il seno", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] DiCostanzo (1604) — Gelo ha Madonna il seno", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Zenaro (1589) — Voi bramate ben mio", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Fonghetti (1598) — Voi bramate ben mio", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1584) — Donna cortese e bella", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Giovannelli (1593) — Dolcissimi legami", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Guami (1588) — Fuggi fuggi dolor da questo petto", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Macque (1589) — Gia fu dolce mia speme", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Monte (1591) — Gia fu mia dolce speme", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dentice (1591) — Gia fu dolce mia speme", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Bellasio (1591) — Soavissimo canto", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Preti (1588) — Tra mille fior gia colti in dolce speco", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Agostini (1583) — Cantava in riva al fiume", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Santini (1602) — Cantava in riva al fiume", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Macigni (1617) — In un fonte tranquillo", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Lambardi (1616) — Gia fui caro a gli occhi tuoi", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Lambardi (1614) — Occhi miei mal accorti", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Lambardi (1616) — Correte amanti a le bellezze nove", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Lambardi (1616) — Amarilli sio ti miro", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cerbello (1619) — Amarilli sio te miro", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Lambardi (1616) — Voi volete chio vami", "collection": "tasso", "finalis": "F", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Lambardi (1614) — Io son la primavera", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Hodemont (1625) — Io son la primavera", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Stefani (1622) — Io son la primavera", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dueto (1586) — Questo riposto bel vago boschetto", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Hassler (1596) — Qui dove i sacri e verdeggianti allori", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1586) — Odi Filli che tuona odi chen gelo", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Luzzaschi (1576) — Aminta poi cha Filli non dispiacque", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Bozi (1591) — Tre son le Grazie ancelle", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mancini (1605) — Bruna sei tu ma bella", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
