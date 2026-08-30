@@ -798,3 +798,53 @@
 {"label": "[Palestrina] Missa De Beata Marie Virginis (III): Gloria (part i)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[Palestrina] Missa De beata virgine (1567): Gloria [Gloria_18]", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
 {"label": "[Palestrina] Missa De beata virgine (1567): Gloria [Gloria_of_1600]", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De beata virgine (1570): Gloria (part a)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De beata virgine (1570): Gloria (part b)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa De beata virgine (1570): Gloria (part c)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Dies sanctificatus: Gloria (part a)", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Dies sanctificatus: Gloria (part b)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Dilexi quoniam: Gloria", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Dum complerentur: Gloria", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Dum esset summus pontifex: Gloria", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ecce ego Joannes: Gloria", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Ecce sacerdos magnus: Gloria", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Emendemus in melius: Gloria", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Eripe me de inimicis: Gloria", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Fratres Ego Enim Accepi: Gloria (part a)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Fratres Ego Enim Accepi: Gloria (part b)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Gabriel Archangelus: Gloria", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Gia fu chi m'ebbe cara: Gloria", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Hodie Christus Natus Est: Gloria (part a)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Hodie Christus Natus Est: Gloria (part b)", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Hodie Christus Natus Est: Gloria (part c)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Illumina oculos meos: Gloria", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (I): Gloria (part a)", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (I): Gloria (part b)", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (I): Gloria (part c)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (I): Gloria (part d)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (I): Gloria (part e)", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (I): Gloria (part f)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (I): Gloria (part g)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (I): Gloria (part h)", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (I): Gloria (part i)", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (II): Gloria (part a)", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (II): Gloria (part b)", "collection": "music21", "finalis": "E", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Palestrina] Missa In duplicibus minoribus (II): Gloria (part c)", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (II): Gloria (part d)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (II): Gloria (part e)", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (II): Gloria (part f)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (II): Gloria (part g)", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (II): Gloria (part h)", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa In duplicibus minoribus (II): Gloria (part i)", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Sine nomine (1567): Gloria", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Je suis desheritee: Gloria", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Petra sancta: Gloria", "collection": "music21", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Primi toni: Gloria", "collection": "music21", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Qual e il piu grande'amore: Gloria", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Quam pulchra es: Gloria", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Quando lieta sperai: Gloria", "collection": "music21", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Quem dicunt homines: Gloria", "collection": "music21", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Quinti toni: Gloria (part a)", "collection": "music21", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Quinti toni: Gloria (part b)", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Regina coeli (1600): Gloria (part a)", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Palestrina] Missa Regina coeli (1600): Gloria (part b)", "collection": "music21", "finalis": "F", "source": "cadence", "detail": null}
