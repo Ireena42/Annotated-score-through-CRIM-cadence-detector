@@ -3803,3 +3803,53 @@
 {"label": "[Tasso] Zanotti (1587) — Giacea la mia virtu vinta e smarrita", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
 {"label": "[Tasso] Mazza (1584) — Io veggio in cielo scintillar le stelle", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
 {"label": "[Tasso] Porta (1573) — Stavasi Amor quasi in regno assiso", "collection": "tasso", "finalis": "E", "source": "cadence", "detail": null}
+{"label": "[Tasso] Guami (1598) — Amor se fia giammai che dolce i tocchi", "collection": "tasso", "finalis": "A", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Pallavicino (1579) — Non egrave questa la mano", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1581) — Non e questa la mano", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Serafico (1581) — Non egrave questa la mano", "collection": "tasso", "finalis": "A", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Cortellini (1583) — Non e questa la mano", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Malvezzi (1584) — Non e questa la mano", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1584) — Non e questa la mano", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Scozzese (1584) — Non e questa la mano", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Duc (1586) — Non e questa la mano", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gastoldi (1588) — Non e questa la mano", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Giovannelli (1588) — Non e questa la mano", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[Tasso] Castro (1591) — Non e questa la mano", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1591) — Non e questa la mano", "collection": "tasso", "finalis": "C", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Ferro (1594) — Non e questa la mano", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gesualdo (1594) — Non e questa la mano", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Roccia (1603) — Non e questa la mano", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Montella (1604) — Non e questa la mano", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Meldert (1578) — Amor lalma mallaccia", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1584) — Amor lalma mallaccia", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dueto (1585) — Amor lalma mallaccia", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1590) — Amor lalma mallaccia", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Bonini (1591) — Amor lalma mallaccia", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Ricci (1597) — Amor lalma mallaccia", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] IlVerso (1603) — Mentre ne cari balli in loco adorno", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Zanotti (1587) — O nemica dAmor che si ti rendi", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1590) — Lunge da voi ben mio", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Felis (1591) — Lunge da voi ben mio", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Pallavicino (1600) — Lunge da voi ben mio", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Dering (1620) — Lunge da voi ben mio", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Mazza (1590) — Lunge da voi mio core", "collection": "tasso", "finalis": "A", "source": "final_fallback", "detail": "cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Fontanelli (1590) — Lunge da voi mio core", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Felis (1591) — Lunge da voi mio core", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cortellini (1584) — Poiche madonna sdegna", "collection": "tasso", "finalis": "D", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Dueto (1585) — Poiche madonna sdegna", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1591) — Poiche Madonna sdegna", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Vecoli (1587) — Costei che su la fronte ha sparsa al vento", "collection": "tasso", "finalis": "G", "source": "final_fallback", "detail": "cadences() failed: KeyError: 'None of [None] are in the columns'"}
+{"label": "[Tasso] Dentice (1598) — Costei che in su la fronte ha sparsa il vento", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Meldert (1578) — Mapre talor madonna il suo celeste", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gesualdo (1594) — Mentre Madonna il fianco lasso posa", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1588) — Mentre nubi di sdegno", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Cancineo (1590) — Mentre nubi di sdegno", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1584) — Disdegno e gelosia", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] Monte (1591) — Disdegno e gelosia", "collection": "tasso", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[Tasso] DIndia (1615) — Donna quanto piu a dentro", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Hassler (1596) — A chi creder deggio", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Luzzaschi (1576) — Geloso amante apro millocchi e giro", "collection": "tasso", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[Tasso] Vittori (1649) — Geloso amante apro millocchi e giro", "collection": "tasso", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[Tasso] Marenzio (1587) — Arsi gran tempo e del mio foco indegno", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Gabella (1585) — Tre gran donne vidio chin esser belle", "collection": "tasso", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[Tasso] Stivori (1585) — Con la saetta da la punta doro", "collection": "tasso", "finalis": "C", "source": "cadence", "detail": null}
