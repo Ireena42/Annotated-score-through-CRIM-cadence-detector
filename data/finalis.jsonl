@@ -1548,3 +1548,53 @@
 {"label": "[CRIM] Francisco Guerrero — Missa Congratulamini mihi: Sanctus [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
 {"label": "[CRIM] Francisco Guerrero — Missa Congratulamini mihi: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
 {"label": "[CRIM] Francisco Guerrero — Missa Sancta et immaculata virginitas: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Sancta et immaculata virginitas: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Sancta et immaculata virginitas: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Sancta et immaculata virginitas: Sanctus [Mass movement]", "collection": "crim", "finalis": "E-", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Sancta et immaculata virginitas: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Super flumina Babylonis: Kyrie [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Super flumina Babylonis: Gloria [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Super flumina Babylonis: Credo [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Super flumina Babylonis: Sanctus [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Super flumina Babylonis: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Beata mater: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Beata mater: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Beata mater: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "part_duration_mismatch", "detail": "low-confidence: parts' own encoded durations disagree (would otherwise be 'cadence' -> G)"}
+{"label": "[CRIM] Francisco Guerrero — Missa Beata mater: Sanctus [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Francisco Guerrero — Missa Beata mater: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Loyset Piéton — Missa In te Domini speravi: Kyrie [Mass movement]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[CRIM] Loyset Piéton — Missa In te Domini speravi: Gloria [Mass movement]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[CRIM] Loyset Piéton — Missa In te Domini speravi: Credo [Mass movement]", "collection": "crim", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[CRIM] Loyset Piéton — Missa In te Domini speravi: Sanctus [Mass movement]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[CRIM] Loyset Piéton — Missa In te Domini speravi: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolle des Celliers de Hesdin — Missa Benedicta es: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolle des Celliers de Hesdin — Missa Benedicta es: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolle des Celliers de Hesdin — Missa Benedicta es: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolle des Celliers de Hesdin — Missa Benedicta es: Sanctus [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolle des Celliers de Hesdin — Missa Benedicta es: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolle des Celliers de Hesdin — Missa Hic est vere martir: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolle des Celliers de Hesdin — Missa Hic est vere martir: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolle des Celliers de Hesdin — Missa Hic est vere martir: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Nicolle des Celliers de Hesdin — Missa Hic est vere martir: Sanctus [Mass movement]", "collection": "crim", "finalis": "A", "source": "part_duration_mismatch", "detail": "low-confidence: parts' own encoded durations disagree (would otherwise be 'cadence' -> A)"}
+{"label": "[CRIM] Nicolle des Celliers de Hesdin — Missa Hic est vere martir: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Jean Hérissant — Missa Quandiu vivam soli Deo serviam: Kyrie [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Jean Hérissant — Missa Quandiu vivam soli Deo serviam: Gloria [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Jean Hérissant — Missa Quandiu vivam soli Deo serviam: Credo [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Jean Hérissant — Missa Quandiu vivam soli Deo serviam: Sanctus [Mass movement]", "collection": "crim", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[CRIM] Jean Hérissant — Missa Quandiu vivam soli Deo serviam: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "F", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pere Riquet — Missa Susanne un jour: Kyrie [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pere Riquet — Missa Susanne un jour: Gloria [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pere Riquet — Missa Susanne un jour: Credo [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pere Riquet — Missa Susanne un jour: Sanctus [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Pere Riquet — Missa Susanne un jour: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "G", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Doulce memoire: Kyrie [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Doulce memoire: Gloria [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Doulce memoire: Credo [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Doulce memoire: Sanctus [Mass movement]", "collection": "crim", "finalis": "A", "source": "cadence", "detail": null}
+{"label": "[CRIM] Roland de Lassus — Missa Doulce memoire: Agnus Dei [Mass movement]", "collection": "crim", "finalis": "D", "source": "cadence", "detail": null}
+{"label": "[CRIM] Giovanni Pierluigi da Palestrina — Missa Io mi son giovinetta: Kyrie [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM has this piece catalogued but no MEI file for it yet."}
+{"label": "[CRIM] Giovanni Pierluigi da Palestrina — Missa Io mi son giovinetta: Gloria [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM has this piece catalogued but no MEI file for it yet."}
+{"label": "[CRIM] Giovanni Pierluigi da Palestrina — Missa Io mi son giovinetta: Credo [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM has this piece catalogued but no MEI file for it yet."}
+{"label": "[CRIM] Giovanni Pierluigi da Palestrina — Missa Io mi son giovinetta: Sanctus [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM has this piece catalogued but no MEI file for it yet."}
+{"label": "[CRIM] Giovanni Pierluigi da Palestrina — Missa Io mi son giovinetta: Agnus Dei [Mass movement]", "collection": "crim", "finalis": null, "source": "error", "detail": "CRIM has this piece catalogued but no MEI file for it yet."}
+{"label": "[CRIM] Giovanni Pierluigi da Palestrina — Missa Quem dicunt homines: Kyrie [Mass movement]", "collection": "crim", "finalis": "C", "source": "cadence", "detail": null}
