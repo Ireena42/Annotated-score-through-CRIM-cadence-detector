@@ -178,8 +178,9 @@ collection actually ships) without any CRIM analysis at all. The
 download button and file name are honest about which case you're in
 ("Download annotated MusicXML" vs. plain "Download MusicXML").
 
-A **"Download annotated PDF"** button sits right below the MusicXML
-download (same "annotated" vs. plain wording), rendered via
+A **"Build annotated PDF"** button sits right below the MusicXML
+download (same "annotated" vs. plain wording, no leading icon -- kept
+coherent with the MusicXML button above it), rendered via
 [Verovio](https://www.verovio.org/) — the same MEI/MusicXML engraving
 library CRIM Intervals itself already uses for its own Jupyter helpers,
 so this isn't a new dependency to the project. It reads the exact same
@@ -330,7 +331,7 @@ above is the one to share.
     download button use Streamlit's own `type="primary"` styling, which
     pulls its color directly from `.streamlit/config.toml`.
 
-## Finalis precompute (in progress, not yet in the app's UI)
+## Finalis precompute (data exists, but the UI filter is currently removed)
 
 A **Finalis** filter for Browse is planned — full-corpus, not scoped to
 one search — but that needs a Finalis *value* for all ~4,300 pieces
@@ -396,25 +397,40 @@ reach the same total duration (tolerance: one measure, 4 quarter
 notes, to allow a genuine pickup-measure difference), its finalis is
 still recorded as a best guess but tagged `source: "part_duration_mismatch"`
 instead of `"cadence"`/`"final_fallback"` — flagged low-confidence
-rather than presented at face value. A full corpus recompute with this
-fix is (planned/in progress as of this writing).
+rather than presented at face value. The full corpus recompute with
+this fix ran and finished the same day (2026-08-30) — `data/finalis.jsonl`
+now has a fresh record per piece, including any newly-flagged
+`part_duration_mismatch` entries.
 
-That data now powers a **"Finalis"** multiselect (several pitch classes
-at once, e.g. both G and D — a real Renaissance-modality comparison,
-unlike the single-composer pickers elsewhere) everywhere a piece gets
-picked: Browse's search results, and each of the six collection-specific
-tabs, narrowing that tab's own Composer → Piece selection the same way.
-It's read straight from `data/finalis.jsonl` as a local file (this app's
-own precomputed output, shipped in the repo — not fetched over the
-network the way every other collection's piece data is), keyed by
-Browse's own prefixed label (`[CRIM] ...`, `[Palestrina] ...`, etc.),
-which each tab reconstructs from its own bare label to look itself up in
-the same shared index. The widget doesn't appear at all for a
-collection/composer with nothing recorded to filter by. Displayed pitch
-classes use real flat/sharp symbols (♭/♯) rather than music21's own
-internal ASCII notation (`-`/`#`) — a display-only swap via
-`format_func`; the underlying value matched against `data/finalis.jsonl`
-is unchanged.
+**Second known issue, found the same day, same way (a user spot-checking
+a real filtered result):** Palestrina's *Missa Quem dicunt homines: Gloria*
+(`Gloria_42`) was recorded as finalis E, but the piece actually ends on
+C — `piece.final()` agrees (`'C3'`), and this piece's voice-parts are
+NOT desynced (`_parts_desynced` correctly returns False here; all 4
+parts reach the identical offset 1208). Root cause, traced directly:
+the piece's very LAST cadence (m.150, "Clausula Vera", CVFs `CTu`) has
+its Cantizans and Tenorizans fully realized (uppercase C, T) resolving
+to Tone **C** — but its Bassizans is *evaded* (lowercase `u`: "goes down
+a third instead" of the expected leap), so the bass actually sounds E
+at that exact moment, not C. `cadences()`'s own `Low` column reports
+whatever the bass literally did (E), while its `Tone` column (the
+Cantizans's own goal note, unaffected by what the bass does) correctly
+reports C. Reading `Low` alone — this precompute script's whole design
+so far — is blind to exactly this case: a single evaded CVF role
+corrupting the bass reading even when the cadence's overall `CadType`
+looks fully resolved (not prefixed `Evaded`/`Abandoned` at all, since
+that prefix reflects the cadence as a whole, not each individual voice).
+
+Given two independent, real failure modes found by simple spot-checks
+in one afternoon, the **Finalis filter UI has been removed** from
+Browse and all six collection tabs (the underlying precompute script,
+data file, and desync check all stay in the repo — this is a UI-only
+rollback) until there's a heuristic that doesn't need after-the-fact patching
+every time someone happens to check a result by ear. A more reliable
+approach would need to consider, at minimum: preferring `Tone` over
+`Low` when the Bassizans CVF is lowercase, and cross-checking `Tone`
+against `piece.final()` the same way `_parts_desynced` already
+cross-checks part durations.
 
 ## Credits & licensing
 
