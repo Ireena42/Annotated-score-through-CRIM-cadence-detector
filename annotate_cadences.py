@@ -29,6 +29,61 @@ from music21 import converter, expressions
 CADENCE_COLOR = '#CC3333'
 BEAT_TOLERANCE = 1e-3
 
+# Minimum gap, in quarter notes, between two labels of the SAME category
+# before their text would likely start touching in Verovio's rendering --
+# Verovio (like most simple score renderers) does not auto-avoid collisions
+# between arbitrary text annotations; it just places each one at its given
+# absolute-y/offset, so two same-category labels landing close together in
+# time need this app's own collision avoidance, not the renderer's. This
+# is a real, confirmed pattern, not a rare edge case: Palestrina's Gloria_42
+# has two cadence labels only 4 quarter notes apart at m.137, and a flurry
+# of them 4-6 quarter notes apart across measures 148-150 (a run of closely-
+# spaced cadences near a movement's end) -- exactly the "picked all the
+# annotations and they overlapped" mess this guards against.
+MIN_LABEL_GAP = 6.0
+LABEL_STAGGER = 16  # extra tenths added to a label staggered off its category's base row
+
+
+class _LabelLane:
+    """Tracks the last labeled offset for ONE category (cadence,
+    presentation-type, or homorhythm), so consecutive close-together
+    events in that SAME category alternate between two vertical rows
+    (base_y and base_y + LABEL_STAGGER) instead of landing on the same
+    line. Each annotate_* function below gets its own instance --
+    categories never share state, since their base rows are already
+    spaced far enough apart (see CADENCE_LABEL_Y/PRESENTATION_LABEL_Y/
+    HOMORHYTHM_LABEL_Y below) that even a staggered row of one category
+    stays clear of the next category's base row; this only guards
+    against crowding WITHIN one category.
+
+    offset must be each label's ABSOLUTE position in the piece (quarter
+    notes from the very start), not an offset-within-measure -- the
+    crowding this guards against routinely spans a measure boundary
+    (see MIN_LABEL_GAP's own docstring), so a measure-relative offset
+    would miss it.
+    """
+    def __init__(self, base_y):
+        self.base_y = base_y
+        self._last_offset = None
+        self._last_row = base_y
+
+    def y_for(self, offset):
+        if self._last_offset is not None and abs(offset - self._last_offset) < MIN_LABEL_GAP:
+            row = self.base_y + LABEL_STAGGER if self._last_row == self.base_y else self.base_y
+        else:
+            row = self.base_y
+        self._last_offset = offset
+        self._last_row = row
+        return row
+
+
+# Each category's own base row, spaced 40 tenths apart -- comfortably more
+# than LABEL_STAGGER (16), so a label staggered onto its category's SECOND
+# row still can't reach into the next category's base row.
+CADENCE_LABEL_Y = 20
+PRESENTATION_LABEL_Y = 60
+HOMORHYTHM_LABEL_Y = 100
+
 
 def cadence_label(row):
     """e.g. 'Authentic -> G'. Some rows have a CVF combination CRIM tracks
@@ -110,6 +165,7 @@ def annotate_score(score, cadences):
     # built once per part, not once per cadence -- see _measure_index's
     # docstring for the measured cost of not doing this
     measure_indices = [_measure_index(p) for p in parts]
+    lane = _LabelLane(CADENCE_LABEL_Y)
 
     n_labeled, n_missed_label, n_colored = 0, 0, 0
     for _, row in cadences.iterrows():
@@ -149,9 +205,14 @@ def annotate_score(score, cadences):
         # crashing the whole annotation over one unplaceable label.
         ts = target_measure.getContextByClass('TimeSignature') if target_measure is not None else None
         if ts is not None:
+            offset_in_measure = ts.getOffsetFromBeat(beat)
             te = expressions.TextExpression(cadence_label(row))
-            te.style.absoluteY = 20  # nudge clear of the staff/notes
-            target_measure.insert(ts.getOffsetFromBeat(beat), te)
+            # lane.y_for staggers this off CADENCE_LABEL_Y when the previous
+            # cadence label landed within MIN_LABEL_GAP quarter notes of this
+            # one -- see _LabelLane's own docstring for why (real crowding
+            # confirmed on Palestrina's Gloria_42, not a hypothetical).
+            te.style.absoluteY = lane.y_for(target_measure.offset + offset_in_measure)
+            target_measure.insert(offset_in_measure, te)
             n_labeled += 1
         else:
             n_missed_label += 1
@@ -205,6 +266,7 @@ def annotate_presentation_types(score, ptypes, part_names):
     parts = list(score.parts)
     name_to_index = {name: i for i, name in enumerate(part_names)}
     measure_indices = [_measure_index(p) for p in parts]
+    lane = _LabelLane(PRESENTATION_LABEL_Y)
 
     n_labeled, n_missed_label, n_colored = 0, 0, 0
     for _, row in ptypes.iterrows():
@@ -230,13 +292,17 @@ def annotate_presentation_types(score, ptypes, part_names):
                 # the whole instance over one unplaceable measure.
                 ts = target_measure.getContextByClass('TimeSignature') if target_measure is not None else None
                 if ts is not None:
+                    offset_in_measure = ts.getOffsetFromBeat(beat)
                     label_text = PRESENTATION_TYPE_LABELS.get(
                         row['Presentation_Type'], row['Presentation_Type']
                     )
                     te = expressions.TextExpression(label_text)
-                    te.style.absoluteY = 40  # above cadence labels (20), to reduce collision
+                    # lane.y_for staggers this off PRESENTATION_LABEL_Y when
+                    # the previous presentation-type label landed within
+                    # MIN_LABEL_GAP of this one -- see _LabelLane's docstring.
+                    te.style.absoluteY = lane.y_for(target_measure.offset + offset_in_measure)
                     te.style.color = PRESENTATION_COLOR
-                    target_measure.insert(ts.getOffsetFromBeat(beat), te)
+                    target_measure.insert(offset_in_measure, te)
                     n_labeled += 1
                     first_labeled = True
         if not first_labeled:
@@ -252,8 +318,10 @@ def annotate_homorhythm(score, hr, part_names, min_gap=4.0):
     """Marks each homorhythmic (chordal, shared-text-declamation) passage
     on the score: colors every note in every voice listed in that row's
     'hr_voices', and labels one point per passage -- placed higher than
-    both cadence (y=20) and presentation-type (y=40) labels so all three
-    features can coexist without overlapping text.
+    both cadence (CADENCE_LABEL_Y) and presentation-type
+    (PRESENTATION_LABEL_Y) labels, and staggered against its own close
+    neighbors via _LabelLane, so all three features can coexist without
+    overlapping text.
 
     score: a music21 Score (mutated in place AND returned).
     hr: a DataFrame like crim_intervals' piece.homorhythm() output --
@@ -282,6 +350,7 @@ def annotate_homorhythm(score, hr, part_names, min_gap=4.0):
     parts = list(score.parts)
     name_to_index = {name: i for i, name in enumerate(part_names)}
     measure_indices = [_measure_index(p) for p in parts]
+    lane = _LabelLane(HOMORHYTHM_LABEL_Y)
 
     n_labeled, n_missed_label, n_colored = 0, 0, 0
     last_labeled_offset = None
@@ -307,7 +376,13 @@ def annotate_homorhythm(score, hr, part_names, min_gap=4.0):
             ts = target_measure.getContextByClass('TimeSignature') if target_measure is not None else None
             if ts is not None:
                 te = expressions.TextExpression('Homorhythm')
-                te.style.absoluteY = 60  # above cadence (20) and imitation (40) labels
+                # lane.y_for staggers this off HOMORHYTHM_LABEL_Y when the
+                # previous homorhythm label landed within MIN_LABEL_GAP of
+                # this one -- min_gap above already merges same-passage
+                # repeats into one label, but two DISTINCT passages close
+                # enough to both get labeled can still be close enough to
+                # collide visually; see _LabelLane's own docstring.
+                te.style.absoluteY = lane.y_for(offset)
                 te.style.color = HOMORHYTHM_COLOR
                 target_measure.insert(ts.getOffsetFromBeat(beat), te)
                 n_labeled += 1

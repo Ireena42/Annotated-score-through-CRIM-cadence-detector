@@ -246,7 +246,18 @@ above is the one to share.
    this app and re-uploading it) can leave that context unresolvable for
    a specific measure even when the original parse had it; when that
    happens the label is skipped and counted as "missed" instead of
-   crashing the whole annotation.
+   crashing the whole annotation. Verovio (like most simple score
+   renderers) doesn't auto-avoid collisions between text annotations, so
+   `_LabelLane` (`annotate_cadences.py`) staggers a label's vertical
+   position off its category's base row whenever the previous label of
+   the SAME category (cadence, points-of-imitation, or homorhythm) landed
+   within 6 quarter notes of it — a real, confirmed need, not a
+   hypothetical: Palestrina's *Missa Quem dicunt homines: Gloria*
+   (`Gloria_42`) has a run of cadences 4-6 quarter notes apart across
+   measures 148-150 that rendered as an unreadable pile of text before
+   this fix, checking every checkbox at once made it much more likely to
+   hit (more categories' labels competing for the same space), not the
+   cause on its own.
 4. **Browse all** reuses every collection's own piece list (built once,
    cached) plus a lightweight per-piece check (already-available metadata
    for CRIM/music21; a single small-file fetch for the five kern-backed
