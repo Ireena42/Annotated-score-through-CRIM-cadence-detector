@@ -176,7 +176,16 @@ unmodified — useful if all you want is this app's aggregated access to
 a piece (in real MusicXML, converted from whatever format its home
 collection actually ships) without any CRIM analysis at all. The
 download button and file name are honest about which case you're in
-("Download annotated MusicXML" vs. plain "Download MusicXML").
+("Download annotated MusicXML" vs. plain "Download MusicXML"). The
+downloaded file's name itself (single-piece downloads and every bulk
+ZIP) isn't just the piece's own machine ID (e.g. `Gloria_42.xml`) --
+`_rich_filename_stem()` combines that ID with the piece's full
+human-readable label (composer, mass/collection title, movement --
+everything Browse's own label already carries), e.g. `Missa Quem
+dicunt homines - Gloria (Gloria_42)_annotated.xml`, so a bulk ZIP's own
+file listing identifies every piece on its own, without needing to
+cross-reference back to the search that produced it. Pure string
+work -- no extra computation or network call, so no meaningful cost.
 
 A **"Build annotated PDF"** button sits right below the MusicXML
 download (same "annotated" vs. plain wording, no leading icon -- kept

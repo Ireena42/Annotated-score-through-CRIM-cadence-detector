@@ -759,7 +759,7 @@ def _build_methods_blurb(include_cadences, include_ptypes, include_homorhythm):
     return ' '.join([_METHODS_BLURB_MUSIC21] + sentences)
 
 
-def show_result(annotated_score, stats, filename_stem, include_cadences=False, include_ptypes=False, include_homorhythm=False, key_prefix=None):
+def show_result(annotated_score, stats, filename_stem, include_cadences=False, include_ptypes=False, include_homorhythm=False, key_prefix=None, download_name=None):
     """Reports whatever run_pipeline()/_annotate_crim_piece() actually
     did (cadences/ptypes/homorhythm are all optional now -- see
     run_pipeline's docstring) and offers the resulting file for
@@ -776,8 +776,21 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
     elsewhere (see render_preview_and_annotate's docstring); defaults to
     filename_stem itself when the caller doesn't have a more specific one
     (e.g. the Upload tab, where only one instance ever exists).
+
+    filename_stem itself stays the piece's own raw machine ID -- it's
+    reused below to build result_key/pdf_cache_key, which need to stay
+    exactly as unique as before (see this file's own git history for why
+    a shared cache key across different pieces was a real, confirmed
+    bug). download_name is what actually appears in the downloaded
+    file's name -- defaults to filename_stem, but every caller with a
+    richer label available passes _rich_filename_stem(label, filename_stem)
+    instead, so a bulk ZIP's own file listing identifies each piece
+    (composer, mass/collection title, movement) without needing to
+    cross-reference back to the search that produced it -- the Upload
+    tab (no such label to build one from) is the one caller that doesn't.
     """
     key_prefix = key_prefix or filename_stem
+    download_name = download_name or filename_stem
     # Shown unconditionally, before anything analysis-specific -- which
     # print edition (or, for CRIM, which modern critical edition and
     # editorial team) an encoding derives from matters for Renaissance
@@ -867,7 +880,7 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
     st.download_button(
         "Download annotated MusicXML" if annotated else "Download MusicXML",
         data=xml_bytes,
-        file_name=f"{filename_stem}_annotated.xml" if annotated else f"{filename_stem}.xml",
+        file_name=f"{download_name}_annotated.xml" if annotated else f"{download_name}.xml",
         mime="application/vnd.recordare.musicxml+xml",
         type="primary",
     )
@@ -924,7 +937,7 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
                 "in MuseScore, Finale, or Dorico instead."
             )
         else:
-            file_name = f"{filename_stem}_annotated.pdf" if annotated else f"{filename_stem}.pdf"
+            file_name = f"{download_name}_annotated.pdf" if annotated else f"{download_name}.pdf"
             if st.session_state.pop(just_built_key, False):
                 # Streamlit's own st.download_button can't trigger a
                 # download by itself -- it IS the click that starts one, so
@@ -1446,6 +1459,42 @@ def _browse_piece_filename_stem(collection, native_ref):
     return Path(native_ref).stem
 
 
+_FILENAME_UNSAFE_CHARS = re.compile(r'[<>:"/\\|?*]')
+
+
+def _rich_filename_stem(label, raw_stem):
+    """Builds a download filename that identifies itself on its own --
+    combines the piece's own human-readable label (composer, mass/
+    collection title, movement -- everything build_browse_index()'s own
+    label already carries) with its machine ID (raw_stem, e.g.
+    'Gloria_42' -- already unique, and exactly what this app's own
+    browsing already shows), so a bulk ZIP's file listing alone tells
+    you what each file is without cross-referencing back to the search
+    that produced it. Pure string work -- no extra computation, network
+    call, or per-piece cost beyond what building the label already did.
+
+    label is this app's own bracketed form (e.g. '[Palestrina] Missa
+    Quem dicunt homines: Gloria', or '[CRIM] Composer -- Title [Genre]')
+    -- the bracket tag itself is dropped (collection identity isn't
+    usually needed in a filename someone's about to open in MuseScore,
+    and the raw_stem suffix stays unique regardless). Characters illegal
+    in a Windows/NTFS filename (<>:"/\\|?*) are replaced with '-' (':'
+    specifically becomes ' -', so 'Missa X: Gloria' reads as 'Missa X -
+    Gloria' rather than a cramped 'Missa X- Gloria'); the human part is
+    capped at 150 characters before the raw_stem suffix is appended, well
+    under Windows' ~260-character full-path limit even for an unusually
+    long title. Falls back to raw_stem alone if the label has no real
+    content beyond its bracket tag (shouldn't happen with this app's own
+    labels, but never worth crashing a download over).
+    """
+    human = label.split('] ', 1)[1] if label.startswith('[') and '] ' in label else label
+    human = human.replace(':', ' -')
+    human = _FILENAME_UNSAFE_CHARS.sub('-', human)
+    human = re.sub(r'\s+', ' ', human).strip(' -')
+    human = human[:150].rstrip(' -')
+    return f"{human} ({raw_stem})" if human and human != raw_stem else raw_stem
+
+
 def _browse_row_to_csv_dict(label, collection, native_ref):
     """One CSV row for Browse's "download search results as CSV" export
     -- source_url/music21_corpus_path are meant to be directly usable in
@@ -1716,7 +1765,7 @@ def _bulk_pdf_zip_bytes(matches, include_cadences, include_ptypes, include_homor
             except Exception as e:
                 failed.append((label, str(e)))
                 continue
-            stem = _browse_piece_filename_stem(collection, native_ref)
+            stem = _rich_filename_stem(label, _browse_piece_filename_stem(collection, native_ref))
             annotated = include_cadences or include_ptypes or include_homorhythm
             zf.writestr(f'{stem}_annotated.pdf' if annotated else f'{stem}.pdf', pdf_bytes)
     return buf.getvalue(), failed
@@ -1915,7 +1964,7 @@ def _bulk_zip_bytes(matches, include_cadences=False, include_ptypes=False, inclu
             except Exception as e:
                 failed.append((label, str(e)))
                 continue
-            stem = _browse_piece_filename_stem(collection, native_ref)
+            stem = _rich_filename_stem(label, _browse_piece_filename_stem(collection, native_ref))
             zf.writestr(f'{stem}_annotated.xml' if annotated else f'{stem}.xml', xml_bytes)
     return buf.getvalue(), failed
 
@@ -2062,6 +2111,7 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
         show_result(
             stored_score, stored_stats, filename_stem, include_cadences=stored_cad,
             include_ptypes=stored_pt, include_homorhythm=stored_hr, key_prefix=key_prefix,
+            download_name=_rich_filename_stem(piece_label, filename_stem),
         )
 
 
