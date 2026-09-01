@@ -268,26 +268,49 @@ def compute_finalis(piece):
     finalis_findings.md in this repo for the full investigation this is
     based on) rather than trusting one value with a single fallback.
     Computes all three _signals_for_piece() values and only calls the
-    result confident when at least two of the AVAILABLE signals agree
-    -- deliberately not "always prefer piece.final()", which would just
+    result confident when at least two INDEPENDENT signals agree --
+    deliberately not "always prefer piece.final()", which would just
     repeat the original design's mistake in the other direction; see
     finalis_findings.md's own "Open questions" for why that was
-    rejected. This directly targets two confirmed failure modes of the
-    original Low-only design (an evaded Bassizans corrupting Low even
-    when the cadence looks fully resolved; Low/Tone both wrong on a
-    desynced/truncated encoding where piece.final() turned out more
-    reliable) without assuming either replacement signal is always
-    right on its own.
+    rejected. This directly targets three confirmed failure modes of
+    the original Low-only design:
+    - an evaded Bassizans corrupting Low even when the cadence looks
+      fully resolved (#3 in finalis_findings.md);
+    - Low/Tone both wrong on a desynced/truncated encoding where
+      piece.final() turned out more reliable (#2);
+    - Low and Tone are NOT actually independent evidence when they
+      happen to agree with each other -- both come from the SAME
+      detected cadence, so "Low == Tone" is really one opinion (the
+      cadence detector's), not two. A genuinely random 24-piece
+      validation sample (#9 in finalis_findings.md) found 3 real cases
+      where Low == Tone but BOTH were wrong, together, because the
+      cadence they came from wasn't actually the piece's true final one
+      (undetected tail, or an evaded gesture near the true end) --
+      the old design counted that as "2 of 3 agree" and called it
+      confident anyway, which was wrong all 3 times. Confirmed this
+      isn't fixable with a numeric threshold on the cadence's own
+      ToNext/Progress columns either: 7 separate CORRECTLY-confident
+      pieces in that same sample share the exact ToNext=16 value as one
+      of the 3 misses -- no cutoff can separate them, since the values
+      are identical. The fix below needs no threshold at all: it's
+      categorical (do the AVAILABLE signals include a second,
+      genuinely independent one, not just a second column).
 
     source values, most to least trustworthy:
     - 'confident_unanimous': all 3 signals were available and agree.
-    - 'confident_majority': exactly 2 signals agree (either only 2 of
-      3 were computable, or 2 of 3 agreed and the third didn't).
-    - 'low_confidence_split': 2+ signals were available but NONE
-      agree with each other -- finalis is still recorded (Low's own
-      value, for continuity with the original convention) but flagged,
-      not presented as trustworthy. A genuinely uncertain piece, not a
-      computation failure.
+    - 'confident_majority': Low and Tone do NOT count as two
+      independent votes when they're equal (see above) -- this tier
+      requires either (a) Low != Tone and any 2 of the (up to 3)
+      available signals agree, or (b) Low == Tone and piece.final() is
+      unavailable to cross-check against at all (so there's genuinely
+      only one opinion on offer, but nothing else to contradict it).
+    - 'low_confidence_split': Low == Tone (the cadence detector's own
+      consistent answer) but piece.final() is available and disagrees
+      -- exactly the pattern #9 found being silently miscounted as
+      confident before this fix. Also covers the older case: 2+
+      signals available but none agree with each other at all. Finalis
+      is still recorded (Low's own value, for continuity) but flagged,
+      not presented as trustworthy.
     - 'single_signal': only ONE signal could be computed at all -- no
       cross-check was actually possible, so this is NOT the same
       confidence tier as an agreeing pair even though it's the only
@@ -306,28 +329,46 @@ def compute_finalis(piece):
     discipline as app.py's own _safe_cadences.
     """
     signals, cadence_error = _signals_for_piece(piece)
+    low, tone, final = signals.get('low'), signals.get('tone'), signals.get('final')
     available = {k: v for k, v in signals.items() if v}
+    n_available = len(available)
 
     if not available:
         return None, 'error', cadence_error or "no signal produced a usable pitch class"
 
-    counts = Counter(available.values())
-    top_value, top_count = counts.most_common(1)[0]
-    n_available = len(available)
-
     if n_available == 1:
         source = 'single_signal'
-    elif top_count == n_available:
-        source = 'confident_unanimous'
-    elif top_count >= 2:
-        source = 'confident_majority'
+        top_value = next(iter(available.values()))
+    elif low is not None and tone is not None and low == tone:
+        # Low and Tone are the SAME opinion (the cadence detector's own),
+        # not two independent ones -- only piece.final() being available
+        # and either agreeing or disagreeing actually changes confidence
+        # here (see this function's own docstring for why, and #9 in
+        # finalis_findings.md for the real cases this was built from).
+        if final is None:
+            source = 'confident_majority'
+            top_value = low
+        elif final == low:
+            source = 'confident_unanimous'
+            top_value = low
+        else:
+            source = 'low_confidence_split'
+            top_value = low  # keep the cadence detector's own answer as the recorded guess, for continuity
     else:
-        # n_available == 3 and all three disagree (top_count == 1) --
-        # the only way to reach this branch. Keep Low's own answer as
-        # the recorded guess, for continuity with the original
-        # convention, but the source tag is what actually matters here.
-        source = 'low_confidence_split'
-        top_value = signals.get('low') or top_value
+        # Low and Tone disagree (or one of them is unavailable) -- any
+        # two of the available signals agreeing here IS genuine
+        # independent agreement, not the correlated-pair problem above.
+        counts = Counter(available.values())
+        top_value, top_count = counts.most_common(1)[0]
+        if top_count == n_available:
+            source = 'confident_unanimous'
+        elif top_count >= 2:
+            source = 'confident_majority'
+        else:
+            # n_available == 3 and all three disagree (top_count == 1) --
+            # the only way to reach this branch.
+            source = 'low_confidence_split'
+            top_value = low if low is not None else top_value
 
     detail = f"signals: {signals}" + (f"; {cadence_error}" if cadence_error else "")
 
