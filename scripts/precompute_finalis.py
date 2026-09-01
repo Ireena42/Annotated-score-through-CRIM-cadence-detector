@@ -97,12 +97,14 @@ Usage:
 """
 import argparse
 import json
+import math
 import os
 import re
 import signal
 import subprocess
 import sys
 import time
+from collections import Counter
 from pathlib import Path
 
 import music21 as m21
@@ -215,60 +217,195 @@ def _parts_desynced(piece):
     return (max(times) - min(times)) > PART_DESYNC_TOLERANCE
 
 
+def _signals_for_piece(piece):
+    """Computes the three independent finalis signals compute_finalis()
+    cross-checks, each None-safe on its own (a crash/NaN in one signal
+    never prevents the other two from still being computed):
+
+    - 'low': the last detected cadence's Low column (lowest sounding
+      pitch at the cadential arrival) -- the original "clausula
+      basizans" method this whole heuristic started from.
+    - 'tone': that SAME cadence's Tone column (the Cantizans/Altizans's
+      own goal note) -- usually equal to Low, but not when the
+      Bassizans is evaded: confirmed directly on Palestrina's Gloria_42
+      (finalis_findings.md #3 in this repo's own investigation), where
+      Low reported the bass's actual (wrong) note while Tone stayed
+      correct, and CadType never flagged the cadence as a whole as
+      Evaded/Abandoned since the OTHER two roles were fully realized.
+    - 'final': crim_intervals' own piece.final() (literal last note,
+      no cadence detection at all) -- the "cruder" method this
+      heuristic originally used only as a last resort, but which won
+      9 of 10 hand-verified cases specifically where Low had already
+      gone wrong (finalis_findings.md #5).
+
+    Returns ({'low':.., 'tone':.., 'final':..}, cadence_error_or_None).
+    """
+    signals = {'low': None, 'tone': None, 'final': None}
+    cadence_error = None
+    try:
+        cadences = piece.cadences(voice_detail=True, include_final=True)
+        if cadences is not None and not cadences.empty:
+            last = cadences.iloc[-1]
+            signals['low'] = _pitch_class(last.get('Low'))
+            tone_val = last.get('Tone')
+            if tone_val is not None and not (isinstance(tone_val, float) and math.isnan(tone_val)):
+                signals['tone'] = _pitch_class(tone_val)
+    except Exception as e:
+        cadence_error = f"cadences() failed: {type(e).__name__}: {e}"
+
+    try:
+        signals['final'] = _pitch_class(piece.final())
+    except Exception:
+        pass
+
+    return signals, cadence_error
+
+
 def compute_finalis(piece):
     """Returns (finalis_pitch_class_or_None, source, detail).
 
-    source is 'cadence' (the last detected cadence's Low column -- see
-    this script's own module docstring for why that's the primary
-    method), 'final_fallback' (piece.final(), used only when zero
-    cadences were detected at all), or 'part_duration_mismatch' (see
-    _parts_desynced) -- this last one still carries a best-guess
-    finalis (whatever cadence/final_fallback would have returned), but
-    flagged low-confidence rather than presented at face value, since
-    the piece's own encoding is missing voices for its whole closing
-    passage. source == 'error' with finalis == None means neither
-    method produced a usable pitch -- recorded explicitly, never
-    silently guessed. Never raises: a real crash in either
-    crim_intervals call (or in reading piece.score.parts) is caught and
-    folded into the returned detail string, same discipline as
-    app.py's own _safe_cadences.
+    Redesigned 2026-09-01 as a genuine multi-signal cross-check (see
+    finalis_findings.md in this repo for the full investigation this is
+    based on) rather than trusting one value with a single fallback.
+    Computes all three _signals_for_piece() values and only calls the
+    result confident when at least two of the AVAILABLE signals agree
+    -- deliberately not "always prefer piece.final()", which would just
+    repeat the original design's mistake in the other direction; see
+    finalis_findings.md's own "Open questions" for why that was
+    rejected. This directly targets two confirmed failure modes of the
+    original Low-only design (an evaded Bassizans corrupting Low even
+    when the cadence looks fully resolved; Low/Tone both wrong on a
+    desynced/truncated encoding where piece.final() turned out more
+    reliable) without assuming either replacement signal is always
+    right on its own.
+
+    source values, most to least trustworthy:
+    - 'confident_unanimous': all 3 signals were available and agree.
+    - 'confident_majority': exactly 2 signals agree (either only 2 of
+      3 were computable, or 2 of 3 agreed and the third didn't).
+    - 'low_confidence_split': 2+ signals were available but NONE
+      agree with each other -- finalis is still recorded (Low's own
+      value, for continuity with the original convention) but flagged,
+      not presented as trustworthy. A genuinely uncertain piece, not a
+      computation failure.
+    - 'single_signal': only ONE signal could be computed at all -- no
+      cross-check was actually possible, so this is NOT the same
+      confidence tier as an agreeing pair even though it's the only
+      value on offer.
+    - 'part_duration_mismatch': overrides any of the above when
+      _parts_desynced is True -- an encoding-integrity problem that can
+      corrupt any/all three signals simultaneously, so agreement
+      between them proves nothing when this is true.
+    - 'error': none of the three signals produced a usable pitch class.
+
+    detail always records the raw per-signal values (e.g.
+    "signals: {'low': 'E', 'tone': 'C', 'final': 'C'}"), so a
+    'low_confidence_split'/'single_signal' record stays inspectable,
+    not just a bare flag. Never raises: a crash in any signal, or in
+    _parts_desynced itself, is caught and folded into detail, same
+    discipline as app.py's own _safe_cadences.
     """
-    try:
-        cadences = piece.cadences(voice_detail=True, include_final=True)
-        cadence_error = None
-    except Exception as e:
-        cadences = None
-        cadence_error = f"cadences() failed: {type(e).__name__}: {e}"
+    signals, cadence_error = _signals_for_piece(piece)
+    available = {k: v for k, v in signals.items() if v}
 
-    pc, source, detail = None, None, None
-    if cadences is not None and not cadences.empty:
-        candidate = _pitch_class(cadences.iloc[-1]['Low'])
-        if candidate:
-            pc, source, detail = candidate, 'cadence', None
+    if not available:
+        return None, 'error', cadence_error or "no signal produced a usable pitch class"
 
-    if pc is None:
-        try:
-            candidate = _pitch_class(piece.final())
-            if candidate:
-                pc, source, detail = candidate, 'final_fallback', cadence_error
-        except Exception as e:
-            detail = f"final() also failed: {type(e).__name__}: {e}"
-            return None, 'error', f"{cadence_error}; {detail}" if cadence_error else detail
+    counts = Counter(available.values())
+    top_value, top_count = counts.most_common(1)[0]
+    n_available = len(available)
 
-    if pc is None:
-        return None, 'error', cadence_error or "cadences() found nothing and final() returned nothing usable"
+    if n_available == 1:
+        source = 'single_signal'
+    elif top_count == n_available:
+        source = 'confident_unanimous'
+    elif top_count >= 2:
+        source = 'confident_majority'
+    else:
+        # n_available == 3 and all three disagree (top_count == 1) --
+        # the only way to reach this branch. Keep Low's own answer as
+        # the recorded guess, for continuity with the original
+        # convention, but the source tag is what actually matters here.
+        source = 'low_confidence_split'
+        top_value = signals.get('low') or top_value
+
+    detail = f"signals: {signals}" + (f"; {cadence_error}" if cadence_error else "")
 
     try:
         desynced = _parts_desynced(piece)
     except Exception as e:
         desynced = False
-        detail = f"{detail + '; ' if detail else ''}_parts_desynced check itself failed: {type(e).__name__}: {e}"
+        detail += f"; _parts_desynced check itself failed: {type(e).__name__}: {e}"
 
     if desynced:
-        detail = f"low-confidence: parts' own encoded durations disagree (would otherwise be {source!r} -> {pc})" + (f"; {detail}" if detail else "")
-        return pc, 'part_duration_mismatch', detail
+        detail = f"low-confidence: parts' own encoded durations disagree (would otherwise be {source!r} -> {top_value}); {detail}"
+        return top_value, 'part_duration_mismatch', detail
 
-    return pc, source, detail
+    return top_value, source, detail
+
+
+def _movement_group_key(piece_id):
+    """(group_key, part_letter_or_None). group_key is piece_id with its
+    trailing single-letter part suffix removed (e.g. 'Gloria_14_a' ->
+    'Gloria_14'), using the EXACT SAME test corpus_sources.py's own
+    _palestrina_movement_label already uses to detect this suffix (last
+    underscore-separated token is a single alphabetic character) --
+    reused rather than reimplemented so grouping stays consistent with
+    how these pieces are already labeled in the browse index.
+    part_letter is that trailing letter, or None if piece_id has no
+    such suffix (a normal, unsplit movement -- its own group of one).
+
+    Why this exists: Palestrina's long Gloria/Credo settings are often
+    split into several files, one per liturgical text clause (e.g.
+    Gloria_14_a="First Section" through Gloria_14_i="Amen") -- but all
+    parts of one such movement carry the IDENTICAL humdrum:RNB metadata
+    value, meaning the source encoding itself treats finalis as a
+    whole-movement property, not something each part independently
+    arrives at (finalis_findings.md #6). Computing Finalis separately
+    per part meant measuring an internal sectional cadence for every
+    part except the last, not the movement's actual ending.
+    """
+    tokens = piece_id.split('_')
+    if len(tokens) > 1 and len(tokens[-1]) == 1 and tokens[-1].isalpha():
+        return '_'.join(tokens[:-1]), tokens[-1]
+    return piece_id, None
+
+
+def _group_rows_for_finalis(rows):
+    """Groups rows into finalis-computation units. A multi-part music21
+    movement (see _movement_group_key) becomes one group whose members
+    share ONE computed finalis, taken from the group's LAST part (by
+    part-letter order -- 'a' < 'b' < ... < 'i' -- assumed to also be
+    liturgical/chronological order within the movement; confirmed
+    directly for one Gloria via each part's own OTL text-incipit field:
+    "First Section", "Benedicimus te", ..., "Amen", in exactly that
+    order). Every other row (non-music21 collections, or a music21
+    piece with no part suffix) is its own group of one.
+
+    Returns a list of groups, each a list of (label, collection,
+    native_ref) tuples already sorted so group[-1] is the piece to
+    actually import and compute on.
+    """
+    # Plain dict, not defaultdict: insertion order (Python 3.7+ guarantees
+    # this) is what keeps `result` below in the same overall order `rows`
+    # came in, without needing a separate order-tracking list.
+    groups = {}
+    for row in rows:
+        label, collection, native_ref = row
+        if collection == 'music21':
+            corpus_key, piece_id = native_ref
+            group_key, part_letter = _movement_group_key(piece_id)
+            full_key = (collection, corpus_key, group_key)
+        else:
+            full_key = (collection, label)  # every non-music21 row is its own group
+            part_letter = None
+        groups.setdefault(full_key, []).append((row, part_letter or ''))
+
+    result = []
+    for members in groups.values():
+        members.sort(key=lambda m: m[1])  # '' (no suffix) sorts before any letter
+        result.append([m[0] for m in members])
+    return result
 
 
 def load_existing(out_path):
@@ -357,7 +494,10 @@ def main():
         description="Batch-compute a heuristic Finalis for every piece in this app's corpus.",
     )
     parser.add_argument('--limit', type=int, default=None,
-                         help="Stop after N NEWLY-computed pieces this run.")
+                         help="Stop after N NEWLY-computed piece-records this run. "
+                              "Approximate, not exact: a multi-part movement's records "
+                              "are all written together once its group is computed, so "
+                              "a run can overshoot this by up to one group's size.")
     parser.add_argument('--collection', default=None,
                          help="Restrict to one collection key (music21/crim/jrp/1520s/tasso/seils/lassus_psalms).")
     parser.add_argument('--out', default='data/finalis.jsonl',
@@ -377,8 +517,18 @@ def main():
         rows = [r for r in rows if r[1] == args.collection]
     print(f"{len(rows)} piece(s) in scope" + (f" (collection={args.collection})" if args.collection else ""), flush=True)
 
-    todo = [r for r in rows if r[0] not in existing]
-    print(f"{len(todo)} piece(s) still to compute.", flush=True)
+    # Groups, not flat rows: a multi-part music21 movement (see
+    # _movement_group_key) is computed ONCE, from its last part, and that
+    # one result is shared across every member -- see _group_rows_for_finalis's
+    # own docstring for why. A group where every member is already in
+    # `existing` needs no import/compute at all; a group whose LAST member
+    # is already recorded (but earlier members aren't -- a resumed run that
+    # got partway through a group before stopping) reuses that recorded
+    # result instead of re-importing/re-computing it from scratch.
+    groups = _group_rows_for_finalis(rows)
+    todo_groups = [g for g in groups if any(m[0] not in existing for m in g)]
+    todo_member_count = sum(1 for g in todo_groups for m in g if m[0] not in existing)
+    print(f"{len(todo_groups)} group(s) ({todo_member_count} piece-record(s)) still to compute.", flush=True)
 
     if _HAS_ALARM:
         signal.signal(signal.SIGALRM, _timeout_handler)
@@ -391,42 +541,64 @@ def main():
     done_this_run = 0
     t0 = time.time()
     with out_path.open('a', encoding='utf-8') as f:
-        for i, (label, collection, native_ref) in enumerate(todo):
+        for i, group in enumerate(todo_groups):
             if args.limit is not None and done_this_run >= args.limit:
                 print(f"Hit --limit {args.limit}, stopping this run.", flush=True)
                 break
 
-            if _HAS_ALARM:
-                signal.alarm(PIECE_TIMEOUT_SECONDS)
-            try:
-                piece, error = _import_piece(collection, native_ref)
-                if error:
-                    record = {'label': label, 'collection': collection, 'finalis': None,
-                              'source': 'error', 'detail': error}
-                else:
-                    finalis, source, detail = compute_finalis(piece)
-                    record = {'label': label, 'collection': collection, 'finalis': finalis,
-                              'source': source, 'detail': detail}
-            except Exception as e:
-                # Catches _PieceTimeout too (it's a plain Exception
-                # subclass) -- its own message already says "exceeded
-                # the Ns per-piece limit", clear enough without a
-                # separate except clause just for it.
-                record = {'label': label, 'collection': collection, 'finalis': None,
-                          'source': 'error', 'detail': f"{type(e).__name__}: {e}"}
-            finally:
+            last_label, last_collection, last_native_ref = group[-1]
+
+            if last_label in existing:
+                # Last part already recorded from a prior run -- reuse it
+                # rather than re-importing/re-computing.
+                last_record = existing[last_label]
+                finalis, source, base_detail = last_record['finalis'], last_record['source'], last_record['detail']
+                group_error = None
+            else:
                 if _HAS_ALARM:
-                    signal.alarm(0)  # cancel -- otherwise a fast piece right after a near-timeout could get a stray alarm mid-flight
+                    signal.alarm(PIECE_TIMEOUT_SECONDS)
+                try:
+                    piece, group_error = _import_piece(last_collection, last_native_ref)
+                    if group_error:
+                        finalis, source, base_detail = None, 'error', group_error
+                    else:
+                        finalis, source, base_detail = compute_finalis(piece)
+                except Exception as e:
+                    # Catches _PieceTimeout too (a plain Exception subclass)
+                    # -- its own message already says "exceeded the Ns
+                    # per-piece limit", clear enough without a separate
+                    # except clause just for it.
+                    finalis, source, base_detail = None, 'error', f"{type(e).__name__}: {e}"
+                    group_error = base_detail
+                finally:
+                    if _HAS_ALARM:
+                        signal.alarm(0)  # cancel -- otherwise a fast piece right after a near-timeout could get a stray alarm mid-flight
 
-            f.write(json.dumps(record, ensure_ascii=False) + '\n')
+            n_written_this_group = 0
+            for label, collection, native_ref in group:
+                if label in existing:
+                    continue
+                if label == last_label:
+                    detail = base_detail
+                else:
+                    # An earlier part of the same multi-part movement --
+                    # this label's OWN last cadence was never even looked
+                    # at; the finalis is the movement's, computed from its
+                    # last part (see _group_rows_for_finalis).
+                    detail = f"finalis inherited from movement's last part ({last_label}): {base_detail}"
+                record = {'label': label, 'collection': collection, 'finalis': finalis,
+                          'source': source, 'detail': detail}
+                f.write(json.dumps(record, ensure_ascii=False) + '\n')
+                done_this_run += 1
+                n_written_this_group += 1
+
             f.flush()
-            done_this_run += 1
-
             elapsed = time.time() - t0
             rate = done_this_run / elapsed if elapsed > 0 else 0.0
+            group_note = f" (+{n_written_this_group - 1} inherited)" if n_written_this_group > 1 else ""
             print(
-                f"[{i + 1}/{len(todo)}] {label[:70]!r} -> {record['finalis']} "
-                f"({record['source']}) -- {rate:.2f}/s, {elapsed / 60:.1f}m elapsed",
+                f"[{i + 1}/{len(todo_groups)}] {last_label[:70]!r} -> {finalis} "
+                f"({source}){group_note} -- {rate:.2f}/s, {elapsed / 60:.1f}m elapsed",
                 flush=True,
             )
 
