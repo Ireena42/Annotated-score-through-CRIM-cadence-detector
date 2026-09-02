@@ -2448,3 +2448,53 @@
 {"label": "[JRP] Josquin des Prez — Sancta trinitas", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
 {"label": "[JRP] Josquin des Prez — Sancti Dei omnes", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
 {"label": "[JRP] Josquin des Prez — Te Deum", "collection": "jrp", "finalis": "A", "source": "confident_majority", "detail": "signals: {'low': 'A', 'tone': 'E', 'final': 'A'}"}
+{"label": "[JRP] Josquin des Prez — Te Deum laudamus", "collection": "jrp", "finalis": "E", "source": "confident_majority", "detail": "signals: {'low': 'A', 'tone': 'E', 'final': 'E'}"}
+{"label": "[JRP] Josquin des Prez — Tua est potentia", "collection": "jrp", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'G', 'tone': 'D', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Veni sancte spiritus", "collection": "jrp", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'F', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — A la mort  Monstra te esse matrem", "collection": "jrp", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] Josquin des Prez — A lombre dung buissonnet", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Cela sans plus [Jos2703-Cela_sans_plus]", "collection": "jrp", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'C', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Cela sans plus [Jos2704-Cela_sans_plus]", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Ce povre mendiant  Pauper sum ego", "collection": "jrp", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] Josquin des Prez — De tous biens plaine [Jos2706-De_tous_biens_plaine]", "collection": "jrp", "finalis": "G", "source": "single_signal", "detail": "signals: {'low': None, 'tone': None, 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — De tous biens plaine [Jos2809-De_tous_biens_plaine]", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — En lombre dung buissonnet [Jos2707-En_lombre_dung_buissonnet]", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — En lombre dung buissonnet [Jos2813-En_lombre_dung_buissonnet]", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Entree suis en grant pensee", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Et trop penser", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Fors seulement I", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Josquin des Prez — Fortuna desperata", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] Josquin des Prez — Fortuna dun gran tempo", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] Josquin des Prez — Helas madame", "collection": "jrp", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'D'}"}
+{"label": "[JRP] Josquin des Prez — Helas que pourra", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] Josquin des Prez — Ile fantazies de Joskin", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Jay bien nourry", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Je me", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Je ne demande", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Je nose plus", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] Josquin des Prez — La belle se siet", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] Josquin des Prez — La Bernardina", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] Josquin des Prez — La plus des plus", "collection": "jrp", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] Josquin des Prez — Lheure est venue  Circumdederunt me", "collection": "jrp", "finalis": "A", "source": "confident_majority", "detail": "signals: {'low': 'F', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] Josquin des Prez — Madame helas", "collection": "jrp", "finalis": "B-", "source": "confident_unanimous", "detail": "signals: {'low': 'B-', 'tone': 'B-', 'final': 'B-'}"}
+{"label": "[JRP] Josquin des Prez — Marguerite", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Josquin des Prez — Mes pensees", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] Josquin des Prez — Mon mary ma diffamee", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] Josquin des Prez — Navez point veu mal assenee", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] Josquin des Prez — O Venus bant", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Pensif mari", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Petite camusette [Jos2731-Petite_camusette]", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Josquin des Prez — Petite camusette [Jos3007-Petite_camusette]", "collection": "jrp", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] Josquin des Prez — Quant je vous voye", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Que vous ma dame  In pace", "collection": "jrp", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'C', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Si jay perdu mon amy", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Si jeusse Marion", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Vray dieu damour", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] Josquin des Prez — A lheure", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Ach hulff mich leid", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Adieu mes amours", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Baisiez moy [Jos2804-Baisiez_moy]", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Baisiez moy [Jos3003-Baisiez_moy]", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Josquin des Prez — Belle pour lamour de vous", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Josquin des Prez — Bergerette savoysienne", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] Josquin des Prez — Comment peult avoir joye", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
