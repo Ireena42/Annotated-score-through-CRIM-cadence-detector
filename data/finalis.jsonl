@@ -3148,3 +3148,53 @@
 {"label": "[1520s] Noel Bauldeweyn — Missa En douleur en tristesse: Credo", "collection": "1520s", "finalis": "F", "source": "low_confidence_split", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'G'}"}
 {"label": "[1520s] Noel Bauldeweyn — Missa En douleur en tristesse: Sanctus", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
 {"label": "[1520s] Noel Bauldeweyn — Missa En douleur en tristesse: Agnus", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Noel Bauldeweyn — Exaltabo te Deus meus", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Noel Bauldeweyn — Quam pulchra es", "collection": "1520s", "finalis": "C", "source": "confident_majority", "detail": "signals: {'low': 'A', 'tone': 'C', 'final': 'C'}"}
+{"label": "[1520s] Noel Bauldeweyn — Gloriosus Dei apostolus Bartholomeus:  Motetti de la corona IV", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Noel Bauldeweyn — En douleur en tristesse", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Bisgueria — Confirma hoc Deus", "collection": "1520s", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'C'}"}
+{"label": "[1520s] Johannes Brunet — Ite in orbem", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Boyleau — In principio", "collection": "1520s", "finalis": "E", "source": "confident_unanimous", "detail": "signals: {'low': 'E', 'tone': 'E', 'final': 'E'}"}
+{"label": "[1520s] Nicolas Champion — De profundis clamavi", "collection": "1520s", "finalis": "E", "source": "confident_majority", "detail": "signals: {'low': 'A', 'tone': 'E', 'final': 'E'}"}
+{"label": "[1520s] Jean Conseil — Assumpta est Maria", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Jean Conseil — Ego sum qui sum", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Jean Conseil — Nigra sum", "collection": "1520s", "finalis": "E", "source": "confident_unanimous", "detail": "signals: {'low': 'E', 'tone': 'E', 'final': 'E'}"}
+{"label": "[1520s] Jean Conseil — Egredere ab occidente:  Liber secundus quatuor et viginiti musicales", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Jean Conseil — Pater peccavi", "collection": "1520s", "finalis": "E", "source": "confident_majority", "detail": "signals: {'low': 'A', 'tone': 'E', 'final': 'E'}"}
+{"label": "[1520s] Jean Conseil — Sancta Maria mater Dei", "collection": "1520s", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[1520s] Jean Conseil — Tempus est ut revertar", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Jean Conseil — In illa die suscipiam te:  Liber septimus", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Jean Conseil — Cum inducerent", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Jean Conseil — Adiuva me Domine", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Jean Conseil — O desolatorum consolator:  Cappella Sistina 55", "collection": "1520s", "finalis": "F", "source": "confident_majority", "detail": "signals: {'low': 'F', 'tone': 'C', 'final': 'F'}"}
+{"label": "[1520s] Carpentras — Missa A lombre dung buissonet: Kyrie", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Carpentras — Missa A lombre dung buissonet: Gloria", "collection": "1520s", "finalis": "D", "source": "confident_majority", "detail": "signals: {'low': 'B-', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Carpentras — Missa A lombre dung buissonet: Credo", "collection": "1520s", "finalis": "D", "source": "confident_majority", "detail": "signals: {'low': 'F', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Carpentras — Missa A lombre dung buissonet: Sanctus", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Carpentras — Missa A lombre dung buissonet: Agnus", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Antonius Divitis — O desolatorum consolator", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Antonius Divitis — Magnificat secundi toni", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Antonius Divitis — Magnificat octavi toni:  Jena 20", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Antonius Divitis — Per lignum salvi facti sumus", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Antonius Divitis — Ista est speciosa", "collection": "1520s", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'G', 'final': 'A'}"}
+{"label": "[1520s] Antonius Divitis — Fors seulement:  Bologna Q19", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Erasmus? — Gloriosi principes", "collection": "1520s", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'E', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Costanzo Festa — Quis dabit oculis", "collection": "1520s", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[1520s] Costanzo Festa — O pulcherrima virgo", "collection": "1520s", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'D'}"}
+{"label": "[1520s] Costanzo Festa — Elisabeth beatissima", "collection": "1520s", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[1520s] Costanzo Festa — Regem regum Dominum:  Bologna Q19", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Costanzo Festa — Regem archangelorum", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Costanzo Festa — Super flumina babilonis:  Medici Codex", "collection": "1520s", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'E-', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Costanzo Festa — Deduc me Domine", "collection": "1520s", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'E'}"}
+{"label": "[1520s] Costanzo Festa — Angelus ad pastores", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Costanzo Festa — Regina celi letare", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Costanzo Festa — Tribus miraculis", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Costanzo Festa — Maria virgo prescripta", "collection": "1520s", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'E'}"}
+{"label": "[1520s] Costanzo Festa — Quam pulchra es", "collection": "1520s", "finalis": "F", "source": "low_confidence_split", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'C'}"}
+{"label": "[1520s] Costanzo Festa — Nunc dimittis", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Costanzo Festa — Felix Anna", "collection": "1520s", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'E', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Costanzo Festa — Vidi speciosam", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Costanzo Festa — Congratulamini mihi", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Costanzo Festa — Inviolata integra et casta es", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Costanzo Festa — In illo tempore", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Costanzo Festa — Sub tuum presedium", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
