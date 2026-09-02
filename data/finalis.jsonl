@@ -3548,3 +3548,53 @@
 {"label": "[1520s] Ludwig Senfl — Nunc Deus ad requiem:  Stuttgart 36", "collection": "1520s", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
 {"label": "[1520s] Ludwig Senfl — Nunc dimittis servum tuum", "collection": "1520s", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
 {"label": "[1520s] Ludwig Senfl — O bone Jesu", "collection": "1520s", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'A'}"}
+{"label": "[1520s] Ludwig Senfl — O magnae admirationis:  Zwickau 1676 1788", "collection": "1520s", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'E', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Ludwig Senfl — O mundi Domina:  Zwickau 1676 1788", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Ludwig Senfl — Pange lingua gloriosi I:  Regensburg C120", "collection": "1520s", "finalis": "E", "source": "confident_majority", "detail": "signals: {'low': 'C', 'tone': 'E', 'final': 'E'}"}
+{"label": "[1520s] Ludwig Senfl — Pange lingua gloriosi II:  Sacrorum hymnorum liber primus", "collection": "1520s", "finalis": "E", "source": "confident_unanimous", "detail": "signals: {'low': 'E', 'tone': 'E', 'final': 'E'}"}
+{"label": "[1520s] Ludwig Senfl — Pange lingua gloriosi III:  Zwickau 1676 1788", "collection": "1520s", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'E'}"}
+{"label": "[1520s] Ludwig Senfl — Patris sapientia veritas divina", "collection": "1520s", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[1520s] Ludwig Senfl — Quare fremuerunt gentes", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Ludwig Senfl — Quid vitam sine te:  Concentus", "collection": "1520s", "finalis": "E", "source": "low_confidence_split", "detail": "signals: {'low': 'E', 'tone': 'E', 'final': 'A'}"}
+{"label": "[1520s] Ludwig Senfl — Regina caeli laetare Conscendit iubilans:  Regensburg C120", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Ludwig Senfl — Rubum quem viderat Moyses:  Zwickau 1676 1788", "collection": "1520s", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'A', 'final': 'E'}"}
+{"label": "[1520s] Ludwig Senfl — Salve regina stella maris:  Munich 19", "collection": "1520s", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'G'}"}
+{"label": "[1520s] Ludwig Senfl — Salve rex aeternae misericordiae", "collection": "1520s", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'G'}"}
+{"label": "[1520s] Ludwig Senfl — Sancta et immaculata virginitas:  Regensburg C120", "collection": "1520s", "finalis": "B-", "source": "confident_unanimous", "detail": "signals: {'low': 'B-', 'tone': 'B-', 'final': 'B-'}"}
+{"label": "[1520s] Ludwig Senfl — Sancta et immaculata virginitas II:  Zwickau 1676 1788", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Ludwig Senfl — Sancta Maria Virgo intercede I", "collection": "1520s", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[1520s] Ludwig Senfl — Sum tuus in vita I", "collection": "1520s", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[1520s] Ludwig Senfl — Suscepimus Deus misericordiam tuam", "collection": "1520s", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'E', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Ludwig Senfl — Tristia fata boni", "collection": "1520s", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[1520s] Ludwig Senfl — Usquequo Domine", "collection": "1520s", "finalis": "E", "source": "confident_majority", "detail": "signals: {'low': 'G', 'tone': 'E', 'final': 'E'}"}
+{"label": "[1520s] Ludwig Senfl — Virga Jesse floruit", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Ludwig Senfl — Virgo prudentissima quo progrederis:  Munich 10", "collection": "1520s", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'D'}"}
+{"label": "[1520s] Ludwig Senfl — Fragment:  Herdringen 9820", "collection": "1520s", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'D'}"}
+{"label": "[1520s] Ludwig Senfl — Conditor alme siderum", "collection": "1520s", "finalis": "F", "source": "low_confidence_split", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'A'}"}
+{"label": "[1520s] Ludwig Senfl — Da pacem Domine II", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Ludwig Senfl — Genuit puerpera", "collection": "1520s", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'A', 'final': 'G'}"}
+{"label": "[1520s] Ludwig Senfl — Ne reminiscaris Domine", "collection": "1520s", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'E'}"}
+{"label": "[1520s] Ludwig Senfl — O sacrum convivium II", "collection": "1520s", "finalis": "B-", "source": "low_confidence_split", "detail": "signals: {'low': 'B-', 'tone': 'B-', 'final': 'F'}"}
+{"label": "[1520s] Ludwig Senfl — Qui prophetice prompsisti", "collection": "1520s", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'A'}"}
+{"label": "[1520s] Ludwig Senfl — Quomodo fiet", "collection": "1520s", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'G'}"}
+{"label": "[1520s] Ludwig Senfl — Salva nos Domine", "collection": "1520s", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'E'}"}
+{"label": "[1520s] Ludwig Senfl — Sum tuus in vita II:  Bartfa 22", "collection": "1520s", "finalis": "E", "source": "low_confidence_split", "detail": "signals: {'low': 'E', 'tone': 'C', 'final': 'B'}"}
+{"label": "[1520s] Ludwig Senfl — Vivo ego dicit Dominus:  Copenhagen 1872", "collection": "1520s", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[1520s] Pierrequin de Therache — Verbum bonum et suave", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Pierrequin de Therache — Clare sanctorum", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Philippe Verdelot — Sancta Maria succurre miseris", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Philippe Verdelot — Ave sanctissima Maria", "collection": "1520s", "finalis": "D", "source": "confident_majority", "detail": "signals: {'low': 'G', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Philippe Verdelot — Tanto tempore", "collection": "1520s", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': None, 'final': 'G'}"}
+{"label": "[1520s] Philippe Verdelot — O dulcissime Domine Jesu Christe", "collection": "1520s", "finalis": "E", "source": "confident_majority", "detail": "signals: {'low': 'A', 'tone': 'E', 'final': 'E'}"}
+{"label": "[1520s] Philippe Verdelot — Deus in nomine tuo", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Philippe Verdelot — Gaudeamus omnes in Domino", "collection": "1520s", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[1520s] Philippe Verdelot — Victime pascali laudes", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Philippe Verdelot — Ad Dominum cum tribularer", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Philippe Verdelot — Hesterna die", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Philippe Verdelot — Si bona suscepimus", "collection": "1520s", "finalis": "A", "source": "confident_majority", "detail": "signals: {'low': 'D', 'tone': 'A', 'final': 'A'}"}
+{"label": "[1520s] Philippe Verdelot — In te Domine speravi", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Philippe Verdelot — Ave gratia plena", "collection": "1520s", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'E'}"}
+{"label": "[1520s] Philippe Verdelot — Recordare Domine", "collection": "1520s", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'E'}"}
+{"label": "[1520s] Philippe Verdelot — Sancta Maria virgo virginum", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Philippe Verdelot — Congregati sunt", "collection": "1520s", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'G'}"}
+{"label": "[1520s] Philippe Verdelot — Salve Barbara", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
