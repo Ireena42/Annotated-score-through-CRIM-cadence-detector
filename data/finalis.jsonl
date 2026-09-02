@@ -4298,3 +4298,17 @@
 {"label": "[Lassus Psalms] Benedicam dominum", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
 {"label": "[Lassus Psalms] Iudica domine nocentes", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
 {"label": "[Lassus Psalms] Dixit iniustus", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Lassus Psalms] Noli aemulari", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Dixi custodiam", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Lassus Psalms] Expectans expectavi", "collection": "lassus_psalms", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[Lassus Psalms] Beatus qui intelligit", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Lassus Psalms] Quemadmodum desiderat", "collection": "lassus_psalms", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[Lassus Psalms] Iudica me deus", "collection": "lassus_psalms", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[Lassus Psalms] Deus auribus nostris", "collection": "lassus_psalms", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[Lassus Psalms] Eructavit cor meum", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Deus noster refugium", "collection": "lassus_psalms", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[Lassus Psalms] Omnes gentes", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Magnus dominus", "collection": "lassus_psalms", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[Lassus Psalms] Audite haec omnes gentes", "collection": "lassus_psalms", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[Lassus Psalms] Deus deorum dominus", "collection": "lassus_psalms", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'C', 'final': 'E'}"}
+{"label": "[Lassus Psalms] Miserere mei deus", "collection": "lassus_psalms", "finalis": "G", "source": "low_confidence_split", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'E'}"}
