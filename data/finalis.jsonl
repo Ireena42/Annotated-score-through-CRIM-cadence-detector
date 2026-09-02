@@ -2848,3 +2848,53 @@
 {"label": "[JRP] de Orto, Marbrianus — Missa Ad fugam: Gloria", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
 {"label": "[JRP] de Orto, Marbrianus — Missa Ad fugam: Credo", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
 {"label": "[JRP] de Orto, Marbrianus — Missa Ad fugam: Sanctus", "collection": "jrp", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'D'}"}
+{"label": "[JRP] de Orto, Marbrianus — Missa Ad fugam: Agnus", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] de Orto, Marbrianus — Kyrie De beata virgine", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] de Orto, Marbrianus — Credo Le serviteur", "collection": "jrp", "finalis": "D", "source": "confident_majority", "detail": "signals: {'low': 'B-', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] de Orto, Marbrianus — Credo a 5", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] de Orto, Marbrianus — Ave Maria gratia plena", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] de Orto, Marbrianus — Ave Maria mater gratie", "collection": "jrp", "finalis": "E", "source": "confident_majority", "detail": "signals: {'low': 'A', 'tone': 'E', 'final': 'E'}"}
+{"label": "[JRP] de Orto, Marbrianus — Domine non secundum peccata nostra", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] de Orto, Marbrianus — Lamentatio Jeremie prophete", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] de Orto, Marbrianus — Lucis creator optime", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] de Orto, Marbrianus — Ut queant laxis", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] de Orto, Marbrianus — Salve regis mater sanctissima  Hic est sacerdos", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] de Orto, Marbrianus — Descendi in ortum meum", "collection": "jrp", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'G'}"}
+{"label": "[JRP] de Orto, Marbrianus — Dung aultre amer", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] de Orto, Marbrianus — Dulces exuvie", "collection": "jrp", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] de Orto, Marbrianus — Fors seulement", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] de Orto, Marbrianus — Je ne suis poinct", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] de Orto, Marbrianus — La mi la sol", "collection": "jrp", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'E'}"}
+{"label": "[JRP] de Orto, Marbrianus — Si jay perdu mon amy", "collection": "jrp", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'E-', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] de Orto, Marbrianus — Venus tu ma pris", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] Pipelare, Matthaeus — Missa Fors seulement: Kyrie", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Pipelare, Matthaeus — Missa Fors seulement: Gloria", "collection": "jrp", "finalis": "D", "source": "confident_majority", "detail": "signals: {'low': 'F', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Pipelare, Matthaeus — Missa Fors seulement: Credo", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Pipelare, Matthaeus — Missa Fors seulement: Sanctus", "collection": "jrp", "finalis": "F", "source": "confident_majority", "detail": "signals: {'low': 'F', 'tone': 'D', 'final': 'F'}"}
+{"label": "[JRP] Pipelare, Matthaeus — Missa Fors seulement: Agnus", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Regis, Johannes — Ave Maria ... benedicta tu", "collection": "jrp", "finalis": "D", "source": "confident_majority", "detail": "signals: {'low': 'B-', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Regis, Johannes — Clangat plebs flores  Sicut lilium", "collection": "jrp", "finalis": null, "source": "error", "detail": "ValueError: invalid literal for int() with base 10: '~142'"}
+{"label": "[JRP] Regis, Johannes — Lauda Sion salvatorem  Ego sum panis", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Regis, Johannes — Lux solemnis  Repleti sunt omnes", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Alleluia: Kyrie", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Alleluia: Gloria", "collection": "jrp", "finalis": "F", "source": "confident_majority", "detail": "signals: {'low': 'F', 'tone': 'C', 'final': 'F'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Almana: Kyrie", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Almana: Gloria", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Almana: Credo", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Almana: Sanctus", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Almana: Agnus", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Assumpta est Maria: Kyrie", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Assumpta est Maria: Gloria", "collection": "jrp", "finalis": "A-", "source": "low_confidence_split", "detail": "signals: {'low': 'A-', 'tone': None, 'final': 'C'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Assumpta est Maria: Credo", "collection": "jrp", "finalis": "C", "source": "confident_majority", "detail": "signals: {'low': 'A', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Assumpta est Maria: Sanctus", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Assumpta est Maria: Agnus", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Ave Maria: Kyrie", "collection": "jrp", "finalis": "A", "source": "confident_majority", "detail": "signals: {'low': 'F', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Ave Maria: Gloria", "collection": "jrp", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Ave Maria: Credo", "collection": "jrp", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Ave Maria: Sanctus", "collection": "jrp", "finalis": "C", "source": "confident_majority", "detail": "signals: {'low': 'C', 'tone': 'E', 'final': 'C'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Ave Maria: Agnus", "collection": "jrp", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Ave sanctissima Maria: Kyrie", "collection": "jrp", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'C', 'final': 'G'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Ave sanctissima Maria: Gloria", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Ave sanctissima Maria: Credo", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Ave sanctissima Maria: Sanctus", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] la Rue, Pierre de — Missa Ave sanctissima Maria: Agnus", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
