@@ -4312,3 +4312,8 @@
 {"label": "[Lassus Psalms] Audite haec omnes gentes", "collection": "lassus_psalms", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
 {"label": "[Lassus Psalms] Deus deorum dominus", "collection": "lassus_psalms", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'C', 'final': 'E'}"}
 {"label": "[Lassus Psalms] Miserere mei deus", "collection": "lassus_psalms", "finalis": "G", "source": "low_confidence_split", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'E'}"}
+{"label": "[1520s] Anonymous — Missa de Assumptione: Kyrie  Montserrat 766", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Anonymous — Missa de Assumptione: Gloria  Montserrat 766", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Anonymous — Missa de Assumptione: Credo  Montserrat 766", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Anonymous — Missa de Assumptione: Sanctus  Montserrat 766", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Anonymous — Missa de Assumptione: Agnus  Montserrat 766", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
