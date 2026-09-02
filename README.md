@@ -30,7 +30,10 @@ Palestrina's polyphony — the app itself has no dependency on that project.
 **[Open the live app](https://renaissance-polyphony-research-toolkit.streamlit.app/)**
 — no install needed, just a browser. First load after a quiet spell can
 take 30-60s while it wakes up (Streamlit Community Cloud's free tier
-sleeps idle apps); after that it's fast.
+sleeps idle apps); after that it's fast. `.github/workflows/keep_awake.yml`
+pings the app every 6 hours specifically to keep this from happening in
+the first place — a scheduled `curl`, no external service needed, free
+to run indefinitely on a public repo.
 
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://renaissance-polyphony-research-toolkit.streamlit.app/)
 

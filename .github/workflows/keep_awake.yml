@@ -1,0 +1,29 @@
+name: Keep App Awake
+
+# Streamlit Community Cloud's free tier puts an app to sleep after a
+# period with no incoming traffic -- the next visitor then has to wait
+# through a ~30-60s cold start (see README's own "first load after a
+# quiet spell" note). A scheduled HTTP GET is the standard, widely-used
+# fix: it's genuine inbound traffic, which is what actually resets
+# Streamlit Cloud's idle timer, not a full interactive browser session
+# specifically. Every 6 hours is a comfortable safety margin under
+# whatever the real sleep threshold is (not precisely documented by
+# Streamlit, community reports range from about a day to about a week
+# of total silence).
+#
+# Free to run indefinitely: GitHub Actions minutes are unlimited for
+# public repos, and this job takes seconds.
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:  # manual trigger, e.g. to test this works right after adding it
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the app to keep Streamlit Cloud from putting it to sleep
+        run: |
+          curl -sSL --max-time 60 -o /dev/null -w "HTTP %{http_code}, %{time_total}s\n" \
+            "https://renaissance-polyphony-research-toolkit.streamlit.app/"
