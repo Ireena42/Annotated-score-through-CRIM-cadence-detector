@@ -4248,3 +4248,53 @@
 {"label": "[SEILS] Luzzaschi — sellauro_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
 {"label": "[SEILS] Macque — goditipur_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
 {"label": "[SEILS] Manara — chiama_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Marenzio — mentrelaura_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Massaino — lafiamma_mn", "collection": "seils", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[SEILS] Mileville — tramille_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Mosto — seccoe_mn", "collection": "seils", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[SEILS] Perue — seitu_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Pigna — giustodis_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Porta — lopensai_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Spontone — tamai_mn", "collection": "seils", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[SEILS] Stabile — fullauro_mn", "collection": "seils", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[SEILS] Strigio — conlaura_mn", "collection": "seils", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': None, 'final': 'E'}"}
+{"label": "[SEILS] Vecchi — fummofelici_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Virchi — arsimentre_mn", "collection": "seils", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[SEILS] Wert — horfuggi_mn", "collection": "seils", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[SEILS] Zoilo — invano_mn", "collection": "seils", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'E'}"}
+{"label": "[Lassus Psalms] Beatus vir", "collection": "lassus_psalms", "finalis": "C", "source": "confident_majority", "detail": "signals: {'low': 'A', 'tone': 'C', 'final': 'C'}"}
+{"label": "[Lassus Psalms] Quare fremuerunt gentes", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Domine quid multiplicati", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Lassus Psalms] Cum invocarem", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Lassus Psalms] Verba mea auribus", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Lassus Psalms] Domine ne in furore [06-domine-ne-in-furore]", "collection": "lassus_psalms", "finalis": "E", "source": "confident_majority", "detail": "signals: {'low': 'C', 'tone': 'E', 'final': 'E'}"}
+{"label": "[Lassus Psalms] Domine ne in furore [37-domine-ne-in-furore]", "collection": "lassus_psalms", "finalis": "E", "source": "single_signal", "detail": "signals: {'low': None, 'tone': None, 'final': 'E'}; cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Lassus Psalms] Domine deus meus", "collection": "lassus_psalms", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'E'}"}
+{"label": "[Lassus Psalms] Domine dominus noster", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Confitebor tibi domine", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] In domino confido", "collection": "lassus_psalms", "finalis": "F", "source": "low_confidence_split", "detail": "signals: {'low': 'F', 'tone': 'A', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Salvum me fac deus", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Lassus Psalms] Usquequo domine", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Lassus Psalms] Dixit insipiens", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Lassus Psalms] Domine quis habitabit", "collection": "lassus_psalms", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[Lassus Psalms] Conserva me domine", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Lassus Psalms] Exaudi domine iustitiam", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Lassus Psalms] Diligam te domine", "collection": "lassus_psalms", "finalis": "F", "source": "confident_majority", "detail": "signals: {'low': 'D', 'tone': 'F', 'final': 'F'}"}
+{"label": "[Lassus Psalms] Caeli enarrant", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Exaudiat te dominus", "collection": "lassus_psalms", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[Lassus Psalms] Domine in virtute tua", "collection": "lassus_psalms", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[Lassus Psalms] Deus deus meus respice", "collection": "lassus_psalms", "finalis": "A", "source": "confident_majority", "detail": "signals: {'low': 'F', 'tone': 'A', 'final': 'A'}"}
+{"label": "[Lassus Psalms] Dominus regit me", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Domini est terra", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Ad te domine levavi animam", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Iudica me domine", "collection": "lassus_psalms", "finalis": "F", "source": "confident_majority", "detail": "signals: {'low': 'D', 'tone': 'F', 'final': 'F'}"}
+{"label": "[Lassus Psalms] Dominus illuminatio mea", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Ad te domine clamavi", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Afferte domino", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Exaltabo te domine", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] In te domine speravi", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Beati quorum", "collection": "lassus_psalms", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[Lassus Psalms] Exultate iusti in domino", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Lassus Psalms] Benedicam dominum", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Iudica domine nocentes", "collection": "lassus_psalms", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Lassus Psalms] Dixit iniustus", "collection": "lassus_psalms", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
