@@ -3698,3 +3698,53 @@
 {"label": "[1520s] Adrian Willaert — Beatus Stephanus", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
 {"label": "[1520s] Adrian Willaert — Precatus est Moyses", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
 {"label": "[1520s] Adrian Willaert — Dulces exuviae", "collection": "1520s", "finalis": "E", "source": "confident_unanimous", "detail": "signals: {'low': 'E', 'tone': 'E', 'final': 'E'}"}
+{"label": "[1520s] Adrian Willaert — Petite Camusette", "collection": "1520s", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[1520s] Adrian Willaert — Irons nous tous jours coucher", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Adrian Willaert — Mon petit cueur", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Adrian Willaert — Jayme bien mon amy I", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Adrian Willaert — Jayme bien mon amy II", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Adrian Willaert — Mon mary ma diffamee", "collection": "1520s", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[1520s] Adrian Willaert — Je lay aymee bien sept ans et demy", "collection": "1520s", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'G'}"}
+{"label": "[1520s] Adrian Willaert — Si je ne voy mamie", "collection": "1520s", "finalis": "C", "source": "single_signal", "detail": "signals: {'low': None, 'tone': None, 'final': 'C'}"}
+{"label": "[1520s] Adrian Willaert — A laventure lentrepris", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Adrian Willaert — Mon cueur mon corps", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Adrian Willaert — Dessus le marche darras", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Adrian Willaert — Allons allons gay", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Adrian Willaert — Or suis je bien au pire", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Adrian Willaert — Jayme par amours", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Adrian Willaert — Qui la dira la peine de mon cueur", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Adrian Willaert — La rouse du moys de may", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Adrian Willaert — Dessus nostre treille de may", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Adrian Willaert — Qui est celuy qui a dit mal du con", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Adrian Willaert — Sire dondieu", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Adrian Willaert — Jan Jan quant tu ten iras", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Adrian Willaert — Je ne scaroys chanter ne rire", "collection": "1520s", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[1520s] Adrian Willaert — Qui veult aymer il fault estre joyeulx", "collection": "1520s", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[1520s] Adrian Willaert — Baises moy tant tant I", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Adrian Willaert — La jeusne dame va au molin", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Adrian Willaert — Quant le joly Robinet", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Adrian Willaert — Baises moy tant tant II", "collection": "1520s", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[1520s] Adrian Willaert — Vous marchez du bout du pie", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Adrian Willaert — Perot viendras tu aux nopces", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Adrian Willaert — Na tu point veu la viscontine", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Adrian Willaert — Jay veu le regnart II", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Adrian Willaert — He Dieu Helayne", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Porto (1625) — Vorrai dunque pur Silvia", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Marotta (1600) — Ho visto al pianto mio", "collection": "tasso", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'G'}"}
+{"label": "[Tasso] Melli (1602) — Ho visto al pianto mio", "collection": "tasso", "finalis": "G", "source": "low_confidence_split", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'F'}"}
+{"label": "[Tasso] Massaino (1604) — Ho visto al pianto mio", "collection": "tasso", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[Tasso] Boschetti (1613) — Ho visto al pianto mio", "collection": "tasso", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Tasso] Benedetti (1617) — Ho visto al pianto mio", "collection": "tasso", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'G'}"}
+{"label": "[Tasso] Macigni (1617) — Ho visto al pianto mio", "collection": "tasso", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'E'}"}
+{"label": "[Tasso] Marotta (1600) — Essendo io fanciulletto  si che a pena", "collection": "tasso", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[Tasso] Marotta (1600) — Di questa parlo ahi lasso Vissi a questa", "collection": "tasso", "finalis": "F", "source": "low_confidence_split", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'A'}"}
+{"label": "[Tasso] Marotta (1600) — Ma mentre io fea rapina di animali", "collection": "tasso", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'A'}"}
+{"label": "[Tasso] Marotta (1600) — E bevea da suoi lumi", "collection": "tasso", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'D'}"}
+{"label": "[Tasso] Marotta (1600) — A lombra di un bel faggio Silvia e Filli", "collection": "tasso", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'G'}"}
+{"label": "[Tasso] Marotta (1600) — Ma la mia bella Silvia disse Taci", "collection": "tasso", "finalis": "F#", "source": "low_confidence_split", "detail": "signals: {'low': 'F#', 'tone': 'D', 'final': 'E'}"}
+{"label": "[Tasso] Marotta (1600) — Cosi dicendo avvicino le labbra", "collection": "tasso", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': None, 'final': 'C'}"}
+{"label": "[Tasso] Marotta (1600) — Io che fin a quel punto altro non volsi", "collection": "tasso", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'F', 'final': 'C'}"}
+{"label": "[Tasso] Marotta (1600) — E fatto non so come astuto e scaltro", "collection": "tasso", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'G'}"}
+{"label": "[Tasso] Marotta (1600) — La semplicetta Silvia", "collection": "tasso", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'G'}"}
+{"label": "[Tasso] Marotta (1600) — Ne lapi dalcun fiore", "collection": "tasso", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[Tasso] Marotta (1600) — Ma mentre al cor scendeva", "collection": "tasso", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
