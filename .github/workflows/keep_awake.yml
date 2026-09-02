@@ -11,6 +11,18 @@ name: Keep App Awake
 # Streamlit, community reports range from about a day to about a week
 # of total silence).
 #
+# A plain `curl -L` (no cookies) FAILS here -- confirmed directly, not
+# assumed: this app's own URL redirects through Streamlit Cloud's own
+# visitor-identification flow (app -> share.streamlit.io/-/auth/app ->
+# a one-time /-/login?payload=... URL -> back to the app), which sets a
+# cookie to remember "this visitor already passed through". Without a
+# cookie jar to accept and resend it, every hop looks like a brand-new
+# visitor and the redirect never terminates -- curl gives up after its
+# default 50-redirect cap with exit code 47 ("too many redirects"),
+# which is exactly what run #1 of this workflow hit in practice before
+# this fix (-c/-b below to persist cookies across the redirect chain,
+# confirmed directly to resolve in 3 redirects and a real 200 instead).
+#
 # Free to run indefinitely: GitHub Actions minutes are unlimited for
 # public repos, and this job takes seconds.
 
@@ -25,5 +37,8 @@ jobs:
     steps:
       - name: Ping the app to keep Streamlit Cloud from putting it to sleep
         run: |
-          curl -sSL --max-time 60 -o /dev/null -w "HTTP %{http_code}, %{time_total}s\n" \
+          curl -sSL --max-time 60 \
+            -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36" \
+            -c cookies.txt -b cookies.txt \
+            -o /dev/null -w "HTTP %{http_code}, %{num_redirects} redirects, %{time_total}s\n" \
             "https://renaissance-polyphony-research-toolkit.streamlit.app/"
