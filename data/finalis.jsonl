@@ -4198,3 +4198,53 @@
 {"label": "[Tasso] Baccusi (1594) — Chiudesti i lumi Armida il cielo avaro", "collection": "tasso", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': None, 'final': 'A'}"}
 {"label": "[Tasso] IlVerso (1603) — Chiudesti i lumi Armida il cielo avaro", "collection": "tasso", "finalis": "D", "source": "confident_majority", "detail": "signals: {'low': 'F', 'tone': 'D', 'final': 'D'}"}
 {"label": "[Tasso] Cifra (1613) — Chiudesti i lumi Armida il cielo avaro", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Chiudesti i lumi Armida il cielo avaro", "collection": "tasso", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Or che fara Dee su lignuda arena", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Montverdi (1592) — Poi chella in se torno deserto e muto", "collection": "tasso", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Tasso] IlVerso (1605) — Poi chella in se torno", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Poi chella in se torno deserto e muto", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Che fa piu meco il pianto Altrarme altrarte", "collection": "tasso", "finalis": "B-", "source": "low_confidence_split", "detail": "signals: {'low': 'B-', 'tone': 'B-', 'final': 'D'}"}
+{"label": "[Tasso] IlVerso (1605) — Misera Armida allor dovevi e degno", "collection": "tasso", "finalis": "B-", "source": "low_confidence_split", "detail": "signals: {'low': 'B-', 'tone': 'B-', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Misera Armida allor dovevi e degno", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Questa bellezza mia sara mercede", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Mazzocchi (1640) — Signor non sotto lombra in piaggia molle", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Wert (1586) — Misera non credea cha gli occhi miei", "collection": "tasso", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'A'}"}
+{"label": "[Tasso] Baccusi (1594) — Misera non credea cha gli occhi miei", "collection": "tasso", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'E'}"}
+{"label": "[Tasso] DIndia (1609) — Misera non credea cha gli occhi miei", "collection": "tasso", "finalis": "G", "source": "single_signal", "detail": "signals: {'low': None, 'tone': None, 'final': 'G'}; cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Cifra (1614) — Misera non credea cha gli occhi miei", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Negri (1635) — Misera non credea cha gli occhi miei", "collection": "tasso", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'G', 'tone': 'D', 'final': 'G'}"}
+{"label": "[Tasso] Wert (1586) — Ma che squallido e scuro anco mi piaci", "collection": "tasso", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Tasso] Baccusi (1594) — Ma che squallido e scuro anco mi piaci", "collection": "tasso", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[Tasso] DIndia (1609) — Ma che squallido e scuro anco mi piaci", "collection": "tasso", "finalis": "G", "source": "single_signal", "detail": "signals: {'low': None, 'tone': None, 'final': 'G'}; cadences() failed: ValueError: Columns must be same length as key"}
+{"label": "[Tasso] Cifra (1614) — Ma che squallido e scuro anco mi piaci", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Negri (1635) — Ma che squallido e scuro anco mi piaci", "collection": "tasso", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'G'}"}
+{"label": "[Tasso] Cifra (1613) — Pietosa bocca che solevi in vita", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Piacquele assai che n quelle valli ombrose", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Ah ma non fia che fra tantarmi e tante", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Dimostratevi in me chio vi perdono", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Felice me se nel morir non reco", "collection": "tasso", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Qui tacque e stabilito il suo pensiero", "collection": "tasso", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Tasso] Cifra (1613) — Si volse Armida el rimiro improvviso", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Si volse Armida e l rimiro improvviso", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — E l bel volto e l bel seno a la meschina", "collection": "tasso", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Tasso] Eredi (1629) — E con man languidetta il forte braccio", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Cifra (1614) — O sempre e quando parti e quando torni", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — O sempre e quando parti e quando torni", "collection": "tasso", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[Tasso] Cifra (1614) — Certo e scemo il tuo onor se non saddita", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[Tasso] Eredi (1629) — Cosi doleasi e con le flebil onde", "collection": "tasso", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Alberti — dalmio_mn", "collection": "seils", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[SEILS] Bardi — lauroohi_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Belli — amorcon_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Bertani — moviil_mn", "collection": "seils", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[SEILS] Correggio — mentreil_mn", "collection": "seils", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[SEILS] DaLocca — perose_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Eremita — merpur_mn", "collection": "seils", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[SEILS] Fiorino — delanima_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Fronti — comehor_mn", "collection": "seils", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[SEILS] Gabrielli — oinprimavera_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Giovannelli — nelfoco_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Ingegneri — gianon_mn", "collection": "seils", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[SEILS] Isnardi — apiedun_mn", "collection": "seils", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[SEILS] Luzzaschi — sellauro_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Macque — goditipur_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[SEILS] Manara — chiama_mn", "collection": "seils", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
