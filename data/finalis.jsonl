@@ -1848,3 +1848,53 @@
 {"label": "[JRP] Busnoys, Antoine — Au povre par necessite", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
 {"label": "[JRP] Busnoys, Antoine — A vous sans aultre", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
 {"label": "[JRP] Busnoys, Antoine — Bel Acueil le sergent dAmours", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Busnoys, Antoine — Bone chere", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Ce nest pas moy", "collection": "jrp", "finalis": "B-", "source": "confident_unanimous", "detail": "signals: {'low': 'B-', 'tone': 'B-', 'final': 'B-'}"}
+{"label": "[JRP] Busnoys, Antoine — Cest bien malheur", "collection": "jrp", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] Busnoys, Antoine — Cest vous en qui jay esperance", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Busnoys, Antoine — Con tutta gentileca", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Corps digne  Dieu quel mariage", "collection": "jrp", "finalis": "F", "source": "confident_majority", "detail": "signals: {'low': 'D', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] Busnoys, Antoine — En soustenant vostre querelle", "collection": "jrp", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] Busnoys, Antoine — En tous les lieux", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] Busnoys, Antoine — En voyant sa dame", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] Busnoys, Antoine — Estil merchy", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Faites de moy", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Faulx mesdisans", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] Busnoys, Antoine — Ha que ville I", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Ha que ville II", "collection": "jrp", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'G', 'tone': 'D', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — In myne zynn", "collection": "jrp", "finalis": null, "source": "error", "detail": "cadences() failed: TypeError: '<' not supported between instances of 'float' and 'Note'"}
+{"label": "[JRP] Busnoys, Antoine — Ja que li ne si attende", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] Busnoys, Antoine — Jay mains de biens", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Je mesbais de vous", "collection": "jrp", "finalis": "B-", "source": "low_confidence_split", "detail": "signals: {'low': 'B-', 'tone': 'D', 'final': 'F'}"}
+{"label": "[JRP] Busnoys, Antoine — Je ne demande aultre degre", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] Busnoys, Antoine — Joye me fuit", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Busnoys, Antoine — Lautrier la pieca", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Busnoys, Antoine — Lautrier que passa", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Le corps sen va", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Busnoys, Antoine — Le monde est tel", "collection": "jrp", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[JRP] Busnoys, Antoine — Ma demoiselle ma maistresse", "collection": "jrp", "finalis": "E", "source": "low_confidence_split", "detail": "signals: {'low': 'E', 'tone': 'E', 'final': 'A'}"}
+{"label": "[JRP] Busnoys, Antoine — Maintes femmes", "collection": "jrp", "finalis": "A", "source": "confident_majority", "detail": "signals: {'low': 'A', 'tone': 'D', 'final': 'A'}"}
+{"label": "[JRP] Busnoys, Antoine — Ma plus quassez", "collection": "jrp", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'F', 'final': 'C'}"}
+{"label": "[JRP] Busnoys, Antoine — Ma tres souveraine princesse", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Ma vostre cueur", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Busnoys, Antoine — Mon mignault  Gracieuse plaisante muniere", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Mon seul et cele souvenir", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — O Fortune trop tu es dure", "collection": "jrp", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'E-', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — On a grant mal  On est bien malade", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Pour entretenir mes amours", "collection": "jrp", "finalis": "D", "source": "confident_majority", "detail": "signals: {'low': 'F', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Busnoys, Antoine — Pucellotte que dieu vous gart", "collection": "jrp", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Quant jay au cueur", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Busnoys, Antoine — Quant vous me ferez", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Busnoys, Antoine — Quelque pauvre homme I", "collection": "jrp", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[JRP] Busnoys, Antoine — Quelque pauvre homme II", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Busnoys, Antoine — Resjois toy terre de France  Rex pacificus", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Seule a par moy", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Soudainement mon cueur a pris", "collection": "jrp", "finalis": "D", "source": "confident_majority", "detail": "signals: {'low': 'D', 'tone': 'A', 'final': 'D'}"}
+{"label": "[JRP] Busnoys, Antoine — Terrible dame", "collection": "jrp", "finalis": "G", "source": "low_confidence_split", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'C'}"}
+{"label": "[JRP] Busnoys, Antoine — Une filleresse destouppes  Sil y a compagnon  Vostre amour", "collection": "jrp", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[JRP] Busnoys, Antoine — Ung grand povre homme", "collection": "jrp", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'C', 'final': 'F'}"}
+{"label": "[JRP] Busnoys, Antoine — Ung que plus tous I", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Ung plus que tous II", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Vous marchez  Marionnette", "collection": "jrp", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[JRP] Busnoys, Antoine — Vostre gracieuse acointance", "collection": "jrp", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[JRP] Busnoys, Antoine — Jay pris amours", "collection": "jrp", "finalis": "D", "source": "confident_majority", "detail": "signals: {'low': 'D', 'tone': 'A', 'final': 'D'}"}
