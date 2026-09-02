@@ -3198,3 +3198,53 @@
 {"label": "[1520s] Costanzo Festa — Inviolata integra et casta es", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
 {"label": "[1520s] Costanzo Festa — In illo tempore", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
 {"label": "[1520s] Costanzo Festa — Sub tuum presedium", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Costanzo Festa — Ecce Deus salvator meus", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Costanzo Festa — Regina celi", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Costanzo Festa — Petrus apostolus", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Costanzo Festa — Lieto non hebbi mai", "collection": "1520s", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[1520s] Sebastiano Festa — Angele Dei", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Sebastiano Festa — Hec est illa dulcis rosa", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Sebastiano Festa — In illo tempore postquam", "collection": "1520s", "finalis": "G", "source": "low_confidence_split", "detail": "signals: {'low': 'G', 'tone': 'D', 'final': 'B-'}"}
+{"label": "[1520s] Sebastiano Festa — Virgo gloriosa Christi", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Sebastiano Festa — Lultimo di de maggio", "collection": "1520s", "finalis": "B-", "source": "low_confidence_split", "detail": "signals: {'low': 'B-', 'tone': 'B-', 'final': 'F'}"}
+{"label": "[1520s] Sebastiano Festa — Amor che me tormenti", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Sebastiano Festa — Amor se voi chio torni", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Sebastiano Festa — Ben mi credea passar", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Sebastiano Festa — Come senza costei viver", "collection": "1520s", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[1520s] Sebastiano Festa — O passi sparsi", "collection": "1520s", "finalis": "A", "source": "confident_unanimous", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'A'}"}
+{"label": "[1520s] Sebastiano Festa — Vergine sacra", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Sebastiano Festa — Perche quel che mi trasse", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Sebastiano Festa — Sel pensier che mi strugge", "collection": "1520s", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'E-', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Antoine de Févin — Sancta trinitas", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Nicolas Gombert — Missa Quam pulchra es: Kyrie", "collection": "1520s", "finalis": "F", "source": "confident_majority", "detail": "signals: {'low': 'D', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Nicolas Gombert — Missa Quam pulchra es: Gloria", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Nicolas Gombert — Missa Media vita: Kyrie", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Dicite in magni", "collection": "1520s", "finalis": "B-", "source": "low_confidence_split", "detail": "signals: {'low': 'B-', 'tone': None, 'final': 'F'}"}
+{"label": "[1520s] Nicolas Gombert — Angelus Domini", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Nicolas Gombert — Suscipe verbum", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Nicolas Gombert — Qui colis Ausoniam", "collection": "1520s", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Aspice Domine", "collection": "1520s", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'E-', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Super flumina Babilonis", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Dignare me", "collection": "1520s", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': None, 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Egregie martir", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Beati omnes", "collection": "1520s", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'E', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Fidelium deus omnium", "collection": "1520s", "finalis": "G", "source": "confident_majority", "detail": "signals: {'low': 'E', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Ave sanctissima Maria", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Inter natos mulierum", "collection": "1520s", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Fuit homo missus a deo", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Quam pulchra es", "collection": "1520s", "finalis": "F", "source": "confident_majority", "detail": "signals: {'low': 'F', 'tone': 'C', 'final': 'F'}"}
+{"label": "[1520s] Nicolas Gombert — Dulcis amica", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': None, 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Conceptio tua Dei genitrix virgo", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Homo erat in Jerusalem", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Nicolas Gombert — Regina celi letare", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
+{"label": "[1520s] Nicolas Gombert — Levavi oculos meos", "collection": "1520s", "finalis": "D", "source": "low_confidence_split", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Gaude mater ecclesia:  Secundus tomus", "collection": "1520s", "finalis": "A", "source": "low_confidence_split", "detail": "signals: {'low': 'A', 'tone': 'A', 'final': 'D'}"}
+{"label": "[1520s] Nicolas Gombert — Gris et tanne me fault porter", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Nicolas Gombert — Alleluya my fault chanter", "collection": "1520s", "finalis": "B-", "source": "low_confidence_split", "detail": "signals: {'low': 'B-', 'tone': 'D', 'final': 'G'}"}
+{"label": "[1520s] Mathieu Gascongne — Missa Mijn herte altijt: Kyrie", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Mathieu Gascongne — Missa Mijn herte altijt: Sanctus", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Mathieu Gascongne — Missa Mijn herte altijt: Agnus", "collection": "1520s", "finalis": "D", "source": "confident_unanimous", "detail": "signals: {'low': 'D', 'tone': 'D', 'final': 'D'}"}
+{"label": "[1520s] Mathieu Gascongne — Dulcis mater", "collection": "1520s", "finalis": "C", "source": "low_confidence_split", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'G'}"}
+{"label": "[1520s] Mathieu Gascongne — Osculetur me", "collection": "1520s", "finalis": "C", "source": "confident_unanimous", "detail": "signals: {'low': 'C', 'tone': 'C', 'final': 'C'}"}
+{"label": "[1520s] Mathieu Gascongne — Dignare me", "collection": "1520s", "finalis": "G", "source": "confident_unanimous", "detail": "signals: {'low': 'G', 'tone': 'G', 'final': 'G'}"}
+{"label": "[1520s] Mathieu Gascongne — Caro mea vere est cibus", "collection": "1520s", "finalis": "F", "source": "confident_unanimous", "detail": "signals: {'low': 'F', 'tone': 'F', 'final': 'F'}"}
