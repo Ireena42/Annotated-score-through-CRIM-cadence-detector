@@ -261,7 +261,29 @@ def annotate_presentation_types(score, ptypes, part_names):
         rule (confirmed directly against a real piece before relying
         on it, not assumed from the docstring alone).
 
-    Returns (score, stats) where stats = {'labeled', 'missed_label', 'colored'}.
+    Placed on the BOTTOM staff, above it -- NOT the top staff like the
+    docstring here used to say. Real, directly-confirmed finding
+    (Gloria_12, the "Imitative Entry"/"Cadence" overlap report): Verovio
+    does not honor MusicXML's default-y/relative-y on <direction><words>
+    at all -- probed by bumping a label's default-y 10x and adding an
+    explicit relative-y, and the rendered SVG y-coordinate didn't move
+    (17570 vs 17569, i.e. unchanged within rounding). What Verovio DOES
+    use is which staff a direction is attached to plus its above/below
+    placement -- confirmed by moving a probe label to the bottom staff
+    with placement='below' and seeing the rendered y jump from ~9600 to
+    ~15000 (same measure). So CADENCE_LABEL_Y/PRESENTATION_LABEL_Y/
+    HOMORHYTHM_LABEL_Y and the same-category _LabelLane stagger below
+    are effectively dead code for Verovio's PDF render (they still do
+    something for the separately-downloadable MusicXML opened in real
+    notation software, which DOES respect default-y -- left in place for
+    that path, not removed). Cross-category separation is achieved here
+    instead by giving each category its own staff/placement combination:
+    cadence = top staff/above (annotate_score, unchanged), presentation
+    = bottom staff/above (here), homorhythm = bottom staff/below (see
+    annotate_homorhythm). Same-category crowding (e.g. two close
+    presentation-type labels) is a separate, still-open problem -- the
+    Y-stagger that was supposed to handle it doesn't work in Verovio
+    either; not fixed here.
     """
     parts = list(score.parts)
     name_to_index = {name: i for i, name in enumerate(part_names)}
@@ -282,7 +304,10 @@ def annotate_presentation_types(score, ptypes, part_names):
                 note_obj.style.color = PRESENTATION_COLOR
                 n_colored += 1
             if not first_labeled:
-                target_measure = measure_indices[0].get(measure_no)
+                # Bottom staff, not top -- see this function's docstring
+                # for why (Verovio ignores default-y; staff+placement is
+                # what actually separates this from cadence labels).
+                target_measure = measure_indices[-1].get(measure_no)
                 # ts can genuinely be None -- see annotate_score's comment
                 # on the same pattern. Unlike a cadence (one shot), an
                 # imitation instance has several entries to try: if THIS
@@ -297,9 +322,11 @@ def annotate_presentation_types(score, ptypes, part_names):
                         row['Presentation_Type'], row['Presentation_Type']
                     )
                     te = expressions.TextExpression(label_text)
-                    # lane.y_for staggers this off PRESENTATION_LABEL_Y when
-                    # the previous presentation-type label landed within
-                    # MIN_LABEL_GAP of this one -- see _LabelLane's docstring.
+                    te.placement = 'above'  # above the BOTTOM staff -- see docstring
+                    # lane.y_for still stamps a default-y/relative-y pair for
+                    # the downloadable-MusicXML path (real notation software
+                    # honors it even though Verovio doesn't) -- kept, not load
+                    # bearing for the in-app PDF anymore.
                     te.style.absoluteY = lane.y_for(target_measure.offset + offset_in_measure)
                     te.style.color = PRESENTATION_COLOR
                     target_measure.insert(offset_in_measure, te)
@@ -345,6 +372,14 @@ def annotate_homorhythm(score, hr, part_names, min_gap=4.0):
         otherwise be a label every beat or two into one per passage.
         Default (4.0) matches homorhythm()'s own default ngram_length.
 
+    Placed on the BOTTOM staff, below it -- see annotate_presentation_types'
+    docstring for the full evidence: Verovio ignores default-y/relative-y
+    entirely for direction placement, so cross-category separation has to
+    come from staff+placement instead. Cadence = top/above, presentation
+    = bottom/above, homorhythm = bottom/below -- three staff/placement
+    combinations confirmed (empirically, not assumed) to render on three
+    visually distinct rows.
+
     Returns (score, stats) where stats = {'labeled', 'missed_label', 'colored'}.
     """
     parts = list(score.parts)
@@ -369,19 +404,22 @@ def annotate_homorhythm(score, hr, part_names, min_gap=4.0):
 
         is_new_passage = last_labeled_offset is None or offset - last_labeled_offset > min_gap
         if any_colored and is_new_passage:
-            target_measure = measure_indices[0].get(measure_no)
+            # Bottom staff, not top -- see this function's docstring.
+            target_measure = measure_indices[-1].get(measure_no)
             # ts can genuinely be None -- see annotate_score's comment on
             # the same pattern (a re-exported/re-imported score can leave
             # a measure with no TimeSignature discoverable via context).
             ts = target_measure.getContextByClass('TimeSignature') if target_measure is not None else None
             if ts is not None:
                 te = expressions.TextExpression('Homorhythm')
-                # lane.y_for staggers this off HOMORHYTHM_LABEL_Y when the
-                # previous homorhythm label landed within MIN_LABEL_GAP of
-                # this one -- min_gap above already merges same-passage
-                # repeats into one label, but two DISTINCT passages close
-                # enough to both get labeled can still be close enough to
-                # collide visually; see _LabelLane's own docstring.
+                te.placement = 'below'  # below the BOTTOM staff -- see docstring
+                # lane.y_for still stamps a default-y/relative-y pair for
+                # the downloadable-MusicXML path (real notation software
+                # honors it even though Verovio doesn't) -- kept, not load
+                # bearing for the in-app PDF anymore. min_gap above already
+                # merges same-passage repeats into one label; two DISTINCT
+                # passages close enough to both get labeled can still
+                # collide visually within this one row -- not fixed here.
                 te.style.absoluteY = lane.y_for(offset)
                 te.style.color = HOMORHYTHM_COLOR
                 target_measure.insert(ts.getOffsetFromBeat(beat), te)

@@ -252,6 +252,97 @@ def _safe_cadences(piece):
         )
 
 
+def homorhythm_rhythm_only(piece, ngram_length=4):
+    """Fallback for pieces with NO encoded lyrics at all, where
+    crim_intervals' own piece.homorhythm() unconditionally returns None
+    regardless of how rhythmically homorhythmic a passage actually is.
+
+    Root cause (confirmed directly by reading homorhythm()'s source,
+    then reproducing its two filter stages by hand on Palestrina's
+    Gloria_12 -- see session notes): homorhythm() requires a passage to
+    match on BOTH a shared duration n-gram AND a shared syllable n-gram
+    across voices. Gloria_12's opening genuinely passes the duration
+    check (33 of 323 candidate 4-note windows have every active voice
+    sharing one duration pattern) -- but the syllable check always comes
+    back empty, because the music21-bundled Palestrina Humdrum corpus
+    has literally no **text spine (checked directly in the raw .krn
+    files, and confirmed no note anywhere has .lyric set) -- not a
+    Gloria_12-specific fact, a whole-corpus one. With piece.lyrics()
+    all-NaN, the internal merge between duration-passing and
+    lyric-passing offsets is empty for every single piece in this
+    corpus, so homorhythm() silently reports nothing for all of them.
+
+    This reimplements exactly homorhythm()'s duration-ngram half (same
+    notes()/durations()/ngrams() calls, same full_hr=True semantics: a
+    window counts only when EVERY active voice shares one duration
+    pattern), skipping the syllable-matching step it cannot pass without
+    lyrics. What it finds is real rhythmic homophony (same attack
+    pattern across voices) but, unlike CRIM's own homorhythm(), makes no
+    claim about shared text declamation -- there's no text to check.
+
+    Returns the same shape piece.homorhythm() would (MultiIndex
+    (Measure, Beat, Offset), an 'hr_voices' column of part names), or
+    None if nothing rhythmically homorhythmic is found -- same
+    None-on-empty convention as the real homorhythm(), so callers don't
+    need a second code path.
+    """
+    nr = piece.notes()
+    dur = piece.durations(df=nr)
+    ng = piece.ngrams(df=dur, n=ngram_length, exclude=[])
+
+    dur_ngrams = [
+        [x for x in row if pd.notnull(x)] for _, row in ng.iterrows()
+    ]
+    ng['dur_ngrams'] = dur_ngrams
+    ng['active_voices'] = ng['dur_ngrams'].apply(len)
+    ng['number_dur_ngrams'] = ng['dur_ngrams'].apply(lambda lst: len(set(lst)))
+    # full_hr=True semantics, same as homorhythm()'s own default: every
+    # active voice (>1 of them) shares the one duration pattern.
+    ng = ng[(ng['number_dur_ngrams'] < 2) & (ng['active_voices'] > 1)]
+    if ng.empty:
+        return None
+
+    # Same voice-matching logic as homorhythm()'s own source, reproduced
+    # exactly (not reinvented): for each row, find which duration
+    # patterns recur across >1 voice, then record which of THIS row's
+    # original columns (voice names) hold one of those recurring
+    # patterns. Only original per-voice columns can match (their values
+    # are tuples); the derived columns added just above hold a list/int,
+    # which never equals a tuple, so they're naturally skipped.
+    hr_voices = []
+    for _, row in ng.iterrows():
+        seen, hr_ngrams = set(), []
+        for x in row['dur_ngrams']:
+            if x in seen and x not in hr_ngrams:
+                hr_ngrams.append(x)
+            else:
+                seen.add(x)
+        hr_voices.append([name for name, value in row.items() if value in hr_ngrams])
+    ng['hr_voices'] = hr_voices
+    ng['ngram_length'] = int(ngram_length)
+
+    result = piece.detailIndex(
+        ng[['active_voices', 'number_dur_ngrams', 'hr_voices']], offset=True
+    )
+    return result if len(result) else None
+
+
+def _piece_homorhythm(piece):
+    """piece.homorhythm(), falling back to homorhythm_rhythm_only() when
+    the piece has no lyrics at all -- see that function's docstring for
+    the full root-cause evidence. Checked cheaply and directly on the
+    underlying music21 score (any note anywhere with .lyric set) rather
+    than via piece.lyrics(), which would mean running CRIM's own lyric
+    extraction a second time just to answer a yes/no question this can
+    answer without it."""
+    hr = piece.homorhythm()
+    if hr is None:
+        has_lyrics = any(n.lyric for n in piece.score.recurse().notes)
+        if not has_lyrics:
+            hr = homorhythm_rhythm_only(piece)
+    return hr
+
+
 def _append_timeline(stats, measure_values, label, color):
     """Appends one row per detected event to stats['timeline'] -- the
     data behind the strip-plot visualization rendered in show_result().
@@ -511,7 +602,7 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
 
     if include_homorhythm:
         try:
-            hr = piece.homorhythm()
+            hr = _piece_homorhythm(piece)
         except Exception:
             hr = None
             stats['hr_failed'] = True
@@ -733,7 +824,8 @@ _METHODS_BLURB_PTYPES = (
 _METHODS_BLURB_HOMORHYTHM = (
     "Homorhythmic passages were identified using CRIM Intervals' homorhythm() "
     "method, which finds passages where two or more voices share both rhythm and "
-    "lyrics."
+    "lyrics; for pieces with no lyrics encoded in the source at all, a rhythm-only "
+    "fallback (same duration-ngram matching, no text check) was used instead."
 )
 
 
@@ -1202,12 +1294,27 @@ only the passages where both line up across two or more voices that are
 actually sounding (not resting). By default it requires *every* active
 voice to match, not just some of them, for a passage to count.
 
+**When there's no text underlay at all:** some sources encoded in this
+tool (confirmed on the music21-bundled Palestrina corpus) have no lyrics
+attached to the notes whatsoever -- CRIM's `homorhythm()` then reports
+zero passages for every single piece from that source, regardless of
+how rhythmically homophonic the music actually is, since it can never
+pass the lyrics half of the check. This tool falls back to a
+**rhythm-only** version of the same detection for pieces with no lyrics
+at all: same duration-matching logic, no text check (there's nothing to
+check). It finds real rhythmic homophony, just without CRIM's stronger
+"same words at the same time" claim -- worth knowing if you're citing a
+result from a source without text underlay.
+
 **What actually appears on the score:** every note belonging to a
 matching passage is colored **green** (cadences are red, points of
 imitation are blue, so all three survive on one file together), and one
-`Homorhythm` text label marks the start of each passage, placed above
-the top staff, higher than the cadence and points-of-imitation labels so
-none of the three ever overlap even when they coincide.
+`Homorhythm` text label marks the start of each passage. Cadence labels
+sit above the top staff, points-of-imitation labels above the bottom
+staff, and homorhythm labels below the bottom staff -- three different
+staff/placement combinations (not just three vertical offsets on the
+same staff) so the three categories stay visually separate even when
+they land at the same moment in the piece.
 
 **Reference:** unlike cadences (Meier) or presentation types (Schubert),
 "homorhythm" itself isn't a single scholar's coinage -- it's standard,
@@ -1277,7 +1384,7 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
             _append_timeline(stats, first_entry_measures, 'Points of Imitation', PRESENTATION_COLOR)
     if include_homorhythm:
         try:
-            hr = piece.homorhythm()
+            hr = _piece_homorhythm(piece)
         except Exception:
             hr = None
             stats['hr_failed'] = True
@@ -1880,7 +1987,7 @@ def _bulk_analysis_csv_bytes(matches, include_cadences, include_ptypes, include_
 
             if include_homorhythm:
                 try:
-                    hr = piece.homorhythm()
+                    hr = _piece_homorhythm(piece)
                 except Exception:
                     hr = None
                 if hr is not None and not hr.empty:
