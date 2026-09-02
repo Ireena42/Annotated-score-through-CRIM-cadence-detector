@@ -165,7 +165,13 @@ def _import_piece(collection, native_ref):
             return None, "CRIM couldn't import this piece (bad MEI file or network issue)."
         return piece, None
     raw_url = corpus_sources.KERN_COLLECTION_BASE_URLS[collection] + native_ref
-    kern_text = requests.get(raw_url, timeout=20).text
+    # Same retry-on-transient-failure helper corpus_sources.py's own
+    # enumeration fetches now use (see its docstring for the real
+    # incident this guards against) -- a per-piece fetch failing here
+    # only costs one piece (caught by main()'s own per-piece try/except,
+    # recorded as an 'error' record, not a crashed run), but a transient
+    # blip shouldn't cost even that when a cheap retry would avoid it.
+    kern_text = corpus_sources._get_with_retry(raw_url, timeout=20).text
     score = m21.converter.parse(kern_text)
     return ci.main_objs.ImportedPiece(score, Path(native_ref).stem), None
 

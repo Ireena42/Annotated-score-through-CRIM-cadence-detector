@@ -19,10 +19,48 @@ nothing real.
 """
 import html
 import re
+import time
 from pathlib import Path
 
 import music21 as m21
 import requests
+
+
+def _get_with_retry(url, max_attempts=3, backoff_seconds=5, **kwargs):
+    """requests.get() with retry-on-transient-failure -- added after a
+    real production incident, not speculatively: a single unretried
+    504 Gateway Timeout from GitHub's own API (a transient blip on
+    GitHub's own infrastructure, nothing wrong with the request itself)
+    killed an entire multi-hour precompute run before it did any real
+    work at all, since every fetch_*() function below runs once, right
+    at the very start of build_browse_index() -- before any of the
+    actual per-piece computation that run existed to do (confirmed
+    directly from the real failed run's own traceback, 2026-09-02).
+
+    Retries on a connection-level exception, or on a 429/5xx status
+    code specifically -- a 4xx (bad URL, not found) wouldn't be fixed
+    by retrying and is left to raise immediately via the caller's own
+    raise_for_status(), same as before. Linear backoff (5s, 10s, ...),
+    not exponential: these are occasional infrastructure blips on
+    GitHub's/CRIM's side, not a service under sustained load that needs
+    aggressive backoff. Returns the (possibly still-failing) response
+    on the final attempt rather than raising itself, so the caller's
+    own raise_for_status() stays the single place that turns a bad
+    response into an exception, unchanged from before this existed.
+    """
+    last_exception = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = requests.get(url, **kwargs)
+            if response.status_code in (429, 500, 502, 503, 504) and attempt < max_attempts:
+                time.sleep(backoff_seconds * attempt)
+                continue
+            return response
+        except requests.exceptions.RequestException as e:
+            last_exception = e
+            if attempt < max_attempts:
+                time.sleep(backoff_seconds * attempt)
+    raise last_exception
 
 try:
     import streamlit as st
@@ -196,7 +234,7 @@ def fetch_crim_pieces():
     caching this would hit crimproject.org on every single button click,
     dropdown change, etc.
     """
-    response = requests.get('https://crimproject.org/data/pieces/', timeout=15)
+    response = _get_with_retry('https://crimproject.org/data/pieces/', timeout=15)
     response.raise_for_status()
     return response.json()
 
@@ -256,7 +294,7 @@ def _fetch_catalog_collection(owner, repo, branch, composer_names, min_size=500)
     verified margin: real scores in both repos run from ~1KB to tens of
     KB, every redirect stub found was under 60 bytes.
     """
-    response = requests.get(
+    response = _get_with_retry(
         f'https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}',
         params={'recursive': '1'}, timeout=20,
     )
@@ -364,7 +402,7 @@ def fetch_tasso_pieces():
     _tasso_piece_label). No composer-code allowlist needed here (unlike
     JRP/1520s) since every genre folder is real content, verified
     directly (zero redirect-stub-sized files in the whole repo)."""
-    response = requests.get(
+    response = _get_with_retry(
         'https://api.github.com/repos/TassoInMusicProject/tasso-scores/git/trees/master',
         params={'recursive': '1'}, timeout=20,
     )
@@ -397,7 +435,7 @@ def fetch_seils_pieces():
     filters out the '_annotation' duplicate of each piece (an OMR/
     analysis-annotated copy of the same music, confirmed by checking
     file pairs directly) so each piece appears once, not twice."""
-    response = requests.get(
+    response = _get_with_retry(
         'https://api.github.com/repos/SEILSdataset/SEILSdataset/git/trees/master',
         params={'recursive': '1'}, timeout=20,
     )
@@ -438,7 +476,7 @@ def fetch_lassus_psalms_pieces():
     settings) -- a single-composer collection, so just a clean title per
     piece (filenames are already 'NN-title-words.krn', no code/catalog
     prefix to strip)."""
-    response = requests.get(
+    response = _get_with_retry(
         'https://api.github.com/repos/WolfgangDrescher/lassus-geistliche-psalmen/git/trees/master',
         params={'recursive': '1'}, timeout=20,
     )
