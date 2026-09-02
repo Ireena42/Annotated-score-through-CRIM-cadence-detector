@@ -334,13 +334,18 @@ def _piece_homorhythm(piece):
     underlying music21 score (any note anywhere with .lyric set) rather
     than via piece.lyrics(), which would mean running CRIM's own lyric
     extraction a second time just to answer a yes/no question this can
-    answer without it."""
+    answer without it.
+
+    Returns (hr, used_rhythm_only_fallback) -- callers that show results
+    to the user (not the bulk CSV export, which just wants hr) use the
+    second value to say so explicitly rather than silently returning a
+    weaker result under the same label as CRIM's own text-aware one."""
     hr = piece.homorhythm()
     if hr is None:
         has_lyrics = any(n.lyric for n in piece.score.recurse().notes)
         if not has_lyrics:
-            hr = homorhythm_rhythm_only(piece)
-    return hr
+            return homorhythm_rhythm_only(piece), True
+    return hr, False
 
 
 def _append_timeline(stats, measure_values, label, color):
@@ -602,14 +607,15 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
 
     if include_homorhythm:
         try:
-            hr = _piece_homorhythm(piece)
+            hr, hr_rhythm_only = _piece_homorhythm(piece)
         except Exception:
-            hr = None
+            hr, hr_rhythm_only = None, False
             stats['hr_failed'] = True
         if hr is not None and not hr.empty:
             annotated_score, hr_stats = annotate_homorhythm(
                 annotated_score, hr, piece._getPartNames()
             )
+            stats['hr_rhythm_only'] = hr_rhythm_only
             stats['hr_labeled'] = hr_stats['labeled']
             stats['hr_colored'] = hr_stats['colored']
             _append_timeline(stats, hr.index.get_level_values('Measure'), 'Homorhythm', HOMORHYTHM_COLOR)
@@ -821,6 +827,13 @@ _METHODS_BLURB_PTYPES = (
     "each instance as a Point of Entry, Imitative Duo, or Fuga based on the time "
     "intervals between successive entries."
 )
+_HOMORHYTHM_CAVEAT = (
+    "Needs lyrics encoded in the source. Without any at all (true of "
+    "this app's whole Palestrina corpus -- checked directly, zero **text "
+    "spines in the raw files), CRIM's own detection can never find "
+    "anything, so a weaker rhythm-only fallback is used instead -- see "
+    "the explainer below."
+)
 _METHODS_BLURB_HOMORHYTHM = (
     "Homorhythmic passages were identified using CRIM Intervals' homorhythm() "
     "method, which finds passages where two or more voices share both rhythm and "
@@ -918,6 +931,14 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
             f"{stats['hr_labeled']} homorhythmic passage(s) found -- "
             f"{stats['hr_colored']} notes colored (green)."
         )
+        if stats.get('hr_rhythm_only'):
+            st.info(
+                "This piece has no lyrics encoded in its source, so CRIM's own "
+                "homorhythm() can't run (it requires matching lyrics as well as "
+                "rhythm) -- the passages above were found with a rhythm-only "
+                "fallback instead: same voices moving in the same rhythm, but "
+                "without CRIM's stronger 'same words at the same time' claim."
+            )
     if stats.get('ptypes_failed'):
         st.info(
             "Points-of-imitation detection hit an internal error on this piece and "
@@ -1384,14 +1405,15 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
             _append_timeline(stats, first_entry_measures, 'Points of Imitation', PRESENTATION_COLOR)
     if include_homorhythm:
         try:
-            hr = _piece_homorhythm(piece)
+            hr, hr_rhythm_only = _piece_homorhythm(piece)
         except Exception:
-            hr = None
+            hr, hr_rhythm_only = None, False
             stats['hr_failed'] = True
         if hr is not None and not hr.empty:
             annotated_score, hr_stats = annotate_homorhythm(
                 annotated_score, hr, piece._getPartNames()
             )
+            stats['hr_rhythm_only'] = hr_rhythm_only
             stats['hr_labeled'] = hr_stats['labeled']
             stats['hr_colored'] = hr_stats['colored']
             _append_timeline(stats, hr.index.get_level_values('Measure'), 'Homorhythm', HOMORHYTHM_COLOR)
@@ -1987,7 +2009,7 @@ def _bulk_analysis_csv_bytes(matches, include_cadences, include_ptypes, include_
 
             if include_homorhythm:
                 try:
-                    hr = _piece_homorhythm(piece)
+                    hr, _hr_rhythm_only = _piece_homorhythm(piece)
                 except Exception:
                     hr = None
                 if hr is not None and not hr.empty:
@@ -2158,6 +2180,8 @@ def render_preview_and_annotate(collection, native_ref, piece_label, filename_st
     include_homorhythm = st.checkbox(
         "Mark homorhythmic passages", key=f"hr_{key_prefix}",
     )
+    if include_homorhythm:
+        st.caption(_HOMORHYTHM_CAVEAT)
     # Label reflects what this button will actually do, not just what it
     # hands back at the end -- with at least one box checked, clicking it
     # runs real analysis and shows results (the strip plot, stats, methods
@@ -2339,9 +2363,11 @@ with tab_browse:
         'Search (partial words OK)',
         key="browse_query",
         help='Matches any text in a result -- composer, title, movement, catalog year, anything '
-             'shown. Words don\'t need to be whole or in order ("159" matches any 1590s piece), '
-             'but every word you type must appear somewhere, so "josquin missa" finds every '
-             'Josquin mass movement.',
+             'shown, OR the source\'s own encoded id/filename (e.g. "Gloria_42", CRIM\'s '
+             '"CRIM_Mass_0019_2", a JRP/1520s/Tasso/SEILS/Lassus file path) even though that id '
+             'isn\'t itself displayed in the result label. Words don\'t need to be whole or in '
+             'order ("159" matches any 1590s piece), but every word you type must appear '
+             'somewhere, so "josquin missa" finds every Josquin mass movement.',
     )
 
     if query:
@@ -2355,8 +2381,29 @@ with tab_browse:
         # every Josquin mass movement (confirmed directly: 0 -> 164 real
         # matches). A single-word query (e.g. "agnus", no composer) behaves
         # exactly as before -- this only adds power for multi-word queries.
+        #
+        # Matched against the label PLUS the source's own raw id/filename
+        # (_browse_piece_filename_stem -- already built for download
+        # filenames, reused as-is rather than re-deriving the same
+        # per-collection native_ref shape a second time), NOT just the
+        # label: most labels are human-readable ("Missa Quem dicunt
+        # homines: Gloria") and never contain the catalog id someone might
+        # actually be looking for ("Gloria_42") -- confirmed directly,
+        # that id only ever appears in a label when it was needed to
+        # disambiguate a genuine title collision (see list_pieces_for_
+        # composer's docstring), i.e. for the rare ~2%, not the rule.
+        # The id itself is still never shown in the result row -- this
+        # only widens what a search term can match, doesn't change what's
+        # displayed.
         terms = query.lower().split()
-        matches = [row for row in index if all(term in row[0].lower() for term in terms)]
+        matches = [
+            row for row in index
+            if all(
+                term in row[0].lower()
+                or term in _browse_piece_filename_stem(row[1], row[2]).lower()
+                for term in terms
+            )
+        ]
 
         if not matches:
             st.info("No matches.")
@@ -2550,6 +2597,8 @@ with tab_upload:
     include_cadences_upload = st.checkbox("Annotate cadences", value=True, key="cadences_upload")
     include_ptypes_upload = st.checkbox("Mark points of imitation", key="ptypes_upload")
     include_homorhythm_upload = st.checkbox("Mark homorhythmic passages", key="hr_upload")
+    if include_homorhythm_upload:
+        st.caption(_HOMORHYTHM_CAVEAT)
     # Same reasoning as render_preview_and_annotate's action_label -- see
     # that comment for why this isn't just always "Download".
     action_label_upload = "Analyze" if (include_cadences_upload or include_ptypes_upload or include_homorhythm_upload) else "Download"
