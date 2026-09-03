@@ -1449,6 +1449,20 @@ reclassified):
   in Computer Science, vol. 10527 (Cham: Springer, 2017) -- ran on this
   same music21-bundled Palestrina corpus; the specific finding behind
   the Tritus/F-final caveat.
+- Margaret Bent, "Musica Recta and Musica Ficta," *Musica Disciplina*
+  26 (1972): 73-100 (no DOI for the original article found via
+  Crossref; a 2013 reprint exists as a book chapter, DOI
+  `10.4324/9780203055588-8`), and Margaret Bent,
+  ["Diatonic Ficta"](https://doi.org/10.1017/S0261127900000413), *Early
+  Music History* 4 (1984): 1-48 -- why some finals (D/G/A) rely on a
+  performer-supplied, usually-unnotated raised leading tone at cadences
+  and others (C/E) don't; the mechanism behind why the modal-family
+  filter's D+mollis-\>Aeolian mapping carries a lower-confidence caveat
+  of its own (see that mapping's own code comment) than the G/F cases.
+- Karol Berger, *Musica Ficta: Theories of Accidental Inflections in
+  Vocal Polyphony from Marchetto da Padova to Gioseffo Zarlino*
+  (Cambridge: Cambridge University Press, 1987) -- the standard
+  monograph on this same topic.
 
 **Software this app is built on:**
 - [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals)
@@ -2042,15 +2056,66 @@ _MODAL_FAMILY_BY_FINAL = {
 #     flat removes exactly the raised-4th that DEFINES Lydian, leaving
 #     the plain major-scale pattern transposed to F)
 #   D + mollis -> sounds like untransposed A-Aeolian    -> Aeolian
-#   C + mollis -> sounds like untransposed G-Mixolydian -> Tetrardus
-#   A + mollis -> sounds like untransposed E-Phrygian   -> Deuterus
+#     (weaker support than G/F -- see the cross-check below: real,
+#     majority evidence, not unanimous)
 # E + mollis is deliberately NOT in this table: its durus-minus-a-
 # fourth equivalent is B, and B-final (Locrian) was never a usable mode
 # in 16th-century practice (its 5th above the final is diminished, not
 # perfect) -- so an E-final piece with a flat doesn't transpose onto
 # any real family this way; it's left as plain Deuterus, unreclassified.
-# B-flat-final pieces (the final itself already flatted) are a further,
-# rarer case not handled here -- still 'nonstandard', same as before.
+# C + mollis is ALSO deliberately not in this table -- see below, this
+# was tried and retracted. B-flat-final pieces (the final itself
+# already flatted) are a further, rarer case not handled here -- still
+# 'nonstandard', same as before.
+#
+# **Second, independent cross-check, added 2026-09-03 after a user asked
+# "how do I know an unmarked accidental (musica ficta) isn't hiding a
+# different mode" for a G-final/no-flat piece.** That question doesn't
+# threaten G/no-flat specifically (checked directly on Agnus_00: 45 F
+# naturals vs. only 10 F-sharps, all explicitly NOTATED in this corpus's
+# own encoding at scattered internal-cadence points, not silently
+# assumed diatonic -- i.e. this corpus's transcription does capture
+# ficta as real accidentals, at least for this piece) -- but chasing it
+# down surfaced something more consequential: 1257 of 1318 Palestrina
+# Humdrum files (95.4%) carry their OWN embedded editorial mode tag
+# (a '*X:dor/phr/lyd/mix/aeo/ion' reference record in the file header,
+# e.g. Agnus_00's is literally '*G:mix') -- an independent editorial
+# judgment, not derived from this app's own finalis/cadence computation
+# at all, so agreement with it is real corroboration, not circular.
+# Cross-checked this app's own (finalis, flats) -> family classification
+# against that tag, confident-tier pieces only, 1018 comparable cases:
+#   G + 0 flat -> tetrardus:  98.8% agree (240/243)
+#   G + 1 flat -> protus:    100.0% agree (183/183) -- the Hermelink-
+#     attested case, now doubly confirmed
+#   F + 1 flat -> ionian:    100.0% agree (170/170) -- the original
+#     bug-report case, fully confirmed
+#   D + 0 flat -> protus:     96.5% agree (111/115)
+#   A + 0 flat -> aeolian:    91.2% agree (73/80)
+#   E + 0 flat -> deuterus:   92.6% agree (87/94)
+#   C + 0 flat -> ionian:     89.4% agree (76/85)
+#   D + 1 flat -> aeolian:    71.8% agree (28/39) -- real majority
+#     support, but the other 28.2% (11/39) tag as 'dor' (still Dorian,
+#     untransposed) instead -- kept as the best-supported option, not
+#     as settled as G/F.
+#   C + 1 flat -> tetrardus:   0.0% agree (0/9) -- ALL 9 tag as 'ion'
+#     (Ionian, untransposed), flatly contradicting the textbook
+#     transposition arithmetic this mapping was built from. RETRACTED:
+#     C is no longer in this table below, so C + mollis now falls
+#     through to the plain untransposed 'ionian' -- which is exactly
+#     what all 9 tagged pieces actually are. Plausible reason, not
+#     independently confirmed: unlike G-Mixolydian (which has a real,
+#     documented tritone problem against F that mollis fixes), Ionian's
+#     untransposed form has no such problem, so a flat here may just be
+#     a customary color choice, not a transposition marker.
+#   A + 1 flat -> deuterus: UNTESTED -- only 2 such pieces exist in the
+#     whole Palestrina corpus, neither landing in the confident tier
+#     with a usable tag. Kept in the table below on pure transposition-
+#     arithmetic grounds only (same as C originally was, before being
+#     retracted) -- flagged here explicitly as the weakest-grounded
+#     entry left, not verified either way.
+# This tag's own provenance (Jeppesen's edition vs. the Humdrum
+# corpus's own encoder) was not traced independently -- treated as one
+# more piece of evidence, not a ground truth.
 #
 # Verified directly against this corpus before relying on it: checked
 # every Palestrina piece's own encoded key signature (0 or 1 flat, no
@@ -2062,15 +2127,21 @@ _MODAL_FAMILY_BY_FINAL = {
 # signatures.py (Palestrina's own flats came free from a local file;
 # the other 6 needed one raw-content fetch per piece -- Humdrum's
 # '*k[...]' line for the 5 kern collections, MEI's 'key.sig="Nf"'
-# attribute for CRIM) -- corpus-wide, 1753 of 4267 pieces with a real
-# finalis (41.1%) get reclassified by this fix, not just Palestrina's
-# own share of it. A further ~1.1% of the corpus (49 pieces) carries 2,
-# 3, or 4 flats -- genuinely rarer, and NOT handled by this table
-# (falls through to the plain untransposed mapping below rather than
-# being force-transposed by an unverified further shift); no sharp-
-# signature piece was found anywhere in this corpus at all.
+# attribute for CRIM) -- corpus-wide, 1633 of 4267 pieces with a real
+# finalis (38.3%) get reclassified by this fix, not just Palestrina's
+# own share of it. (This number DROPPED from an earlier 1753/41.1% after
+# the C-final retraction above: 120 C+mollis pieces corpus-wide were
+# being reclassified to 'tetrardus' on unverified transposition
+# arithmetic alone; the embedded-tag cross-check found zero support for
+# that and unanimous support for leaving them 'ionian' instead, so
+# they're excluded from this count now, not silently still counted.) A
+# further ~1.1% of the corpus (49 pieces) carries 2, 3,
+# or 4 flats -- genuinely rarer, and NOT handled by this table (falls
+# through to the plain untransposed mapping below rather than being
+# force-transposed by an unverified further shift); no sharp-signature
+# piece was found anywhere in this corpus at all.
 _MOLLIS_TRANSPOSITION = {
-    'G': 'protus', 'F': 'ionian', 'D': 'aeolian', 'C': 'tetrardus', 'A': 'deuterus',
+    'G': 'protus', 'F': 'ionian', 'D': 'aeolian', 'A': 'deuterus',
 }
 _MODAL_FAMILIES = [
     ('protus', 'Protus -- Dorian/Hypodorian'),
@@ -2941,8 +3012,14 @@ with tab_browse:
              "mollis (a flat in the signature) transposing the WHOLE family -- e.g. an "
              "F-final piece WITH a flat is grouped as Ionian, not Tritus, since the flat "
              "removes Lydian's own defining raised 4th (standard theory, Powers 1981/Meier "
-             "1988, see Bibliography below) -- checked directly, this reclassifies 1753 of "
-             "4267 pieces corpus-wide (41%), not a rare edge case. Uses only 2 of "
+             "1988, see Bibliography below) -- checked directly, this reclassifies 1633 of "
+             "4267 pieces corpus-wide (38%), not a rare edge case. Cross-checked against an "
+             "independent editorial mode tag embedded in 95% of Palestrina's own source files: "
+             "the G-final and F-final cases above are 100% confirmed by it, but a C-final/flat "
+             "case originally handled the same way was flatly contradicted (0/9) and has since "
+             "been retracted -- see _MOLLIS_TRANSPOSITION's own code comment for the full "
+             "per-final breakdown, including a D-final case that's only majority- (72%), not "
+             "unanimously, supported. Uses only 2 of "
              "Powers' own 3 'tonal type' markers (system + final, not cleffing) -- checked "
              "whether that matters here rather than assuming: Palestrina's own soprano clef "
              "is the same in 1316 of 1318 pieces regardless of flats, so there was no second "

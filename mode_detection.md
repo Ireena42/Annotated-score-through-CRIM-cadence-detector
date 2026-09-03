@@ -208,19 +208,21 @@ exactly the G→Protus reclassification this app makes, independently
 attested for this composer by name, not assumed by analogy from
 generic theory.
 
-Concretely, for the 5 finals this corpus actually uses under mollis:
+Concretely, for the finals this corpus actually uses under mollis
+(**updated** — see "Independent cross-check" below; C was originally
+included here too, on transposition arithmetic alone, and has since
+been retracted):
 
 | Final (mollis) | Sounds like (untransposed) | → Family |
 |---|---|---|
 | G | D-Dorian | Protus |
 | F | C-Ionian | Ionian |
 | D | A-Aeolian | Aeolian |
-| C | G-Mixolydian | Tetrardus |
 | A | E-Phrygian | Deuterus |
 
 ```python
 _MOLLIS_TRANSPOSITION = {
-    'G': 'protus', 'F': 'ionian', 'D': 'aeolian', 'C': 'tetrardus', 'A': 'deuterus',
+    'G': 'protus', 'F': 'ionian', 'D': 'aeolian', 'A': 'deuterus',
 }
 
 def _modal_family_key(finalis_pitch, flats=0):
@@ -234,6 +236,118 @@ is B, and B-final (Locrian) was never a usable mode in 16th-century
 practice — its fifth above the final is diminished, not perfect. An
 E-final piece with a flat therefore doesn't transpose onto any real
 family this way and is left as plain Deuterus, unreclassified.
+
+## Independent cross-check, and a retraction (2026-09-03)
+
+Prompted by a direct user question: *"how do I know the F's in a
+G-final, no-flat piece (e.g. one of the "Missa De Beata Marie
+Virginis" Agnus movements) are really natural, and not an unnotated
+accidental (musica ficta) hiding a different mode?"*
+
+**The musica ficta question itself, answered.** Not every final is
+equally exposed to this risk, for a structural reason. In the
+untransposed diatonic collection, only two finals already have a
+natural semitone available for their characteristic cadential
+approach: **C** (Ionian — B natural leading tone, already a semitone
+below) and **E** (Phrygian — its characteristic cadence approaches
+from *above*, F→E, already a semitone, not a raised leading tone at
+all). The other three common finals need a scale degree *raised* by
+performer-supplied musica ficta to get a standard semitone-below
+cadential approach: **D** (Protus, needs C♯), **G** (Tetrardus, needs
+F♯), **A** (Aeolian, needs G♯). **F** (Tritus/Lydian) has the opposite,
+already-documented problem: its own diatonic 4th degree (B) is a
+tritone away and is habitually *lowered* (B♭) rather than a degree
+being raised — the mechanism behind the Tritus caveat already in this
+app (Tompkins 2017). Standard references on this whole practice:
+Margaret Bent, "Musica Recta and Musica Ficta," *Musica Disciplina* 26
+(1972): 73–100 (no DOI found via Crossref for the original 1972
+article — cite by journal/volume/page, not by a guessed link; a 2013
+reprint exists as a book chapter, DOI `10.4324/9780203055588-8`, if a
+clickable link is needed); Margaret Bent,
+["Diatonic Ficta,"](https://doi.org/10.1017/S0261127900000413) *Early
+Music History* 4 (1984): 1–48 (DOI `10.1017/S0261127900000413`,
+verified via Crossref); Karol Berger, *Musica Ficta: Theories of
+Accidental Inflections in Vocal Polyphony from Marchetto da Padova to
+Gioseffo Zarlino* (Cambridge: Cambridge University Press, 1987).
+
+Crucially, this kind of ficta is **local** — it raises/lowers a note
+only in its immediate cadential context, reverting elsewhere — unlike a
+notated key-signature flat, which is a *global*, systematic
+transposition of the whole piece. It doesn't threaten the family
+classification (which depends on the final and the overall diatonic
+frame, not on transient cadential color) the way an unnotated *global*
+sharp-transposition would — and 16th-century notation practice has no
+real documented convention for that (unlike cantus mollis, which is
+exactly the one systematic, *notated* transposition mechanism this
+whole section is about).
+
+**Checked directly on a real piece** rather than left as theory:
+Agnus_00 (*Missa De Beata Marie Virginis (II)*, G-final, no flat —
+exactly the case asked about). Its own Humdrum encoding contains 45
+natural F's against only 10 F♯'s (scattered across measures 4, 7, 14,
+21, 22, 33, 40, 45 — plausible cadential approach points, not a
+pervasive recoloring) and 10 B♭'s (a complementary tritone-avoidance
+ficta) — **all of them explicitly notated as real accidentals in the
+encoding**, not silently assumed diatonic. This specific corpus's
+transcription does capture musica ficta rather than hiding it.
+
+**Chasing this down surfaced a second, more consequential source of
+evidence.** 1,257 of 1,318 Palestrina Humdrum files (95.4%) carry their
+own embedded editorial mode tag — a `*X:dor/phr/lyd/mix/aeo/ion`
+reference record in the file header (Agnus_00's is literally
+`*G:mix`) — an independent editorial judgment, not derived from this
+app's own finalis/cadence computation at all, so agreement with it is
+real corroboration, not circular. Cross-checked this app's
+`(finalis, flats) → family` output against it, confident-tier pieces
+only, 1,018 comparable cases:
+
+| Final + flats | This app says | Agreement |
+|---|---|---|
+| G + 0 | Tetrardus | 98.8% (240/243) |
+| **G + 1** | **Protus** | **100.0% (183/183)** |
+| **F + 1** | **Ionian** | **100.0% (170/170)** |
+| D + 0 | Protus | 96.5% (111/115) |
+| A + 0 | Aeolian | 91.2% (73/80) |
+| E + 0 | Deuterus | 92.6% (87/94) |
+| C + 0 | Ionian | 89.4% (76/85) |
+| D + 1 | Aeolian | 71.8% (28/39) |
+| ~~C + 1~~ | ~~Tetrardus~~ | **0.0% (0/9) — retracted** |
+| A + 1 | Deuterus | untested (n=2 corpus-wide) |
+
+The two mollis cases with independent literature attestation — G
+(Hermelink, via Powers) and F (the original bug report) — are now
+*also* perfectly confirmed by this fully independent source: **100%
+agreement on both**, real corroboration from a source this app's own
+computation never touches. D+mollis→Aeolian has real majority support
+(71.8%) but is honestly weaker: 11 of 39 comparable pieces (28.2%) are
+tagged `dor` (still Dorian, untransposed) instead — kept as the
+best-supported option, disclosed as less certain than G/F, not
+presented with equal confidence. **C+mollis→Tetrardus had no
+literature attestation of its own** (it was pure transposition
+arithmetic, extrapolated from the G case without independent
+verification) **and is flatly contradicted**: all 9 comparable pieces
+are tagged `ion` (Ionian), not `mix`. **Retracted** — removed from
+`_MOLLIS_TRANSPOSITION` above; a C-final piece with a flat now falls
+through to the plain untransposed Ionian family, matching the evidence.
+A plausible (not independently confirmed) reason for the asymmetry:
+G-Mixolydian's untransposed form has a real, documented tritone problem
+(F against B) that mollis specifically fixes; Ionian's untransposed
+form has no such problem, so a flat there may just be a customary
+color choice, not a transposition marker. A+mollis→Deuterus is simply
+**untested**: only 2 such pieces exist in the whole Palestrina corpus,
+neither landing in a comparable confidence tier — kept on transposition
+arithmetic alone, flagged as the weakest-grounded entry remaining, not
+verified either way.
+
+This retraction changes real output, not just reasoning: corpus-wide,
+120 C-final/mollis pieces that were being reclassified to Tetrardus are
+now correctly left as Ionian, dropping the overall corpus-wide
+reclassification count from an earlier 1,753/4,267 (41.1%) to
+**1,633/4,267 (38.3%)** — see the updated table below.
+
+This tag's own provenance (Jeppesen's edition specifically, vs. the
+Humdrum corpus's own encoder independently) was not traced — treated as
+one more piece of real evidence, not as ground truth.
 
 ### What was checked, and what was deliberately left open
 
@@ -301,26 +415,31 @@ record with a real finalis (0=none, N=N flats, verified distribution:
 
 ### Reclassification impact, verified directly against the data
 
-**Corpus-wide: 1,753 of 4,267 pieces with a determined finalis and
-flat-count (41.1%)** get reclassified into a different modal family by
-this fix, relative to reading the bare finalis alone. Per collection:
+**Corpus-wide (updated after the C-final retraction above): 1,633 of
+4,267 pieces with a determined finalis and flat-count (38.3%)** get
+reclassified into a different modal family by this fix, relative to
+reading the bare finalis alone. Per collection:
 
 | Collection | Reclassified | Total | % |
 |---|---|---|---|
-| `1520s` | 340 | 667 | 51.0% |
-| `crim` | 143 | 309 | 46.3% |
-| `tasso` | 231 | 503 | 45.9% |
+| `1520s` | 310 | 667 | 46.5% |
+| `crim` | 139 | 309 | 45.0% |
 | `seils` | 13 | 30 | 43.3% |
-| `lassus_psalms` | 20 | 50 | 40.0% |
-| `jrp` | 521 | 1,338 | 38.9% |
-| `music21` (Palestrina + Monteverdi) | 485 | 1,370 | 35.4% |
-| **Total** | **1,753** | **4,267** | **41.1%** |
+| `tasso` | 209 | 503 | 41.6% |
+| `jrp` | 495 | 1,338 | 37.0% |
+| `lassus_psalms` | 18 | 50 | 36.0% |
+| `music21` (Palestrina + Monteverdi) | 449 | 1,370 | 32.8% |
+| **Total** | **1,633** | **4,267** | **38.3%** |
 
-This is not a rare edge case in any of the 7 collections — it is
-close to *half* the corpus in every one of them. Palestrina alone: 459
-of 1,318 pieces (34.8%), of which the F-final/mollis→Ionian case (the
-one that originally prompted this investigation) is 184 pieces on its
-own.
+This is not a rare edge case in any of the 7 collections — it is well
+over a third of the corpus in every one of them. Palestrina alone: 423
+of 1,318 pieces (32.1%, down from an earlier 459/34.8% before the
+C-final retraction — 36 of those 459 were Palestrina's own share of
+the now-retracted C+mollis cases), of which the F-final/mollis→Ionian
+case (the one that originally prompted this investigation) is 184
+pieces on its own — still the single largest component, and still
+fully intact (100% confirmed by the independent cross-check above, not
+touched by the retraction).
 
 **End-to-end functional verification:** the actual Browse-tab filter
 logic (`_modal_family_key(record['finalis'], record['flats'])`) was
@@ -346,7 +465,22 @@ cases.
   — the confidence-tier design was validated on hand-checked samples
   *before* being applied to the whole corpus, and the transposition
   mapping came from Powers/Hermelink's independent classification of
-  Palestrina, not from adjusting anything until it matched.
+  Palestrina, not from adjusting anything until it matched. The C-final
+  retraction above is this same discipline working the other way: a
+  mapping that turned out to have no independent support was dropped
+  the moment real evidence contradicted it, not defended.
+- **D+mollis→Aeolian is real but not as solid as G/F+mollis.** 71.8%
+  agreement against the independent tag, not the 100% seen for the two
+  literature-attested cases — kept as the best-supported option, but
+  should be read with that lower confidence in mind, not presented as
+  equally certain.
+- **A+mollis→Deuterus is genuinely untested** — only 2 pieces exist
+  corpus-wide, neither in a comparable confidence tier. Kept on
+  transposition arithmetic alone.
+- **This app's transcription of musica ficta accidentals was checked
+  on exactly one piece** (Agnus_00) — confirmed to notate them
+  explicitly there, not assumed to hold for the other 1,317 Palestrina
+  pieces or the other 6 collections.
 
 ## Bibliography
 
@@ -383,6 +517,19 @@ cases.
   Systematically,"](https://www.academia.edu/109443988/Musicologists_and_Data_Scientists_Pull_out_all_the_Stops_Defining_Renaissance_Cadences_Systematically)
   Music Encoding Conference, Halifax, Canada, 2022 — the cadence
   detection method the `Low`/`Tone` finalis signals depend on.
+- Margaret Bent, "Musica Recta and Musica Ficta," *Musica Disciplina*
+  26 (1972): 73–100 (no DOI for the original article found via
+  Crossref; a 2013 reprint exists as a book chapter, DOI
+  `10.4324/9780203055588-8`).
+- Margaret Bent,
+  ["Diatonic Ficta,"](https://doi.org/10.1017/S0261127900000413) *Early
+  Music History* 4 (1984): 1–48. DOI `10.1017/S0261127900000413`,
+  verified via Crossref.
+- Karol Berger, *Musica Ficta: Theories of Accidental Inflections in
+  Vocal Polyphony from Marchetto da Padova to Gioseffo Zarlino*
+  (Cambridge: Cambridge University Press, 1987) — the standard
+  monograph on musica ficta, the source for why some finals (D/G/A)
+  need a cadential raised leading tone and others (C/E) don't.
 
 ## Where the underlying code lives
 

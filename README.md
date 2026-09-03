@@ -503,10 +503,53 @@ from a local file; the other 6 needed one raw-content fetch per piece
 (Humdrum's `*k[...]` line for the 5 kern collections, MEI's
 `key.sig="Nf"` attribute for CRIM), run once as a background batch job
 (0 errors across 4,252 fetches) — so corpus-wide, not just Palestrina's
-own share of it, this reclassifies 1,753 of 4,267 pieces with a real
-finalis (41.1%). A further ~1.1% of the corpus (49 pieces) carries 2,
+own share of it, this reclassifies 1,633 of 4,267 pieces with a real
+finalis (38.3%). A further ~1.1% of the corpus (49 pieces) carries 2,
 3, or 4 flats and is deliberately left unreclassified — genuinely
 rarer, and the further transposition that many flats would imply
+
+**Second cross-check, 2026-09-03, prompted by a user question** ("how
+do I know an unmarked accidental isn't hiding a different mode?" for a
+G-final/no-flat piece): checking that specific worry directly (on
+Agnus_00: 45 F-naturals vs. only 10 F-sharps, all explicitly *notated*
+at scattered internal-cadence points, not silently assumed diatonic —
+this corpus's transcription does capture musica ficta as real
+accidentals) surfaced something more useful than the original question:
+95.4% of Palestrina's own Humdrum files (1,257/1,318) carry an embedded
+editorial mode tag (`*X:dor/phr/lyd/mix/aeo/ion`) — an independent
+judgment, not derived from this app's own finalis/cadence computation,
+so agreement with it is real corroboration. Cross-checked against it,
+1,018 confident-tier comparable pieces:
+
+| Final + flats | This app says | Agreement |
+|---|---|---|
+| G + 0 | Tetrardus | 98.8% (240/243) |
+| G + 1 | Protus | **100.0%** (183/183) |
+| F + 1 | Ionian | **100.0%** (170/170) |
+| D + 0 | Protus | 96.5% (111/115) |
+| A + 0 | Aeolian | 91.2% (73/80) |
+| E + 0 | Deuterus | 92.6% (87/94) |
+| C + 0 | Ionian | 89.4% (76/85) |
+| D + 1 | Aeolian | 71.8% (28/39) — real majority support, kept, disclosed as weaker than G/F |
+| C + 1 | *was* Tetrardus | **0.0%** (0/9) — **retracted**, see below |
+| A + 1 | Deuterus | untested — only 2 such pieces exist corpus-wide, neither in a comparable tier |
+
+The G-final and F-final mollis cases — the two independently attested
+in the primary literature (Hermelink, and the original bug report,
+respectively) — are now *also* perfectly confirmed by this fully
+independent source. The C-final mollis case had no literature
+attestation of its own (it was pure transposition arithmetic) and is
+flatly contradicted here: all 9 comparable pieces are tagged Ionian,
+not Tetrardus. **Retracted** — `_MOLLIS_TRANSPOSITION` no longer
+includes `'C'`, so a C-final piece with a flat now falls through to the
+plain untransposed Ionian mapping, matching the evidence. Plausible
+reason (not independently confirmed): G-Mixolydian's untransposed form
+has a real, documented tritone problem against F that mollis fixes;
+Ionian's untransposed form has no such problem, so a flat there may
+just be a customary color choice, not a transposition marker. This
+retraction is why the reclassification count above dropped from an
+earlier 1,753/41.1% to 1,633/38.3% — 120 corpus-wide C-final/mollis
+pieces are no longer reclassified.
 wasn't independently verified before shipping this; no sharp-signature
 piece was found anywhere in the corpus at all.
 
