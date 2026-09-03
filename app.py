@@ -54,7 +54,7 @@ from corpus_sources import (
     CORPUS_COMPOSERS, list_pieces_for_composer, fetch_crim_pieces, fetch_jrp_pieces,
     fetch_1520s_pieces, fetch_tasso_pieces, fetch_seils_pieces, fetch_lassus_psalms_pieces,
     KERN_COLLECTION_BASE_URLS, build_browse_index, group_browse_rows, parse_music21_piece,
-    last_member_label, _palestrina_movement_members, _palestrina_key_signature_flats,
+    last_member_label, _palestrina_movement_members,
 )  # piece-enumeration layer -- see corpus_sources.py's own module docstring for why
   # this moved out of app.py (precompute_finalis.py needs the identical logic too).
 
@@ -1856,28 +1856,37 @@ def _browse_piece_filename_stem(collection, native_ref):
 
 @st.cache_data
 def _load_finalis_index():
-    """{browse_label: {'finalis': pitch_class, 'source': confidence_tier}}
-    for every piece with a successfully precomputed finalis -- see
-    scripts/precompute_finalis.py's own module docstring for the
-    multi-signal heuristic (compute_finalis(): cross-checks the last
-    detected cadence's Low/Tone against crim_intervals' own .final()).
-    Loaded from data/finalis.jsonl, which ships IN this repo as a local
-    file read (this app's own precomputed output, committed alongside
-    the code, refreshed by the Precompute Finalis GitHub Action -- not
-    fetched over the network the way every other collection's piece
-    data is). browse_label is exactly build_browse_index()'s own
-    prefixed label (e.g. '[Palestrina] Missa Quem dicunt homines:
-    Gloria') -- precompute_finalis.py records each result under that
-    same string, so no per-tab prefix reconstruction is needed the way
-    the older, since-removed finalis filter needed (see git history:
-    fe3df79 removed it, this is a fresh implementation on top of the
-    redesigned compute_finalis()).
+    """{browse_label: {'finalis': pitch_class, 'source': confidence_tier,
+    'flats': int}} for every piece with a successfully precomputed
+    finalis -- see scripts/precompute_finalis.py's own module docstring
+    for the multi-signal heuristic (compute_finalis(): cross-checks the
+    last detected cadence's Low/Tone against crim_intervals' own
+    .final()). Loaded from data/finalis.jsonl, which ships IN this repo
+    as a local file read (this app's own precomputed output, committed
+    alongside the code, refreshed by the Precompute Finalis GitHub
+    Action -- not fetched over the network the way every other
+    collection's piece data is). browse_label is exactly
+    build_browse_index()'s own prefixed label (e.g. '[Palestrina]
+    Missa Quem dicunt homines: Gloria') -- precompute_finalis.py
+    records each result under that same string, so no per-tab prefix
+    reconstruction is needed the way the older, since-removed finalis
+    filter needed (see git history: fe3df79 removed it, this is a
+    fresh implementation on top of the redesigned compute_finalis()).
 
     Skips rows with finalis=None (source 'error') -- nothing to filter
     by for those -- but keeps every other source tier, including the
     low-confidence ones, so the caller can decide whether to show or
     hide them (see _CONFIDENT_FINALIS_SOURCES) rather than this losing
     that distinction by only keeping a bare pitch class.
+
+    'flats' -- the piece's own key-signature flat count (negative for
+    sharps), added by scripts/augment_key_signatures.py in a separate
+    pass across ALL 7 collections (not just Palestrina, where it could
+    be read for free from a local file -- the other 6 needed one raw-
+    content fetch per piece) -- defaults to 0 (untransposed) when
+    absent, e.g. for a record augment_key_signatures.py hasn't reached
+    yet, or a network fetch that failed for that one piece. See
+    _MOLLIS_TRANSPOSITION for what this feeds into.
     """
     path = Path(__file__).parent / 'data' / 'finalis.jsonl'
     index = {}
@@ -1896,6 +1905,7 @@ def _load_finalis_index():
                 index[record['label']] = {
                     'finalis': record['finalis'],
                     'source': record.get('source'),
+                    'flats': record.get('flats', 0),
                 }
     return index
 
@@ -1995,8 +2005,19 @@ _MODAL_FAMILY_BY_FINAL = {
 # every Palestrina piece's own encoded key signature (0 or 1 flat, no
 # sharps, no piece with more than 1 flat -- see corpus_sources.
 # _palestrina_key_signature_flats) crossed with its precomputed finalis;
-# 459 of 1318 pieces (34.8%) carry a 1-flat signature on one of these 5
-# finals and were, before this fix, silently placed in the wrong family.
+# 459 of 1318 Palestrina pieces (34.8%) carry a 1-flat signature on one
+# of these 5 finals and were, before this fix, silently placed in the
+# wrong family. Extended to all 7 collections via scripts/augment_key_
+# signatures.py (Palestrina's own flats came free from a local file;
+# the other 6 needed one raw-content fetch per piece -- Humdrum's
+# '*k[...]' line for the 5 kern collections, MEI's 'key.sig="Nf"'
+# attribute for CRIM) -- corpus-wide, 1753 of 4267 pieces with a real
+# finalis (41.1%) get reclassified by this fix, not just Palestrina's
+# own share of it. A further ~1.1% of the corpus (49 pieces) carries 2,
+# 3, or 4 flats -- genuinely rarer, and NOT handled by this table
+# (falls through to the plain untransposed mapping below rather than
+# being force-transposed by an unverified further shift); no sharp-
+# signature piece was found anywhere in this corpus at all.
 _MOLLIS_TRANSPOSITION = {
     'G': 'protus', 'F': 'ionian', 'D': 'aeolian', 'C': 'tetrardus', 'A': 'deuterus',
 }
@@ -2865,21 +2886,20 @@ with tab_browse:
              "numbered mode: this app never determines ambitus, so it can't tell authentic "
              "from plagal, and Tompkins (2017, MCM/LNCS 10527) found this exact Palestrina "
              "corpus's own pitch content only reliably supports about this many groups, not "
-             "the full theoretical set. For Palestrina, also accounts for cantus mollis "
-             "(a flat in the signature) transposing the WHOLE family -- e.g. an F-final "
-             "piece WITH a flat is grouped as Ionian, not Tritus, since the flat removes "
-             "Lydian's own defining raised 4th (standard theory, Powers 1981/Meier 1988, "
-             "see Bibliography below) -- checked directly, this reclassifies 459 of 1318 "
-             "Palestrina pieces (35%), not a rare edge case. Uses only 2 of Powers' own 3 "
-             "'tonal type' markers (system + final, not cleffing) -- checked whether that "
-             "matters here rather than assuming: this corpus' own soprano clef is the same "
-             "in 1316 of 1318 pieces regardless of flats, so there's no second signal to "
-             "read even if this checked it; where cleffing DOES vary in Powers' own "
-             "examples, its role is authentic/plagal, a finer distinction this filter "
-             "already doesn't attempt. Not yet done for the other 6 collections (would "
-             "need a per-piece fetch just for the key signature). Based on the precomputed "
-             "finalis in data/finalis.jsonl -- pieces with no successful finalis result "
-             "aren't matchable by this filter.",
+             "the full theoretical set. Across all 7 collections, also accounts for cantus "
+             "mollis (a flat in the signature) transposing the WHOLE family -- e.g. an "
+             "F-final piece WITH a flat is grouped as Ionian, not Tritus, since the flat "
+             "removes Lydian's own defining raised 4th (standard theory, Powers 1981/Meier "
+             "1988, see Bibliography below) -- checked directly, this reclassifies 1753 of "
+             "4267 pieces corpus-wide (41%), not a rare edge case. Uses only 2 of "
+             "Powers' own 3 'tonal type' markers (system + final, not cleffing) -- checked "
+             "whether that matters here rather than assuming: Palestrina's own soprano clef "
+             "is the same in 1316 of 1318 pieces regardless of flats, so there was no second "
+             "signal to read even if this checked it there; where cleffing DOES vary in "
+             "Powers' own examples, its role is authentic/plagal, a finer distinction this "
+             "filter already doesn't attempt (not independently re-checked for the other 6 "
+             "collections). Based on the precomputed finalis in data/finalis.jsonl -- "
+             "pieces with no successful finalis result aren't matchable by this filter.",
     )
     only_confident_finalis = False
     if selected_families:
@@ -2950,26 +2970,10 @@ with tab_browse:
                     return last_member_label(label, native_ref[0], native_ref[1])
                 return label
 
-            palestrina_flats = _palestrina_key_signature_flats()
-
-            def _row_flats(row):
-                # cantus-mollis (1-flat) transposition data -- see
-                # _MOLLIS_TRANSPOSITION's own docstring -- only exists
-                # for Palestrina so far (cheap local file reads; the
-                # other 6 collections would need a per-piece network
-                # fetch just for this, not done here). Every other row
-                # gets 0 -- the untransposed mapping, unchanged from
-                # before this fix, not "confirmed no flat".
-                label, collection, native_ref = row
-                if collection != 'music21' or native_ref[0] != 'palestrina':
-                    return 0
-                members = _palestrina_movement_members().get(native_ref[1], [native_ref[1]])
-                return palestrina_flats.get(members[-1], 0)
-
             matches = [
                 row for row in matches
                 if (record := finalis_index.get(_finalis_lookup_label(row))) is not None
-                and _modal_family_key(record['finalis'], _row_flats(row)) in selected_family_keys
+                and _modal_family_key(record['finalis'], record['flats']) in selected_family_keys
                 and (not only_confident_finalis or record['source'] in _CONFIDENT_FINALIS_SOURCES)
             ]
 

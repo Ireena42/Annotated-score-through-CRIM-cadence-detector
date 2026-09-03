@@ -477,6 +477,39 @@ Deuterus/Tritus/Tetrardus) or Glarean's two added ones (Ionian/Aeolian)
 a piece's finalis falls into, with an "only high-confidence results"
 option using those same tiers.
 
+**Cantus mollis transposition** (added after a user question: "if the
+finalis is F and there's a flat in the clef, shouldn't that be
+transposed Ionian, not Tritus?"): a flat in the key signature
+transposes the WHOLE diatonic collection up a fourth, so a piece under
+that signature sounds like the untransposed mode a fourth below its
+own final — checked directly against Powers, "Tonal Types and Modal
+Categories in Renaissance Polyphony" (*JAMS* 34/3, 1981), which cites
+Hermelink's own etic study of Palestrina classifying a cantus-mollis
+G-final Palestrina piece as "Hypodorian" (transposed up a fourth from
+D) — the same reclassification this filter makes. On Palestrina alone,
+this reclassifies 459 of 1318 pieces (35%) — not a rare edge case; F
+alone was 184 of those, the exact case that prompted the question.
+Deliberately checked, not assumed, whether dropping cleffing (Powers'
+own "tonal type" is system + cleffing + final, three markers, not the
+two — system + final — this filter uses) loses anything here: it
+doesn't, because Palestrina's own soprano clef is the same (`G2`) in
+1316 of 1318 pieces regardless of flats, so there's no second signal
+to read; where cleffing *does* vary in Powers' own examples, its role
+is authentic/plagal, a finer distinction this filter doesn't attempt
+anyway (not independently re-checked for the other 6 collections).
+`scripts/augment_key_signatures.py` extends the key-signature lookup
+this needs to all 7 collections — Palestrina's own flat count was free
+from a local file; the other 6 needed one raw-content fetch per piece
+(Humdrum's `*k[...]` line for the 5 kern collections, MEI's
+`key.sig="Nf"` attribute for CRIM), run once as a background batch job
+(0 errors across 4,252 fetches) — so corpus-wide, not just Palestrina's
+own share of it, this reclassifies 1,753 of 4,267 pieces with a real
+finalis (41.1%). A further ~1.1% of the corpus (49 pieces) carries 2,
+3, or 4 flats and is deliberately left unreclassified — genuinely
+rarer, and the further transposition that many flats would imply
+wasn't independently verified before shipping this; no sharp-signature
+piece was found anywhere in the corpus at all.
+
 Also since redesigned: Palestrina's long Gloria/Credo/Sanctus settings
 are often split across several encoded files (e.g. Sanctus_92_a/b/c =
 "First Section"/"Pleni"/"Hosanna") — 262 of Palestrina's real movements,
