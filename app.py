@@ -1789,12 +1789,12 @@ _MODAL_FAMILY_BY_FINAL = {
     'C': 'ionian', 'A': 'aeolian',
 }
 _MODAL_FAMILIES = [
-    ('protus', 'Protus (D final) -- Dorian/Hypodorian'),
-    ('deuterus', 'Deuterus (E final) -- Phrygian/Hypophrygian'),
-    ('tritus', 'Tritus (F final) -- Lydian/Hypolydian'),
-    ('tetrardus', 'Tetrardus (G final) -- Mixolydian/Hypomixolydian'),
-    ('ionian', 'Ionian (C final)'),
-    ('aeolian', 'Aeolian (A final)'),
+    ('protus', 'Protus -- Dorian/Hypodorian'),
+    ('deuterus', 'Deuterus -- Phrygian/Hypophrygian'),
+    ('tritus', 'Tritus -- Lydian/Hypolydian'),
+    ('tetrardus', 'Tetrardus -- Mixolydian/Hypomixolydian'),
+    ('ionian', 'Ionian'),
+    ('aeolian', 'Aeolian'),
     ('nonstandard', 'Non-standard/uncertain final'),
 ]
 _MODAL_FAMILY_LABELS = dict(_MODAL_FAMILIES)
@@ -2610,7 +2610,7 @@ with tab_browse:
 
     finalis_index = _load_finalis_index()
     selected_families = st.multiselect(
-        "Modal family (finalis-based, optional)",
+        "Modal family",
         [label for _, label in _MODAL_FAMILIES],
         key="browse_modal_family",
         help="Grouped by FAMILY (which of the 4 traditional finals -- D/E/F/G -- plus "
@@ -2633,7 +2633,7 @@ with tab_browse:
                  "(signals disagreed) results -- real, disclosed lower-confidence answers, not "
                  "wrong ones, but worth knowing which is which.",
         )
-        if 'Tritus (F final) -- Lydian/Hypolydian' in selected_families:
+        if 'Tritus -- Lydian/Hypolydian' in selected_families:
             st.caption(f"ⓘ {_TRITUS_CAVEAT}")
 
     if query or selected_families:
