@@ -254,151 +254,6 @@ def _safe_cadences(piece):
         )
 
 
-def homorhythm_rhythm_only(piece, ngram_length=4):
-    """Fallback for pieces with NO encoded lyrics at all, where
-    crim_intervals' own piece.homorhythm() unconditionally returns None
-    regardless of how rhythmically homorhythmic a passage actually is.
-
-    Root cause for homorhythm() returning nothing at all on this corpus
-    (confirmed directly by reading homorhythm()'s source, then
-    reproducing its two filter stages by hand on Palestrina's Gloria_12
-    -- see session notes): homorhythm() requires a passage to match on
-    BOTH a shared duration n-gram AND a shared syllable n-gram across
-    voices, and the music21-bundled Palestrina Humdrum corpus has
-    literally no **text spine (checked directly in the raw .krn files,
-    and confirmed no note anywhere has .lyric set) -- not a
-    Gloria_12-specific fact, a whole-corpus one. With piece.lyrics()
-    all-NaN, the syllable check can never pass, so homorhythm()
-    silently reports nothing for every piece in this corpus.
-
-    A FIRST version of this function reimplemented homorhythm()'s
-    duration-ngram half verbatim (same crim_intervals ngrams()/
-    durations() row alignment) -- but that inherited a real bug from
-    homorhythm() itself, caught directly on Gloria_12 after it was
-    reported: crim_intervals' ngrams() aligns rows by ATTACK offset, so
-    a voice only shows up as "active" in a given row if it attacks a
-    note exactly there. A voice sustaining a longer note THROUGH that
-    offset (very much still sounding, just not attacking) is silently
-    absent from that row -- confirmed directly: at Gloria_12 offset
-    134.0, Tenor is mid-note (held from offset 132.0, quarterLength
-    4.0) while Soprano/Alto/Bass all attack together, and the old
-    version flagged that offset as "3 voices homorhythmic," missing
-    that a 4th voice was ALSO sounding, just not moving with the other
-    three. Exactly the false-positive pattern reported: a passage
-    getting marked homorhythmic because SOME of the sounding voices
-    share a rhythm, not ALL of them, inflating the measured density.
-
-    This version works directly from each part's real Note/Chord
-    onsets and durations instead (no crim_intervals ngram/duration
-    alignment at all): at every candidate attack point it computes
-    which voices are SOUNDING (covering that instant -- attacked here
-    or still holding a note from earlier) versus ATTACKING (a note
-    starts exactly here), and only counts the point as a genuine
-    chordal attack when those two sets are equal -- every voice
-    sounding right now is also attacking right now, so no voice is
-    silently holding through while the others move. A run of at least
-    `ngram_length` consecutive chordal attack points, with the same set
-    of voices throughout, becomes one passage (a voice entering or
-    dropping out starts a new run, not a continuation of the old one).
-    Re-verified on Gloria_12: correctly excludes offset 134.0 (Tenor
-    sustaining) while still finding the genuinely 4-voice-unanimous
-    passages (e.g. the real homorhythmic opening).
-
-    What it finds is real rhythmic homophony among every voice
-    genuinely sounding at each moment, but, unlike CRIM's own
-    homorhythm(), makes no claim about shared text declamation --
-    there's no text to check.
-
-    Returns the same shape piece.homorhythm() would (MultiIndex
-    (Measure, Beat, Offset), an 'hr_voices' column of part names), or
-    None if nothing rhythmically homorhythmic is found -- same
-    None-on-empty convention as the real homorhythm(), so callers don't
-    need a second code path.
-    """
-    parts = list(piece.score.parts)
-    # Each part's own (onset, quarterLength) pairs for real notes/chords
-    # only (Stream.notes already excludes rests -- a resting voice isn't
-    # "sounding" and correctly has no entry here at all).
-    part_notes = [
-        sorted(((n.offset, n.quarterLength) for n in p.flatten().notes), key=lambda t: t[0])
-        for p in parts
-    ]
-    # Every distinct note-onset offset across the WHOLE piece -- the only
-    # offsets worth checking as a candidate chordal attack point (nothing
-    # new happens anywhere between two consecutive onsets).
-    all_onsets = sorted({onset for notes in part_notes for onset, _ in notes})
-
-    def _sounding_and_attacking(offset):
-        sounding, attacking = set(), set()
-        for i, notes in enumerate(part_notes):
-            for onset, ql in notes:
-                if onset > offset:
-                    break
-                if onset <= offset < onset + ql:
-                    sounding.add(i)
-                    if onset == offset:
-                        attacking.add(i)
-                    break
-        return sounding, attacking
-
-    chordal_points = []
-    for offset in all_onsets:
-        sounding, attacking = _sounding_and_attacking(offset)
-        # >1 voice sounding (a single voice "moving alone" isn't
-        # homorhythm), and EVERY sounding voice attacks here -- not just
-        # however many happen to attack here.
-        if len(sounding) > 1 and sounding == attacking:
-            chordal_points.append((offset, frozenset(sounding)))
-
-    # Consolidate consecutive chordal points into passages: a run of at
-    # least ngram_length points where the same voices stay sounding+
-    # attacking together throughout. One row per passage (its first
-    # chordal offset), not one per point, matching presentationTypes()'
-    # already-consolidated shape rather than homorhythm()'s own raw,
-    # un-consolidated sliding-window output (see annotate_homorhythm's
-    # min_gap docstring for why that distinction matters downstream).
-    passages, run = [], []
-    for offset, voices in chordal_points:
-        if run and voices != run[-1][1]:
-            if len(run) >= ngram_length:
-                passages.append(run)
-            run = []
-        run.append((offset, voices))
-    if len(run) >= ngram_length:
-        passages.append(run)
-    if not passages:
-        return None
-
-    part_names = piece._getPartNames()
-    rows = [
-        {'Offset': run[0][0], 'hr_voices': [part_names[i] for i in sorted(run[0][1])]}
-        for run in passages
-    ]
-    result = piece.detailIndex(pd.DataFrame(rows).set_index('Offset'), offset=True)
-    return result if len(result) else None
-
-
-def _piece_homorhythm(piece):
-    """piece.homorhythm(), falling back to homorhythm_rhythm_only() when
-    the piece has no lyrics at all -- see that function's docstring for
-    the full root-cause evidence. Checked cheaply and directly on the
-    underlying music21 score (any note anywhere with .lyric set) rather
-    than via piece.lyrics(), which would mean running CRIM's own lyric
-    extraction a second time just to answer a yes/no question this can
-    answer without it.
-
-    Returns (hr, used_rhythm_only_fallback) -- callers that show results
-    to the user (not the bulk CSV export, which just wants hr) use the
-    second value to say so explicitly rather than silently returning a
-    weaker result under the same label as CRIM's own text-aware one."""
-    hr = piece.homorhythm()
-    if hr is None:
-        has_lyrics = any(n.lyric for n in piece.score.recurse().notes)
-        if not has_lyrics:
-            return homorhythm_rhythm_only(piece), True
-    return hr, False
-
-
 def _append_timeline(stats, measure_values, label, color):
     """Appends one row per detected event to stats['timeline'] -- the
     data behind the strip-plot visualization rendered in show_result().
@@ -740,15 +595,14 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
 
     if include_homorhythm:
         try:
-            hr, hr_rhythm_only = _piece_homorhythm(piece)
+            hr = piece.homorhythm()
         except Exception:
-            hr, hr_rhythm_only = None, False
+            hr = None
             stats['hr_failed'] = True
         if hr is not None and not hr.empty:
             annotated_score, hr_stats = annotate_homorhythm(
                 annotated_score, hr, piece._getPartNames()
             )
-            stats['hr_rhythm_only'] = hr_rhythm_only
             stats['hr_labeled'] = hr_stats['labeled']
             stats['hr_colored'] = hr_stats['colored']
             _append_timeline(stats, hr.index.get_level_values('Measure'), 'Homorhythm', HOMORHYTHM_COLOR)
@@ -964,15 +818,13 @@ _HOMORHYTHM_CAVEAT = (
     "Needs lyrics encoded in the source. Without any at all (true of "
     "this app's whole Palestrina corpus -- checked directly, zero **text "
     "spines in the raw files), CRIM's own detection can never find "
-    "anything, so a weaker rhythm-only fallback is used instead -- see "
-    "the explainer below."
+    "anything -- it will always come back empty for those pieces, not "
+    "a bug in this app, see the explainer below."
 )
 _METHODS_BLURB_HOMORHYTHM = (
     "Homorhythmic passages were identified using CRIM Intervals' homorhythm() "
     "method, which finds passages where two or more voices share both rhythm and "
-    "lyrics; for pieces with no lyrics encoded in the source at all, a rhythm-only "
-    "fallback was used instead, requiring EVERY voice sounding at a given moment "
-    "(not just however many happen to attack together) to move in unison."
+    "lyrics."
 )
 
 
@@ -1065,14 +917,6 @@ def show_result(annotated_score, stats, filename_stem, include_cadences=False, i
             f"{stats['hr_labeled']} homorhythmic passage(s) found -- "
             f"{stats['hr_colored']} notes colored (green)."
         )
-        if stats.get('hr_rhythm_only'):
-            st.info(
-                "This piece has no lyrics encoded in its source, so CRIM's own "
-                "homorhythm() can't run (it requires matching lyrics as well as "
-                "rhythm) -- the passages above were found with a rhythm-only "
-                "fallback instead: same voices moving in the same rhythm, but "
-                "without CRIM's stronger 'same words at the same time' claim."
-            )
     if stats.get('ptypes_failed'):
         st.info(
             "Points-of-imitation detection hit an internal error on this piece and "
@@ -1454,17 +1298,12 @@ tool (confirmed on the music21-bundled Palestrina corpus) have no lyrics
 attached to the notes whatsoever -- CRIM's `homorhythm()` then reports
 zero passages for every single piece from that source, regardless of
 how rhythmically homophonic the music actually is, since it can never
-pass the lyrics half of the check. This tool falls back to a
-**rhythm-only** version of the same detection for pieces with no lyrics
-at all, checking each voice's actual note-by-note sounding, not just
-where it attacks: at every moment, every voice genuinely sounding then
-(holding a note, whether it just attacked or is mid-note) has to attack
-together with all the others for that moment to count -- a voice
-sustaining a note while the others move does NOT count as homorhythm,
-even if some subset of the voices happen to move together. It finds
-real rhythmic homophony among everyone actually sounding, just without
-CRIM's stronger "same words at the same time" claim -- worth knowing if
-you're citing a result from a source without text underlay.
+pass the lyrics half of the check. This is a real, disclosed limitation
+of the underlying method on that kind of source, not a bug in this
+app -- a rhythm-only fallback was tried here and removed again (it
+didn't hold up well enough in practice), so a lyrics-less piece simply
+won't show any homorhythm results at all, rather than a weaker
+approximation under the same label.
 
 **What actually appears on the score:** every note belonging to a
 matching passage is colored **green** (cadences are red, points of
@@ -1544,15 +1383,14 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
             _append_timeline(stats, first_entry_measures, 'Points of Imitation', PRESENTATION_COLOR)
     if include_homorhythm:
         try:
-            hr, hr_rhythm_only = _piece_homorhythm(piece)
+            hr = piece.homorhythm()
         except Exception:
-            hr, hr_rhythm_only = None, False
+            hr = None
             stats['hr_failed'] = True
         if hr is not None and not hr.empty:
             annotated_score, hr_stats = annotate_homorhythm(
                 annotated_score, hr, piece._getPartNames()
             )
-            stats['hr_rhythm_only'] = hr_rhythm_only
             stats['hr_labeled'] = hr_stats['labeled']
             stats['hr_colored'] = hr_stats['colored']
             _append_timeline(stats, hr.index.get_level_values('Measure'), 'Homorhythm', HOMORHYTHM_COLOR)
@@ -2299,7 +2137,7 @@ def _bulk_analysis_csv_bytes(matches, include_cadences, include_ptypes, include_
 
             if include_homorhythm:
                 try:
-                    hr, _hr_rhythm_only = _piece_homorhythm(piece)
+                    hr = piece.homorhythm()
                 except Exception:
                     hr = None
                 if hr is not None and not hr.empty:
