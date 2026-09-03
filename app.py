@@ -1327,6 +1327,84 @@ Project (CRIM)"](https://online.ucpress.edu/jams/article/77/3/863/203475/Citatio
         """
     )
 
+with st.expander("📚 Bibliography -- every method cited in this app, in one place"):
+    st.markdown(
+        """
+Every citation below already appears somewhere in this app -- next to
+the specific label, filter, or method it backs (the "References"
+sections of the expanders above, and the modal-family filter's own
+help text on the Browse tab). Collected here as one list, organized by
+what each source actually backs, for anyone who wants the full
+bibliography without hunting through several different expanders --
+not a new claim about what this app does, just the same sources in one
+place. See "ℹ️ Credits & data sources" above for the 7 score
+collections themselves and their own licenses, which is a separate
+question from the scholarly literature below.
+
+**Cadence detection & typology** (the CVF names, cadence type labels,
+and the pairwise-interval detection method itself):
+- Bernhard Meier, *Die Tonarten der klassischen Vokalpolyphonie*
+  (Utrecht: A. Oosthoek, 1974); trans. Ellen S. Beebe, rev. by the
+  author, as *[The Modes of Classical Vocal Polyphony: Described
+  According to the
+  Sources](https://openlibrary.org/works/OL3121670W/The_modes_of_classical_vocal_polyphony)*
+  (New York: Broude Brothers, 1988).
+- Alexander Morgan, Daniel Russo-Batterham, and Richard Freedman,
+  ["Musicologists and Data Scientists Pull out all the Stops: Defining
+  Renaissance Cadences
+  Systematically"](https://www.academia.edu/109443988/Musicologists_and_Data_Scientists_Pull_out_all_the_Stops_Defining_Renaissance_Cadences_Systematically)
+  (Music Encoding Conference, Halifax, Canada, 2022).
+
+**Points of imitation / presentation types** (the Point of
+Entry/Imitative Duo/Fuga terminology and classification):
+- Peter N. Schubert, *Modal Counterpoint, Renaissance Style* (New York:
+  Oxford University Press, 1999).
+- Julie E. Cumming and Peter Schubert, "The Origins of Pervasive
+  Imitation," in *The Cambridge History of Fifteenth-Century Music*,
+  ed. Anna Maria Busse Berger and Jesse Rodin (Cambridge: Cambridge
+  University Press, 2015), chapter 12.
+
+**Homorhythm & the CRIM Project itself:**
+- Richard Freedman and David Fiala, ["Citations: The Renaissance
+  Imitation Mass Project
+  (CRIM)"](https://online.ucpress.edu/jams/article/77/3/863/203475/Citations-The-Renaissance-Imitation-Mass-Project),
+  *Journal of the American Musicological Society* 77, no. 3 (2024):
+  863-875.
+
+**Modal theory & the Browse tab's Modal family filter** (why it groups
+by family rather than showing a raw finalis pitch, and why Tritus
+carries its own caveat):
+- Heinrich Glarean, *Dodecachordon* (Basel, 1547) -- the primary source
+  for the 12-mode system this filter's 6 families are drawn from
+  (the 4 traditional finals plus Glarean's own added Ionian/Aeolian).
+- Daniel C. Tompkins, ["A Cluster Analysis for Mode Identification in
+  Early Music
+  Genres"](https://link.springer.com/chapter/10.1007/978-3-319-71827-9_24),
+  in *Mathematics and Computation in Music* (MCM 2017), Lecture Notes
+  in Computer Science, vol. 10527 (Cham: Springer, 2017) -- ran on this
+  same music21-bundled Palestrina corpus; the specific finding behind
+  the Tritus/F-final caveat.
+
+**Software this app is built on:**
+- [CRIM Intervals](https://github.com/HCDigitalScholarship/intervals)
+  -- Richard Freedman (Haverford College) and the [CRIM
+  Project](https://crimproject.org/) team. Every cadence, point of
+  imitation, and homorhythmic passage this app marks comes from calling
+  its `cadences()`/`presentationTypes()`/`homorhythm()` directly, not a
+  reimplementation.
+- Michael Scott Cuthbert and Christopher Ariza, ["music21: A Toolkit
+  for Computer-Aided Musicology and Symbolic Music
+  Data"](https://www.music21.org/) (2010) -- every score this app reads
+  is parsed with it.
+
+**A citation missing something, or reads wrong?** These are transcribed
+by hand from each source's own title page/DOI, not auto-generated --
+open an issue on [this repo's own
+GitHub](https://github.com/vclag/Renaissance-score-workbench) if one
+looks off.
+        """
+    )
+
 def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, include_homorhythm=False):
     """Shared by the CRIM tab and Browse: import + metadata-fix, then
     whichever of CRIM's three analyses are requested, for one CRIM MEI
