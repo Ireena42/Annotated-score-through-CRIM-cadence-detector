@@ -54,7 +54,7 @@ from corpus_sources import (
     CORPUS_COMPOSERS, list_pieces_for_composer, fetch_crim_pieces, fetch_jrp_pieces,
     fetch_1520s_pieces, fetch_tasso_pieces, fetch_seils_pieces, fetch_lassus_psalms_pieces,
     KERN_COLLECTION_BASE_URLS, build_browse_index, group_browse_rows, parse_music21_piece,
-    last_member_label, _palestrina_movement_members,
+    last_member_label, _palestrina_movement_members, _palestrina_key_signature_flats,
 )  # piece-enumeration layer -- see corpus_sources.py's own module docstring for why
   # this moved out of app.py (precompute_finalis.py needs the identical logic too).
 
@@ -1921,6 +1921,45 @@ _MODAL_FAMILY_BY_FINAL = {
     'D': 'protus', 'E': 'deuterus', 'F': 'tritus', 'G': 'tetrardus',
     'C': 'ionian', 'A': 'aeolian',
 }
+
+# cantus mollis (one flat in the signature) doesn't just "soften" a
+# mode -- it transposes the WHOLE diatonic collection up a fourth (down
+# a fifth). A piece under mollis with final X sounds exactly like the
+# UNTRANSPOSED mode on (X - a fourth), just moved. This is standard
+# 16th-century theory, not something invented here -- it's the second
+# half of Powers' own "tonal type" system (cleffing + durus/mollis +
+# final; Powers 1981, already in the Bibliography below) and is
+# discussed at length in Meier's book (also already cited) under
+# "transposition," the other main variable alongside "system" that
+# determines a piece's real modal identity.
+#
+# Concretely, for the finals this corpus actually uses:
+#   G + mollis -> sounds like untransposed D-Dorian    -> Protus
+#   F + mollis -> sounds like untransposed C-Ionian     -> Ionian
+#     (the specific case a user flagged directly: F-final with a flat
+#     signature was showing as Tritus/Lydian -- wrong, because the
+#     flat removes exactly the raised-4th that DEFINES Lydian, leaving
+#     the plain major-scale pattern transposed to F)
+#   D + mollis -> sounds like untransposed A-Aeolian    -> Aeolian
+#   C + mollis -> sounds like untransposed G-Mixolydian -> Tetrardus
+#   A + mollis -> sounds like untransposed E-Phrygian   -> Deuterus
+# E + mollis is deliberately NOT in this table: its durus-minus-a-
+# fourth equivalent is B, and B-final (Locrian) was never a usable mode
+# in 16th-century practice (its 5th above the final is diminished, not
+# perfect) -- so an E-final piece with a flat doesn't transpose onto
+# any real family this way; it's left as plain Deuterus, unreclassified.
+# B-flat-final pieces (the final itself already flatted) are a further,
+# rarer case not handled here -- still 'nonstandard', same as before.
+#
+# Verified directly against this corpus before relying on it: checked
+# every Palestrina piece's own encoded key signature (0 or 1 flat, no
+# sharps, no piece with more than 1 flat -- see corpus_sources.
+# _palestrina_key_signature_flats) crossed with its precomputed finalis;
+# 459 of 1318 pieces (34.8%) carry a 1-flat signature on one of these 5
+# finals and were, before this fix, silently placed in the wrong family.
+_MOLLIS_TRANSPOSITION = {
+    'G': 'protus', 'F': 'ionian', 'D': 'aeolian', 'C': 'tetrardus', 'A': 'deuterus',
+}
 _MODAL_FAMILIES = [
     ('protus', 'Protus -- Dorian/Hypodorian'),
     ('deuterus', 'Deuterus -- Phrygian/Hypophrygian'),
@@ -1941,21 +1980,37 @@ _MODAL_FAMILY_LABELS = dict(_MODAL_FAMILIES)
 # the two, so a result set including Tritus pieces doesn't get read as a
 # stronger claim than the underlying pitch content supports.
 _TRITUS_CAVEAT = (
-    "Tritus (F-final) results: in this Palestrina corpus, F-final pieces' pitch-class "
-    "profiles cluster with Ionian (C-final), not separately -- Tompkins (2017) found "
-    "sharp-4 gets lowered by musica ficta too consistently for Lydian to read as "
-    "statistically distinct from Ionian in the actual notes, even when notated as Lydian."
+    "Tritus (F-final, untransposed -- no flat in the signature) results: Tompkins (2017) "
+    "found F-final pieces' pitch-class profiles cluster with Ionian (C-final), not "
+    "separately, even for genuinely untransposed ones -- sharp-4 gets lowered by musica "
+    "ficta too consistently for Lydian to read as statistically distinct from Ionian in "
+    "the actual notes. (F-final pieces WITH a flat in the signature are no longer shown "
+    "here at all -- see the modal family filter's own help text -- they're reclassified "
+    "as Ionian outright, since the flat removes Lydian's defining raised 4th.)"
 )
 
 
-def _modal_family_key(finalis_pitch):
-    """Pitch class (e.g. 'G', 'C#') -> one of _MODAL_FAMILIES' first
-    elements. Anything outside the 6 standard finals (accidental/
-    chromatic finals like 'C#', 'B-', 'F#' -- real but rare in this
-    corpus' precomputed data, ~2.4% of Palestrina pieces, checked
-    directly -- almost certainly transposition or lower-confidence
-    heuristic artifacts, not a 7th family) falls back to 'nonstandard'
-    rather than being force-mapped onto one of the 6 real families."""
+def _modal_family_key(finalis_pitch, flats=0):
+    """Pitch class (e.g. 'G', 'C#') plus the piece's own key-signature
+    flat count -> one of _MODAL_FAMILIES' first elements.
+
+    flats=1 (cantus mollis) routes through _MOLLIS_TRANSPOSITION first
+    -- see that mapping's own docstring for the musicological
+    reasoning -- falling back to the plain untransposed mapping below
+    only for a final that mapping doesn't cover (E, or anything
+    already 'nonstandard'). flats=0 (or not supplied -- every caller
+    outside the Palestrina-specific one defaults to 0, since flat data
+    is only available for that collection so far) skips straight to
+    the untransposed mapping, unchanged from before.
+
+    Anything outside the 6 standard finals (accidental/chromatic finals
+    like 'C#', 'B-', 'F#' -- real but rare in this corpus' precomputed
+    data, ~2.4% of Palestrina pieces, checked directly -- almost
+    certainly transposition or lower-confidence heuristic artifacts,
+    not a 7th family) falls back to 'nonstandard' rather than being
+    force-mapped onto one of the 6 real families."""
+    if flats == 1 and finalis_pitch in _MOLLIS_TRANSPOSITION:
+        return _MOLLIS_TRANSPOSITION[finalis_pitch]
     return _MODAL_FAMILY_BY_FINAL.get(finalis_pitch, 'nonstandard')
 
 
@@ -2770,8 +2825,15 @@ with tab_browse:
              "numbered mode: this app never determines ambitus, so it can't tell authentic "
              "from plagal, and Tompkins (2017, MCM/LNCS 10527) found this exact Palestrina "
              "corpus's own pitch content only reliably supports about this many groups, not "
-             "the full theoretical set. Based on the precomputed finalis in data/finalis.jsonl "
-             "-- pieces with no successful finalis result aren't matchable by this filter.",
+             "the full theoretical set. For Palestrina, also accounts for cantus mollis "
+             "(a flat in the signature) transposing the WHOLE family -- e.g. an F-final "
+             "piece WITH a flat is grouped as Ionian, not Tritus, since the flat removes "
+             "Lydian's own defining raised 4th (standard theory, Powers 1981/Meier 1988, "
+             "see Bibliography below) -- checked directly, this reclassifies 459 of 1318 "
+             "Palestrina pieces (35%), not a rare edge case. Not yet done for the other 6 "
+             "collections (would need a per-piece fetch just for the key signature). Based "
+             "on the precomputed finalis in data/finalis.jsonl -- pieces with no successful "
+             "finalis result aren't matchable by this filter.",
     )
     only_confident_finalis = False
     if selected_families:
@@ -2842,10 +2904,26 @@ with tab_browse:
                     return last_member_label(label, native_ref[0], native_ref[1])
                 return label
 
+            palestrina_flats = _palestrina_key_signature_flats()
+
+            def _row_flats(row):
+                # cantus-mollis (1-flat) transposition data -- see
+                # _MOLLIS_TRANSPOSITION's own docstring -- only exists
+                # for Palestrina so far (cheap local file reads; the
+                # other 6 collections would need a per-piece network
+                # fetch just for this, not done here). Every other row
+                # gets 0 -- the untransposed mapping, unchanged from
+                # before this fix, not "confirmed no flat".
+                label, collection, native_ref = row
+                if collection != 'music21' or native_ref[0] != 'palestrina':
+                    return 0
+                members = _palestrina_movement_members().get(native_ref[1], [native_ref[1]])
+                return palestrina_flats.get(members[-1], 0)
+
             matches = [
                 row for row in matches
                 if (record := finalis_index.get(_finalis_lookup_label(row))) is not None
-                and _modal_family_key(record['finalis']) in selected_family_keys
+                and _modal_family_key(record['finalis'], _row_flats(row)) in selected_family_keys
                 and (not only_confident_finalis or record['source'] in _CONFIDENT_FINALIS_SOURCES)
             ]
 

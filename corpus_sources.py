@@ -204,6 +204,33 @@ def _palestrina_movement_members():
     }
 
 
+@_cache_data_no_ttl
+def _palestrina_key_signature_flats():
+    """{piece_id: flat_count} for every Palestrina file -- read directly
+    from the raw .krn key-signature line (e.g. '*k[b-]' = one flat,
+    '*k[]' or no such line at all = none), a cheap header scan with no
+    full music21 parse needed, the same convention _local_file_stats
+    (app.py) already uses for voice-count/has-text. Only ever produces
+    0 or 1 in this corpus in practice (checked directly: a handful of
+    rarer chromatic finals exist, but no piece was found with 2+
+    flats), which is exactly what the cantus-durus/cantus-mollis
+    transposition scheme this feeds (see app.py's
+    _MOLLIS_TRANSPOSITION) is built to handle -- see that mapping's own
+    docstring for the musicological reasoning and citations.
+    """
+    flats = {}
+    for f in m21.corpus.getComposer('palestrina'):
+        try:
+            with open(f, encoding='utf-8', errors='ignore') as fh:
+                for line in fh:
+                    if line.startswith('*k['):
+                        flats[f.stem] = line.split('\t')[0].count('-')
+                        break
+        except Exception:
+            pass
+    return flats
+
+
 def _voice_slot_keys(score):
     """Ordered [(part_name, occurrence_index), ...] for one Score's
     parts -- a stable identity for a voice even when several of a
