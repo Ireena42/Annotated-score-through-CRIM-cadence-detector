@@ -439,6 +439,53 @@ _HUMDRUM_EDITION_FIELDS = [
     ('humdrum:PWK', 'Print/manuscript source'),
 ]
 
+# Volume -> editor for "Le Opere Complete di Giovanni Pierluigi da
+# Palestrina" (Rome: Fratelli Scalera / Istituto italiano per la storia
+# della musica, 1939-1999, 35 vols) -- the specific edition this app's
+# Palestrina corpus cites via its own encoded YOR field (see
+# _HUMDRUM_EDITION_FIELDS above), e.g. "Le Opere Complete, v. 18, p. 126".
+# The volume number alone doesn't say who edited it -- Casimiri (who
+# started the whole series) didn't edit all 35 volumes himself, later
+# volumes were finished by others after his death. Editor-per-volume-range
+# confirmed via IMSLP and two independent secondary sources (not the
+# comment already above this dict, which only asserted it qualitatively):
+# https://imslp.org/wiki/Le_opere_complete_di_Giovanni_Pierluigi_da_Palestrina_(Palestrina,_Giovanni_Pierluigi_da)
+# https://www.farcoro.it/2010/09/28/palestrina-mantova-storia-relazione-distanza/
+# Deliberately editor-only, no publication year: a few individual
+# volumes' years turned up in that research (e.g. 18-19 -> 1954), but not
+# reliably for all 15 volumes this corpus actually cites, and at least one
+# (vol. 15) has a genuine original-1941-vs-1964-75-Bianchi-reprint
+# ambiguity the encoded YOR field doesn't resolve -- showing a year for
+# some volumes and not others, or guessing, would be less honest than
+# showing none.
+_OPERE_COMPLETE_EDITORS = [
+    # (inclusive volume range, editor name)
+    ((1, 16), 'Raffaele Casimiri'),
+    ((17, 17), 'Lavinio Virgili'),
+    ((18, 19), 'Knud Jeppesen'),
+    ((20, 35), 'Lino Bianchi'),
+]
+_OPERE_COMPLETE_VOLUME_RE = re.compile(r'Opere Complete,?\s*v\.?\s*(\d+)', re.IGNORECASE)
+
+
+def _opere_complete_editor(yor_value):
+    """Given a YOR field's value (e.g. 'Le Opere Complete, v. 18, p.
+    126'), returns the editor name for that volume from
+    _OPERE_COMPLETE_EDITORS, or None if this isn't an Opere Complete
+    citation at all, or its volume number falls outside every mapped
+    range (shouldn't happen for this app's own Palestrina corpus --
+    checked directly, every volume actually cited by any file in it is
+    1-30 -- but a stray/future file citing vol. 31-35 unmapped-detail
+    would just silently get no editor shown, not a wrong one)."""
+    m = _OPERE_COMPLETE_VOLUME_RE.search(yor_value)
+    if not m:
+        return None
+    vol = int(m.group(1))
+    for (lo, hi), editor in _OPERE_COMPLETE_EDITORS:
+        if lo <= vol <= hi:
+            return editor
+    return None
+
 
 def _humdrum_edition_info(score):
     """Whatever edition/source fields this piece's own file actually
@@ -453,12 +500,26 @@ def _humdrum_edition_info(score):
     different, richer scheme (see _crim_edition_info). Returns a list
     of (label, value) pairs for only the fields actually present, in a
     fixed order -- empty if this score has no metadata at all, or none
-    of these specific fields (never raises)."""
+    of these specific fields (never raises).
+
+    Adds one more pair, 'Editor', right after 'Original print edition'
+    when that field is an Opere Complete citation with a mapped volume
+    (see _opere_complete_editor) -- not itself an encoded field, derived
+    from the volume number in YOR, so it's inserted here rather than
+    added to _HUMDRUM_EDITION_FIELDS (which only ever reads what's
+    literally in the file)."""
     try:
         meta = dict(score.metadata.all())
     except Exception:
         return []
-    return [(label, str(meta[key])) for key, label in _HUMDRUM_EDITION_FIELDS if meta.get(key)]
+    info = [(label, str(meta[key])) for key, label in _HUMDRUM_EDITION_FIELDS if meta.get(key)]
+    for i, (label, value) in enumerate(info):
+        if label == 'Original print edition':
+            editor = _opere_complete_editor(value)
+            if editor:
+                info.insert(i + 1, ('Editor', editor))
+            break
+    return info
 
 
 _MEI_NS = {'mei': 'http://www.music-encoding.org/ns/mei'}
