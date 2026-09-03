@@ -1397,10 +1397,12 @@ carries its own caveat):
 ### Further reading -- computational musicology & Renaissance polyphony, more broadly
 
 Not used by any feature in this app -- related work on applying
-computational/statistical methods to this same repertoire (several to
-Palestrina specifically), for anyone using this app as part of broader
-research into the field:
+computational/statistical methods to this same repertoire (most of it
+to Palestrina specifically), for anyone using this app as part of
+broader research into the field. Grouped by what each one actually
+does, the same way the section above is.
 
+**Melodic pattern-finding & retrieval:**
 - Morwaread Mary Farbood and Bernd Schöner, ["Analysis and Synthesis of
   Palestrina-Style Counterpoint Using Markov
   Chains"](https://quod.lib.umich.edu/i/icmc/bbp2372.2001.003/2/) (Proceedings
@@ -1423,7 +1425,7 @@ research into the field:
 - David Meredith, Kjell Lemström, and Geraint A. Wiggins, ["Algorithms
   for Discovering Repeated Patterns in Multidimensional Representations
   of Polyphonic
-  Music"](https://www.researchgate.net/publication/2525888_Algorithms_for_Discovering_Repeated_Patterns_in_Multidimensional_Representations_of_Polyphonic_Music),
+  Music"](https://doi.org/10.1076/jnmr.31.4.321.14162),
   *Journal of New Music Research* 31, no. 4 (2002): 321-345 -- the
   SIA/SIATEC/COSIATEC algorithms, a foundational general-purpose method
   for finding repeated patterns in polyphonic music that later
@@ -1436,14 +1438,101 @@ research into the field:
   Heidelberg: Springer, 2010), 466-482 -- polyphonic score alignment,
   the general problem underlying any "does this passage match that
   one" comparison across encoded scores.
-- Martha E. Thomae, ["Semi-Automatic Pipeline for the Transcription of
-  Mensural Polyphony into Symbolic Interpreted
-  Scores"](https://doi.org/10.5334/tismir.292), *Transactions of the
-  International Society for Music Information Retrieval* 9, no. 1
-  (2026): 293-308 -- an OMR + rhythmic-interpretation pipeline for
-  turning scanned mensural-notation sources (Renaissance originals, not
-  a modern transcription) into symbolic scores -- the step that has to
-  happen before a corpus like this app's own can even be built.
+- Francisco Gómez, Manuel Tizón, Aitor Arronte Alvarez, and Victor
+  Padilla, ["Rhetorical Pattern
+  Finding"](https://doi.org/10.9781/ijimai.2022.10.002),
+  *International Journal of Interactive Multimedia and Artificial
+  Intelligence* (June 2023) -- uses the BIDE sequence-mining algorithm
+  to automatically find rhetorical figures (epizeuxis, palilogy, synonymia, polyptoton)
+  in Victoria's Masses, reaching 98.1% recall against expert human
+  annotation (71.7% precision -- most of the "extra" matches turned out
+  to be real patterns nested inside ones the human annotators had
+  already flagged, not false positives).
+
+**Dissonance treatment & contrapuntal rules:**
+- Torsten Anders and Benjamin Inden, ["Machine Learning of Symbolic
+  Compositional Rules with Genetic Programming: Dissonance Treatment in
+  Palestrina"](https://doi.org/10.7717/peerj-cs.244), *PeerJ Computer
+  Science* 5 (2019): e244 -- labels dissonances in Palestrina's own
+  Masses (the same music21-bundled corpus this app uses) with a custom
+  algorithm, clusters them into dissonance categories (passing tone,
+  suspension, etc.) with DBSCAN, then learns symbolic composition rules
+  describing each category's treatment with genetic programming --
+  rules expressed as human-readable logic/numeric formulas, not just a
+  black-box classifier.
+- Andie Sigler, Jon Wild, and Eliot Handelman, ["Schematizing the
+  Treatment of Dissonance in 16th-Century
+  Counterpoint"](https://archives.ismir.net/ismir2015/paper/000153.pdf),
+  *Proceedings of ISMIR 2015*: 645-651 -- automatic annotation and
+  database methods build a schema of dissonance treatment across
+  nearly 1,000 Mass movements by Palestrina and Victoria, finding 297
+  distinct dissonance structures -- suggestive of a large but genuinely
+  bounded "composable space" rather than either a fixed rulebook or
+  anything-goes.
+- L. Light and Claire Arthur, ["Voice-Leading in Palestrina's Masses:
+  A Comparison of Interval-Succession
+  Definitions"](https://kb.osu.edu/bitstream/handle/1811/93179/1/FDMC_2021_Light_054.pdf)
+  (Future Directions of Music Cognition, Ohio State University, Feb.
+  2021) -- finds that violations of traditional voice-leading rules
+  (e.g. parallel 5ths/octaves) are significantly more frequent at the
+  metric-pulse level than the individual-note level -- a methodologically
+  important result showing that the choice of analytical unit changes
+  the empirical outcome, not just its precision.
+- Claire Arthur, ["Vicentino versus Palestrina: A Computational
+  Investigation of Voice Leading across Changing Vocal
+  Densities"](https://doi.org/10.1080/09298215.2021.1877729), *Journal
+  of New Music Research* 50, no. 1 (2021): 1-19 -- computationally
+  compares the contrapuntal rules Vicentino theorized against
+  Palestrina's actual practice, finding general agreement but also
+  that Vicentino's taxonomy is too rigid to fully describe how
+  Palestrina really used it.
+- Peter Schubert and Marcelle Lessoil-Daelman, ["What Modular Analysis
+  Can Tell Us About Musical Modeling in the
+  Renaissance"](https://mtosmt.org/issues/mto.13.19.1/mto.13.19.1.schubert_lessoil-daelman.html),
+  *Music Theory Online* 19, no. 1 (2013) -- modular analysis (tracking
+  recurring contrapuntal combinations) of two Kyrie settings by Lassus
+  and Palestrina built on the same Lupi chanson model, finding
+  Palestrina works "from within" by increasing contrapuntal density
+  while Lassus builds longer formal spans.
+
+**Style, attribution & clustering:**
+- María Elena Cuenca Rodríguez and Richard Freedman, ["Pedagogía del
+  análisis computacional para repertorios renacentistas: el proyecto
+  CRIM y las misas de Pedro Fernández
+  Buch"](https://resonancias.uc.cl/wp-content/uploads/sites/13/2024/12/REV_2.Resonancias-55-Cuenca-11-44.pdf),
+  *Resonancias* 28, no. 55 (julio-diciembre 2024): 11-44 -- uses CRIM
+  Intervals itself (the exact tool this app is built on) to teach and
+  analyze the parody-mass technique in Pedro Fernández Buch's Masses on
+  models by Francisco Guerrero, showing how the composer transforms
+  borrowed material by building non-imitative duets from it.
+- Bram Geelen, David Burn, and Bart De Moor, ["A Clustering Analysis of
+  Renaissance Polyphony Using State-Space
+  Models"](https://doi.org/10.1484/J.JAF.5.124209), *Journal of the
+  Alamire Foundation* 13, no. 1 (2021): 127-146 -- clusters pieces from
+  the Josquin Research Project by modeling each one's 12-pitch-class
+  activity over time as a state-space system, using the resulting
+  clusters both to suggest attributions for disputed works and to
+  visualize the whole corpus via unsupervised dimensionality reduction
+  -- the authors are candid that the method still lags purpose-built
+  attribution approaches, since it relies on harmonic progression
+  alone.
+- María Elena Cuenca-Rodríguez and Cory McKay, ["Exploring Musical
+  Style in the Anonymous and Doubtfully Attributed Mass Movements of
+  the Coimbra Manuscripts: A Statistical and Machine Learning
+  Approach"](https://doi.org/10.1080/09298215.2020.1870505), *Journal
+  of New Music Research* 50, no. 3 (2021): 199-219 -- statistical/ML
+  methods applied to disputed mass movements from the Coimbra
+  manuscripts, probing stylistic differences between the Iberian and
+  Franco-Flemish traditions.
+- Cory McKay, Julie Cumming, and Ichiro Fujinaga, ["Lessons Learned in
+  a Large-Scale Project to Digitize and Computationally Analyze
+  Musical Scores"](https://doi.org/10.1093/llc/fqaa058), *Digital
+  Scholarship in the Humanities* 36, Supplement 2 (2021): ii198-ii202
+  -- a candid methodological retrospective on the SIMSSA project's own
+  pitfalls in large-scale corpus digitization and machine learning, with
+  concrete recommendations on data/software sharing for reproducibility.
+
+**Modal theory & statistics:**
 - Daniel Harasim, Fabian C. Moss, Matthias Ramirez, and Martin
   Rohrmeier, ["Exploring the Foundations of Tonality: Statistical
   Cognitive Modeling of Modes in the History of Western Classical
@@ -1461,16 +1550,6 @@ research into the field:
   this writing; building a new corpus-scale catalogue specifically for
   studying modal cycles (a full set of pieces spanning all the modes)
   across Renaissance polyphony.
-- Torsten Anders and Benjamin Inden, ["Machine Learning of Symbolic
-  Compositional Rules with Genetic Programming: Dissonance Treatment in
-  Palestrina"](https://doi.org/10.7717/peerj-cs.244), *PeerJ Computer
-  Science* 5 (2019): e244 -- labels dissonances in Palestrina's own
-  Masses (the same music21-bundled corpus this app uses) with a custom
-  algorithm, clusters them into dissonance categories (passing tone,
-  suspension, etc.) with DBSCAN, then learns symbolic composition rules
-  describing each category's treatment with genetic programming --
-  rules expressed as human-readable logic/numeric formulas, not just a
-  black-box classifier.
 - Claire Arthur, Julie E. Cumming, and Peter Schubert, ["The Role of
   Structural Tones in Establishing Mode in Renaissance
   Counterpoint"](https://doi.org/10.1093/oxfordhb/9780190945442.013.25),
@@ -1481,6 +1560,23 @@ research into the field:
   Lassus, Zarlino, Pontio, and Glarean), testing whether melodic leaps,
   outlines, and perfect vertical intervals actually highlight a mode's
   defining tones the way theory predicts.
+- Daniel Hensel, ["Modale Klangstrukturen in Madrigalen Giovanni
+  Pierluigi da Palestrinas und ihre Analyse durch die Software
+  PALESTRiNIZER"](https://doi.org/10.25162/AFMW-2022-0008), *Archiv für
+  Musikwissenschaft* 79, no. 2 (2022): 153-172 -- PALESTRiNIZER, custom
+  software for statistical analysis and visualization of modal
+  sound-structures in Palestrina's madrigals, surfacing differences
+  between genres (madrigal vs. motet) and between individual modes.
+
+**Transcription pipelines:**
+- Martha E. Thomae, ["Semi-Automatic Pipeline for the Transcription of
+  Mensural Polyphony into Symbolic Interpreted
+  Scores"](https://doi.org/10.5334/tismir.292), *Transactions of the
+  International Society for Music Information Retrieval* 9, no. 1
+  (2026): 293-308 -- an OMR + rhythmic-interpretation pipeline for
+  turning scanned mensural-notation sources (Renaissance originals, not
+  a modern transcription) into symbolic scores -- the step that has to
+  happen before a corpus like this app's own can even be built.
         """
     )
 
