@@ -1107,7 +1107,7 @@ restrictive) is [MIT-licensed](https://github.com/vclag/Renaissance-score-workbe
         """
     )
 
-with st.expander("What do the cadence labels mean?"):
+with st.expander("About cadence detection"):
     st.markdown(
         """
 Each label is `<CadType> → <Tone>` -- the kind of cadence, and which
@@ -1154,40 +1154,17 @@ CRIM detected the shape of, but that doesn't fully "land," which is why
 rows like this often have a blank CadType (no complete standard pattern
 matched) rather than one of the named types above.
 
-**References** -- the categories above aren't this app's own invention, or
-even CRIM's: the CVF names/roles are reproduced from
-[CRIM Intervals' own documentation](https://github.com/HCDigitalScholarship/intervals)
-(`ImportedPiece.cadences`/`.cvfs` docstrings), so this stays accurate if
-CRIM's own definitions change -- but CRIM itself is applying an existing
-musicological framework, not one it invented:
-- The Cantizans/Tenorizans/Bassizans/Altizans names are Bernhard Meier's
-  own Latin coinages for these voice-leading roles: Bernhard Meier, *Die
-  Tonarten der klassischen Vokalpolyphonie* (Utrecht: A. Oosthoek, 1974);
-  trans. Ellen S. Beebe, rev. by the author, as *The Modes of Classical
-  Vocal Polyphony: Described According to the Sources* (New York: Broude
-  Brothers, 1988).
-- The systematic classification into named cadence types (Authentic,
-  Phrygian, Clausula Vera, etc.) that CRIM's algorithm implements is
-  documented in Alexander Morgan, Daniel Russo-Batterham, and Richard
-  Freedman, ["Musicologists and Data Scientists Pull out all the Stops:
-  Defining Renaissance Cadences Systematically"](https://www.academia.edu/109443988/Musicologists_and_Data_Scientists_Pull_out_all_the_Stops_Defining_Renaissance_Cadences_Systematically)
-  (Music Encoding Conference, Halifax, Canada, 2022).
-        """
-    )
-
-with st.expander("How does the cadence detector actually work?"):
-    st.markdown(
-        """
-It doesn't look at the full chord at once -- it looks at **pairs of
-voices**, and tracks two things between each pair over time: the
-harmonic interval separating them (3rd, 5th, octave, ...) and each
-voice's own melodic motion (step up, step down, leap, by how much). A
-cadence, contrapuntally, is really a small number of well-known
-two-voice interval progressions -- e.g. a major 6th expanding to an
-octave (a classic Cantizans-Tenorizans pair), or a major 3rd contracting
-to a unison. CRIM has a table of these named two-voice patterns
-(`CVFLabels.csv`, inside the library itself) and scans **every pair of
-voices** in the piece for a match, at every point in time.
+**How it finds them:** it doesn't look at the full chord at once -- it
+looks at **pairs of voices**, and tracks two things between each pair
+over time: the harmonic interval separating them (3rd, 5th, octave,
+...) and each voice's own melodic motion (step up, step down, leap, by
+how much). A cadence, contrapuntally, is really a small number of
+well-known two-voice interval progressions -- e.g. a major 6th
+expanding to an octave (a classic Cantizans-Tenorizans pair), or a
+major 3rd contracting to a unison. CRIM has a table of these named
+two-voice patterns (`CVFLabels.csv`, inside the library itself) and
+scans **every pair of voices** in the piece for a match, at every point
+in time.
 
 **Why it needs at least 2 voices in the file, but works fine on a
 2-voice passage inside a bigger piece:** with only 1 voice there's no
@@ -1201,17 +1178,29 @@ dropdown above don't work here: their files are a single monophonic
 voice, full stop -- not "a 2-voice passage," genuinely no second voice
 to pair with, ever.)
 
-**Reference:** this pairwise, interval-progression approach to detecting
-cadences computationally is documented in Alexander Morgan, Daniel
-Russo-Batterham, and Richard Freedman, ["Musicologists and Data Scientists
-Pull out all the Stops: Defining Renaissance Cadences Systematically"](https://www.academia.edu/109443988/Musicologists_and_Data_Scientists_Pull_out_all_the_Stops_Defining_Renaissance_Cadences_Systematically)
-(Music Encoding Conference, Halifax, Canada, 2022) -- same paper as the
-cadence-labels expander above, since it covers both the categories and
-the detection method together.
+**References** -- neither the categories above nor the detection method
+are this app's own invention, or even CRIM's: the CVF names/roles are
+reproduced from [CRIM Intervals' own
+documentation](https://github.com/HCDigitalScholarship/intervals)
+(`ImportedPiece.cadences`/`.cvfs` docstrings), so this stays accurate if
+CRIM's own definitions change -- but CRIM itself is applying an
+existing musicological framework, not one it invented:
+- The Cantizans/Tenorizans/Bassizans/Altizans names are Bernhard Meier's
+  own Latin coinages for these voice-leading roles: Bernhard Meier, *Die
+  Tonarten der klassischen Vokalpolyphonie* (Utrecht: A. Oosthoek, 1974);
+  trans. Ellen S. Beebe, rev. by the author, as *The Modes of Classical
+  Vocal Polyphony: Described According to the Sources* (New York: Broude
+  Brothers, 1988).
+- The systematic classification into named cadence types (Authentic,
+  Phrygian, Clausula Vera, etc.), and this pairwise interval-progression
+  detection method itself, are documented in Alexander Morgan, Daniel
+  Russo-Batterham, and Richard Freedman, ["Musicologists and Data Scientists
+  Pull out all the Stops: Defining Renaissance Cadences Systematically"](https://www.academia.edu/109443988/Musicologists_and_Data_Scientists_Pull_out_all_the_Stops_Defining_Renaissance_Cadences_Systematically)
+  (Music Encoding Conference, Halifax, Canada, 2022).
         """
     )
 
-with st.expander("What do the points-of-imitation labels mean?"):
+with st.expander("About points of imitation detection"):
     st.markdown(
         """
 This is a separate feature from cadences -- turn it on with the "Mark
@@ -1272,7 +1261,7 @@ for the code side of that.
         """
     )
 
-with st.expander("What do the homorhythm labels mean?"):
+with st.expander("About homorhythmic passages detection"):
     st.markdown(
         """
 A third, separate feature -- turn it on with the "Mark homorhythmic
@@ -1327,19 +1316,27 @@ Project (CRIM)"](https://online.ucpress.edu/jams/article/77/3/863/203475/Citatio
         """
     )
 
-with st.expander("📚 Bibliography -- every method cited in this app, in one place"):
+with st.expander("📚 Bibliography"):
     st.markdown(
         """
-Every citation below already appears somewhere in this app -- next to
+Two parts. The first, **What this app actually uses**, is every
+citation that already appears somewhere else in this app -- next to
 the specific label, filter, or method it backs (the "References"
 sections of the expanders above, and the modal-family filter's own
 help text on the Browse tab). Collected here as one list, organized by
-what each source actually backs, for anyone who wants the full
-bibliography without hunting through several different expanders --
-not a new claim about what this app does, just the same sources in one
-place. See "ℹ️ Credits & data sources" above for the 7 score
-collections themselves and their own licenses, which is a separate
-question from the scholarly literature below.
+what each source backs, for anyone who wants the full bibliography
+without hunting through several different expanders -- not a new claim
+about what this app does, just the same sources in one place. The
+second, **Further reading**, is related computational-musicology work
+on Renaissance polyphony that this app does NOT itself implement or
+call -- included because it's directly relevant to what this app does
+(cadence/pattern detection, corpus-scale analysis, modal
+classification), not because any feature here is built on it. See "ℹ️
+Credits & data sources" above for the 7 score collections themselves
+and their own licenses, a separate question from the scholarly
+literature below.
+
+### What this app actually uses
 
 **Cadence detection & typology** (the CVF names, cadence type labels,
 and the pairwise-interval detection method itself):
@@ -1396,6 +1393,74 @@ carries its own caveat):
   for Computer-Aided Musicology and Symbolic Music
   Data"](https://www.music21.org/) (2010) -- every score this app reads
   is parsed with it.
+
+### Further reading -- computational musicology & Renaissance polyphony, more broadly
+
+Not used by any feature in this app -- related work on applying
+computational/statistical methods to this same repertoire (several to
+Palestrina specifically), for anyone using this app as part of broader
+research into the field:
+
+- Morwaread Mary Farbood and Bernd Schöner, ["Analysis and Synthesis of
+  Palestrina-Style Counterpoint Using Markov
+  Chains"](https://quod.lib.umich.edu/i/icmc/bbp2372.2001.003/2/) (Proceedings
+  of the International Computer Music Conference, Havana, Cuba, 2001) --
+  models Palestrina's own counterpoint rules as a Markov process, both
+  to analyze and to generate new counterpoint in the style.
+- Ian Knopke and Frauke Jürgensen, ["A System for Identifying Common
+  Melodic Phrases in the Masses of
+  Palestrina"](https://doi.org/10.1080/09298210903288329), *Journal of
+  New Music Research* 38, no. 2 (2009): 171-181 -- corpus-scale melodic
+  pattern-finding across Palestrina's complete Mass output (700+
+  sections, ~1,000,000 notes).
+- David Garfinkle, Claire Arthur, Peter Schubert, Julie Cumming, and
+  Ichiro Fujinaga, ["PatternFinder: Content-Based Music Retrieval with
+  music21"](https://doi.org/10.1145/3144749.3144751), *Proceedings of
+  the 4th International Workshop on Digital Libraries for Musicology*
+  (DLfM 2017, Shanghai, China): 5-8 -- a polyphonic pattern-search
+  toolkit built on the same music21 library this app uses, from several
+  of the same scholars behind CRIM's own presentation-types work.
+- David Meredith, Kjell Lemström, and Geraint A. Wiggins, ["Algorithms
+  for Discovering Repeated Patterns in Multidimensional Representations
+  of Polyphonic
+  Music"](https://www.researchgate.net/publication/2525888_Algorithms_for_Discovering_Repeated_Patterns_in_Multidimensional_Representations_of_Polyphonic_Music),
+  *Journal of New Music Research* 31, no. 4 (2002): 321-345 -- the
+  SIA/SIATEC/COSIATEC algorithms, a foundational general-purpose method
+  for finding repeated patterns in polyphonic music that later
+  Palestrina-specific pattern-search work (Knopke & Jürgensen above)
+  builds on.
+- Julien Allali, Pascal Ferraro, Pierre Hanna, and Matthias Robine,
+  ["Polyphonic Alignment Algorithms for Symbolic Music
+  Retrieval"](https://doi.org/10.1007/978-3-642-12439-6_24), in *CMMR/ICAD
+  2009*, Lecture Notes in Computer Science, vol. 5954 (Berlin,
+  Heidelberg: Springer, 2010), 466-482 -- polyphonic score alignment,
+  the general problem underlying any "does this passage match that
+  one" comparison across encoded scores.
+- Martha E. Thomae, ["Semi-Automatic Pipeline for the Transcription of
+  Mensural Polyphony into Symbolic Interpreted
+  Scores"](https://doi.org/10.5334/tismir.292), *Transactions of the
+  International Society for Music Information Retrieval* 9, no. 1
+  (2026): 293-308 -- an OMR + rhythmic-interpretation pipeline for
+  turning scanned mensural-notation sources (Renaissance originals, not
+  a modern transcription) into symbolic scores -- the step that has to
+  happen before a corpus like this app's own can even be built.
+- Daniel Harasim, Fabian C. Moss, Matthias Ramirez, and Martin
+  Rohrmeier, ["Exploring the Foundations of Tonality: Statistical
+  Cognitive Modeling of Modes in the History of Western Classical
+  Music"](https://doi.org/10.1057/s41599-020-00678-6), *Humanities and
+  Social Sciences Communications* 8, article 5 (2021) -- a different
+  statistical approach to the same question Tompkins (above) asks of
+  Palestrina specifically: how many modes does a given historical
+  period's music actually, empirically support -- finds 4 for the
+  Renaissance broadly, using a ~13,000-piece MIDI corpus rather than
+  Palestrina alone.
+- Frans Wiering and Mirjam Visscher, "Between Modes and Biggish Data:
+  Creating and Exploring a New Catalogue of Polyphonic Modal Cycles"
+  (Medieval and Renaissance Music Conference, MedRen 2025) -- a very
+  recent conference presentation, no stable public link found yet as of
+  this writing; building a new corpus-scale catalogue specifically for
+  studying modal cycles (a full set of pieces spanning all the modes)
+  across Renaissance polyphony.
 
 **A citation missing something, or reads wrong?** These are transcribed
 by hand from each source's own title page/DOI, not auto-generated --
