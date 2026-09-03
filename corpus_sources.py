@@ -408,7 +408,28 @@ def parse_music21_piece(corpus_key, piece_id):
                 titles.append(meta.get('title', member_id))
                 scores.append(s)
             return merge_movement_parts(scores, titles)
-    return m21.corpus.parse(f'{corpus_key}/{piece_id}'), None
+    score = m21.corpus.parse(f'{corpus_key}/{piece_id}')
+    if not score.metadata.title:
+        # Checked directly: several Monteverdi .mxl files (e.g.
+        # madrigal.3.7 = "Se per estremo ardore") carry NO title at all
+        # in their own embedded metadata -- s.metadata.title is None --
+        # even though a real title IS derivable, from a same-stem sibling
+        # file in music21's own metadata bundle (here, madrigal.3.7.rntxt,
+        # which DOES carry title 'Se per estremo ardore'). Left alone,
+        # this piece's exported MusicXML/PDF has no real title and
+        # music21's own writer falls back to a generic placeholder
+        # ("Music21 Fragment") -- the exact same failure class already
+        # fixed for CRIM pieces in app.py's _annotate_crim_piece.
+        # list_pieces_for_composer already resolves this correctly (it's
+        # what Browse's own dropdown label uses) via exactly this
+        # bundle-sibling lookup, so reuse it here rather than duplicating
+        # the logic -- it's cached (@_cache_data_no_ttl), so this costs
+        # nothing after the first call per corpus_key.
+        for label, pid in list_pieces_for_composer(corpus_key).items():
+            if pid == piece_id:
+                score.metadata.title = label
+                break
+    return score, None
 
 
 def group_browse_rows(rows):

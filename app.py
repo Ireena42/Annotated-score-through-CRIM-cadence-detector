@@ -631,6 +631,56 @@ def score_to_download_bytes(score):
         tmp_path.unlink(missing_ok=True)
 
 
+def _strip_phantom_verse_text(score):
+    """Some of this corpus's Renaissance-madrigal Finale/Dolet exports
+    encode a SECOND stanza of poetry as free-floating <direction>/<words>
+    text positioned by a 'relative-x' horizontal-cursor offset, instead
+    of as real per-note <lyric> content -- a Finale-specific layout hack
+    that doesn't survive translation into music21's object model as
+    anything but a pile of TextExpression objects with no positional
+    meaning left. Checked directly, not assumed: 14 of 49 Monteverdi
+    .mxl files in this corpus do this (madrigal.3.5/.6/.7/.9/.10/.11/
+    .12/.16/.17/.19/.20, 4.12, 4.20, 5.3), always in the Canto part's
+    very first measure, which otherwise has NO real notes at all -- e.g.
+    madrigal.3.7 ("Se per estremo ardore")'s Canto measure 1 holds 36
+    TextExpression objects and one filler Rest. Verovio has no way to
+    interpret 'relative-x' positioning and stacks each one on its own
+    row, reserving a huge blank vertical block on the page -- confirmed
+    directly against that same piece's own rendered SVG: ~15000 of the
+    page's 24940 units (roughly 60% of the page) of blank space between
+    the Canto and Quinto staves, exactly because of this.
+
+    Fix scope deliberately narrow, to avoid ever deleting a real
+    annotation: only strips TextExpression objects sitting in a measure
+    with ZERO real (non-rest) notes of its own AND more than 5 of them --
+    an ordinary title/tempo/directive marking never produces that
+    combination. Operates on a COPY: the original `score` -- what
+    "Download MusicXML"/"Download annotated MusicXML" actually offers --
+    keeps this text; only this (Verovio/PDF-rendering-bound) copy drops
+    it, since Verovio can't lay it out sanely either way and the
+    alternative is this blank-page bug, not a correctly rendered second
+    stanza. The lost text is a genuine, disclosed limitation of the PDF/
+    preview path specifically -- see README.md -- not of this app's own
+    data: it's still there in the downloadable MusicXML.
+    """
+    import copy
+    from music21 import expressions
+    score = copy.deepcopy(score)
+    for part in score.parts:
+        for m in part.getElementsByClass('Measure'):
+            tes = list(m.recurse().getElementsByClass(expressions.TextExpression))
+            if len(tes) <= 5:
+                continue
+            real_notes = [n for n in m.recurse().notesAndRests if not n.isRest]
+            if real_notes:
+                continue
+            for te in tes:
+                site = te.activeSite
+                if site is not None:
+                    site.remove(te)
+    return score
+
+
 def score_to_pdf_bytes(score):
     """PDF export via Verovio -- replaces an earlier attempt that went
     through music21's own LilyPond backend (score.write('lily.pdf')).
@@ -694,6 +744,7 @@ def score_to_pdf_bytes(score):
     # pip package's own data bundling right.
     verovio.setDefaultResourcePath(str(Path(__file__).parent / 'verovio_data'))
 
+    score = _strip_phantom_verse_text(score)
     xml_bytes = score_to_download_bytes(score)
     tk = verovio.toolkit()
     if not tk.loadData(xml_bytes.decode('utf-8')):

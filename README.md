@@ -526,6 +526,61 @@ silently misalign voices for most of the corpus. The original section
 boundaries are still marked on the score (as rehearsal-mark-style
 labels, e.g. "Pleni") so they're not lost.
 
+## Known Monteverdi encoding quirks (title, and a blank-page PDF bug)
+
+Found 2026-09-03 from a real user report ("il pdf è uno schifo... c'è
+tutto uno spazio bianco sulla prima pagina" / titles showing as generic
+"Music21 Fragment" text instead of the piece's real name), traced
+directly rather than guessed:
+
+- **Missing title.** Several Monteverdi `.mxl` files (e.g.
+  `madrigal.3.7` = "Se per estremo ardore") carry no title at all in
+  their own embedded metadata — `score.metadata.title` comes back
+  `None` from a direct parse — even though the real title IS derivable,
+  from a same-stem sibling file in music21's own metadata bundle (here,
+  `madrigal.3.7.rntxt`, which does carry it; this is exactly what
+  Browse's own dropdown label already reads). Left alone, this piece's
+  exported MusicXML/PDF has no real title and music21's own writer
+  falls back to a generic placeholder ("Music21 Fragment") — the same
+  failure class already fixed for CRIM pieces (`_annotate_crim_piece`
+  in `app.py`). Fixed the same way: `corpus_sources.parse_music21_piece`
+  now fills in a missing title from `list_pieces_for_composer`'s own
+  (already-correct) label lookup before returning the score.
+- **Blank space on page 1 of the PDF.** Some of this corpus's
+  Monteverdi Finale/Dolet exports encode a SECOND stanza of poetry as
+  free-floating `<direction>`/`<words>` text positioned by a
+  `relative-x` horizontal-cursor offset, instead of as real per-note
+  `<lyric>` content — a Finale-specific layout hack that doesn't
+  survive translation into music21's object model as anything but a
+  pile of `TextExpression` objects with no positional meaning left.
+  Checked directly, not assumed: **14 of 49** Monteverdi `.mxl` files in
+  this corpus do this (`madrigal.3.5/.6/.7/.9/.10/.11/.12/.16/.17/.19/
+  .20`, `4.12`, `4.20`, `5.3`), always in the Canto part's very first
+  measure, which otherwise has NO real notes at all — e.g.
+  `madrigal.3.7`'s Canto measure 1 holds 36 `TextExpression` objects and
+  one filler `Rest`. Verovio has no way to interpret `relative-x`
+  positioning and stacks each one on its own row, reserving a huge
+  blank vertical block on the page — confirmed directly against that
+  same piece's own rendered SVG: the gap between the Canto and Quinto
+  staff labels was ~15000 of the page's 24940 SVG units (roughly 60% of
+  the whole page), collapsing to the normal, uniform ~1800-unit spacing
+  once fixed. Fixed via a new `app.py` helper,
+  `_strip_phantom_verse_text`, called only inside `score_to_pdf_bytes`
+  on a **copy** of the score: strips `TextExpression` objects sitting in
+  a measure with zero real (non-rest) notes of its own AND more than 5
+  of them — a real title/tempo marking never produces that combination,
+  so this can't accidentally delete a normal annotation. The original
+  `score` object — what "Download MusicXML"/"Download annotated
+  MusicXML" actually offers — is untouched, so the second stanza's text
+  is never actually lost, only left out of the rendered PDF/preview,
+  which can't lay it out correctly either way.
+
+Both fixes verified directly against all 14 affected pieces (titles all
+resolve correctly, phantom text stripped, no crashes) plus two
+unaffected control pieces (a normal Palestrina piece and a Monteverdi
+piece with no phantom-text measure), confirming neither fix touches
+anything it shouldn't.
+
 ## Credits & licensing
 
 *(The same content is also in the app itself, in the "ℹ️ Credits & data
