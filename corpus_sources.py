@@ -160,6 +160,336 @@ def _palestrina_movement_label(stem):
     return f'{genre}{numeral}{part}'
 
 
+def _movement_group_key(piece_id):
+    """(group_key, part_letter_or_None). group_key is piece_id with its
+    trailing single-letter part suffix removed (e.g. 'Gloria_14_a' ->
+    'Gloria_14'), the same test _palestrina_movement_label above already
+    uses to detect this suffix (last underscore-separated token is a
+    single alphabetic character). part_letter is that trailing letter,
+    or None if piece_id has no such suffix (a normal, unsplit movement
+    -- its own group of one).
+
+    Canonical definition -- scripts/precompute_finalis.py imports this
+    rather than keeping its own copy (it used to; unified here so the
+    two can't drift). Only meaningful for corpus_key == 'palestrina';
+    callers are expected to guard that themselves (matches how
+    _palestrina_movement_label is only ever called for that composer).
+    """
+    tokens = piece_id.split('_')
+    if len(tokens) > 1 and len(tokens[-1]) == 1 and tokens[-1].isalpha():
+        return '_'.join(tokens[:-1]), tokens[-1]
+    return piece_id, None
+
+
+@_cache_data_no_ttl
+def _palestrina_movement_members():
+    """{group_key: [ordered real piece_ids]} for EVERY Palestrina movement
+    -- singletons (a movement that was never split, group of one) and
+    multi-part movements alike, ordered 'a' < 'b' < ... (confirmed
+    against real per-part title-incipit metadata, e.g. 'First Section',
+    'Et ex Patre', ..., 'Et vitam' for a 9-part Credo -- alphabetical
+    part-letter order IS liturgical/chronological order here, not just
+    an assumption). The one place that scans the raw file list for this
+    -- parse_music21_piece() and the browse-grouping layer both go
+    through this rather than re-deriving it.
+    """
+    groups = {}
+    for f in m21.corpus.getComposer('palestrina'):
+        stem = f.stem
+        group_key, part_letter = _movement_group_key(stem)
+        groups.setdefault(group_key, []).append((part_letter or '', stem))
+    return {
+        group_key: [stem for _, stem in sorted(members)]
+        for group_key, members in groups.items()
+    }
+
+
+def _voice_slot_keys(score):
+    """Ordered [(part_name, occurrence_index), ...] for one Score's
+    parts -- a stable identity for a voice even when several of a
+    score's parts share one name (e.g. two 'Soprano' lines in a
+    double-choir texture -> ('Soprano', 0), ('Soprano', 1)). Used to
+    align voices ACROSS a movement's separately-encoded parts, where
+    plain position (Part index 0, 1, 2...) is NOT reliable -- see
+    merge_movement_parts's own docstring for why."""
+    keys = []
+    seen = {}
+    for p in score.parts:
+        name = p.partName or 'Part'
+        idx = seen.get(name, 0)
+        keys.append((name, idx))
+        seen[name] = idx + 1
+    return keys
+
+
+def merge_movement_parts(scores, titles):
+    """Stitches a Palestrina movement's separately-encoded sub-sections
+    (e.g. Sanctus_92_a/b/c = 'First Section'/'Pleni'/'Hosanna') into ONE
+    continuous Score, for real analysis (cadences/presentationTypes/
+    homorhythm spanning a part boundary need to see the whole movement
+    at once, not 2-9 disconnected fragments) rather than just display.
+
+    scores: list of already-parsed music21 Scores, one per sub-section,
+        IN ORDER (see _palestrina_movement_members -- alphabetical part-
+        letter order).
+    titles: parallel list of each sub-section's own title (e.g. from its
+        metadata.title), used for the boundary labels this returns.
+
+    NOT a naive index-by-index concatenation (Part 0 of section A onto
+    Part 0 of section B, etc.) -- checked directly across a random
+    sample of 60 real multi-part movements and found 46 (77%!) change
+    voicing mid-movement: a voice drops out for a reduced-voice passage
+    (e.g. Sanctus_66_b is missing Soprano entirely for 'Pleni' -- a
+    classic, deliberate Renaissance texture contrast, not an encoding
+    gap), or a section is scored for full double choir (8 voices) while
+    an adjacent one (e.g. Credo_15's 'Crucifixus') drops to single choir
+    (4) -- also a real, celebrated compositional device (reduced voices
+    at 'Crucifixus... et sepultus est'), not noise. Index-based
+    concatenation would silently misalign voices across most of this
+    corpus's split movements.
+
+    Aligns by _voice_slot_keys() (name + occurrence index) instead: the
+    union of every section's voice-slot keys becomes the merged score's
+    part list. Within one section, a voice-slot that's genuinely absent
+    (tacet) is padded with a full measure-grid of rests -- MEASURE BY
+    MEASURE, copying that section's own real measure boundaries from
+    whichever part IS present there, not one giant undivided rest --
+    because this app's own note-lookup (_measure_index in
+    annotate_cadences.py) locates a note by POSITIONAL measure number
+    ("the Nth Measure object in this part"), assumed identical across
+    every voice at any given point in the piece; a tacet voice with
+    fewer/coarser measure objects than its sounding neighbors would
+    silently break that alignment for the rest of the movement, not
+    just the padded section.
+
+    A voice whose FIRST real appearance in the movement is itself a
+    padded (tacet) section (checked directly against a real case,
+    Benedictus_01's Bass entering only in 'Hosanna') has no clef of its
+    own yet at that point -- borrowed from wherever it first has real
+    content, inserted at the very start, so the merged part still opens
+    correctly.
+
+    Verified against real crim_intervals analysis, not just structural
+    checks: piece.cadences()/.presentationTypes()/.final() all ran
+    successfully on a merged Sanctus_66 (the Pleni/tacet-Soprano case)
+    with no crash and no obviously spurious result at the padded
+    section's boundary.
+
+    Returns (merged_score, boundaries) where boundaries is a list of
+    (offset, title) pairs, one per section start (offset 0.0 for the
+    first), deduplicated across voices -- for the caller to label on
+    the score (see annotate_cadences.annotate_movement_sections).
+    Measure numbers are renumbered continuously (1, 2, 3, ... straight
+    through) -- cosmetic only (this app's own analysis is positional,
+    not .number-based) but keeps the rendered PDF's measure numbers
+    from restarting at every section.
+    """
+    from music21 import stream, note
+
+    per_section_keys = [_voice_slot_keys(s) for s in scores]
+    all_keys, seen_keys = [], set()
+    for keys in per_section_keys:
+        for k in keys:
+            if k not in seen_keys:
+                seen_keys.add(k)
+                all_keys.append(k)
+
+    merged_parts = {key: stream.Part() for key in all_keys}
+    boundaries = []
+
+    for sec, sec_keys, title in zip(scores, per_section_keys, titles):
+        key_to_part = dict(zip(sec_keys, sec.parts))
+        boundaries.append((next(iter(merged_parts.values())).highestTime, title))
+        for key in all_keys:
+            target = merged_parts[key]
+            if key in key_to_part:
+                for m in key_to_part[key].getElementsByClass('Measure'):
+                    target.append(m)
+            else:
+                ref_part = next(iter(key_to_part.values()))
+                for m in ref_part.getElementsByClass('Measure'):
+                    rest_measure = stream.Measure(number=m.number)
+                    rest_measure.append(note.Rest(quarterLength=m.barDuration.quarterLength))
+                    target.append(rest_measure)
+
+    # A voice-slot that's tacet for its own first appearance in the
+    # movement has no clef yet -- borrow one from wherever it first has
+    # real content (see docstring).
+    for key, part in merged_parts.items():
+        if part.flatten().getElementsByClass('Clef'):
+            continue
+        for sec, sec_keys in zip(scores, per_section_keys):
+            if key in sec_keys:
+                src_part = dict(zip(sec_keys, sec.parts))[key]
+                clefs = src_part.flatten().getElementsByClass('Clef')
+                if clefs:
+                    part.getElementsByClass('Measure')[0].insert(0, clefs[0])
+                break
+
+    for part in merged_parts.values():
+        for i, m in enumerate(part.getElementsByClass('Measure'), 1):
+            m.number = i
+
+    merged_score = stream.Score()
+    for key in all_keys:
+        merged_score.insert(0, merged_parts[key])
+
+    # Deliberately NOT copying scores[0].metadata.title here (its own
+    # section title, e.g. 'First Section') -- checked directly and found
+    # crim_intervals' ImportedPiece prefers score.metadata.title over
+    # the `path` argument it's constructed with whenever the former is
+    # set, so a copied section title would silently replace the far
+    # more identifying piece_id (e.g. 'Sanctus_66') in every one of
+    # CRIM's own internal messages ("No HR passages found in ...:First
+    # Section"). Leaving title unset lets that fallback do its job.
+    # composer, unlike title, genuinely doesn't vary section to section
+    # -- safe and correct to copy from the first one.
+    src_meta = scores[0].metadata
+    merged_score.metadata = m21.metadata.Metadata()
+    if src_meta is not None:
+        merged_score.metadata.composer = src_meta.composer
+
+    return merged_score, boundaries
+
+
+def parse_music21_piece(corpus_key, piece_id):
+    """The one place that turns a music21-corpus (corpus_key, piece_id)
+    into a real Score -- replaces every direct m21.corpus.parse(f'{corpus_
+    key}/{piece_id}') call for Palestrina, which piece_id doesn't always
+    name a real file for any more: Browse and the corpus tab now show
+    ONE row per Palestrina MOVEMENT (see group_browse_rows), keyed by
+    its group_key (e.g. 'Credo_06'), not one row per real file
+    ('Credo_06_a', ...). A group_key with more than one real member gets
+    parsed member-by-member and stitched into one continuous Score (see
+    merge_movement_parts); a group of exactly one (the ~40% of
+    Palestrina movements that were never split, or any non-Palestrina
+    composer, which has no group scheme at all) just parses normally --
+    no special case needed, since a group-of-one's only member IS
+    piece_id.
+
+    Returns (score, boundaries_or_None) -- boundaries is the list
+    merge_movement_parts returns when a real merge happened, None
+    otherwise (a single-file piece has no sections to mark).
+    """
+    if corpus_key == 'palestrina':
+        members = _palestrina_movement_members().get(piece_id)
+        if members is not None and len(members) > 1:
+            scores, titles = [], []
+            for member_id in members:
+                s = m21.corpus.parse(f'{corpus_key}/{member_id}')
+                meta = dict(s.metadata.all())
+                titles.append(meta.get('title', member_id))
+                scores.append(s)
+            return merge_movement_parts(scores, titles)
+    return m21.corpus.parse(f'{corpus_key}/{piece_id}'), None
+
+
+def group_browse_rows(rows):
+    """Collapses build_browse_index()'s Palestrina multi-part rows (one
+    per real encoded file, e.g. '...: Sanctus (part a)'/'(part b)'/
+    '(part c)') into ONE row per movement ('...: Sanctus') -- for
+    DISPLAY only (Browse's own list, its search/filter counts, the
+    per-collection corpus tab's dropdown). Deliberately NOT applied
+    inside build_browse_index() itself: scripts/precompute_finalis.py
+    calls that function directly and already has 4,319/4,319 pieces'
+    worth of validated results keyed by today's per-part labels
+    (data/finalis.jsonl) -- changing build_browse_index()'s own output
+    shape would silently break every one of those lookups. This runs
+    as a separate layer on top instead, so precompute_finalis.py needs
+    no changes at all.
+
+    A movement's native_ref becomes (corpus_key, group_key) -- group_key
+    names no real file when the movement has more than one part (that's
+    fine: parse_music21_piece() is the only thing that ever needs to
+    turn it into an actual Score, and it already knows how to expand a
+    group_key back into its ordered real members). Every non-Palestrina
+    row, and every already-single-file Palestrina movement, passes
+    through completely unchanged -- same row, same real piece_id.
+
+    Real reduction, checked directly: 839 of 1318 Palestrina rows
+    (64%) were multi-part before this (262 real movements behind them);
+    Browse's own list, CSV exports, and the modal-family filter's
+    counts were all silently 2-9x inflated for those movements.
+    """
+    members_by_group = _palestrina_movement_members()
+    group_to_row = {}
+    result = []
+    for row in rows:
+        label, collection, native_ref = row
+        if collection != 'music21':
+            result.append(row)
+            continue
+        corpus_key, piece_id = native_ref
+        if corpus_key != 'palestrina':
+            result.append(row)
+            continue
+        group_key, part_letter = _movement_group_key(piece_id)
+        if part_letter is None:
+            result.append(row)
+            continue
+        # Only the FIRST part encountered actually emits a row -- later
+        # parts of the same movement are folded into it silently. Label
+        # comes from _palestrina_movement_label on the bare group_key
+        # (no part suffix -- naturally produces e.g. 'Sanctus', not
+        # 'Sanctus (part a)'), keeping the '[Composer] Mass title: '
+        # prefix already on this row's own label rather than re-deriving
+        # it from metadata a second time.
+        prefix = label.rsplit(': ', 1)[0]
+        group_label = f'{prefix}: {_palestrina_movement_label(group_key)}'
+        group_native_ref = (corpus_key, group_key)
+        full_key = (collection, corpus_key, group_key)
+        if full_key not in group_to_row:
+            group_to_row[full_key] = True
+            result.append((group_label, collection, group_native_ref))
+    return result
+
+
+@_cache_data_no_ttl
+def _music21_piece_label_lookup():
+    """{(corpus_key, piece_id): label} for every music21-corpus row in
+    build_browse_index() -- the REAL label each real file already got,
+    read back verbatim rather than re-derived. last_member_label()
+    below needs this instead of just reconstructing '{prefix}: {_pale
+    strina_movement_label(last_id)}' by hand: a first version did that,
+    and it silently collided for Missa Veni Sancte Spiritus's two
+    accidental-duplicate-content Credo files (Credo_61/Credo_62, see
+    CLAUDE.md's own corpus-quality-audit note) -- both real, distinct
+    encoded pieces, but _dedupe_labels' own '[stem]' disambiguation
+    bracket (needed because they'd otherwise share one bare label) only
+    ever gets computed correctly by list_pieces_for_composer/_dedupe_
+    labels themselves, not by re-deriving it from a bare group label a
+    second time. Reading the already-correct label straight from
+    build_browse_index() sidesteps reconstructing it at all.
+    """
+    return {
+        native_ref: label
+        for label, collection, native_ref in build_browse_index()
+        if collection == 'music21'
+    }
+
+
+def last_member_label(group_label, corpus_key, group_key):
+    """The OLD per-part label (e.g. '...: Sanctus (part c)') for a
+    movement's LAST real member -- what data/finalis.jsonl is actually
+    keyed by (see group_browse_rows' docstring: the precomputed finalis
+    index was never re-keyed to the new grouped labels). Used to look
+    up a grouped row's finalis without touching finalis.jsonl at all.
+    group_label is the row's own (already-grouped) label, e.g.
+    '[Palestrina] Missa X: Sanctus' -- returned unchanged for a
+    non-Palestrina or already-single-file group (nothing to resolve);
+    otherwise looks up the movement's LAST real member's own true label
+    in _music21_piece_label_lookup() (see that function's docstring for
+    why this doesn't just reconstruct the string by hand -- confirmed
+    to silently collide for real duplicate-content pieces when it did).
+    Falls back to group_label itself if the lookup somehow doesn't have
+    an entry (never raises)."""
+    members = _palestrina_movement_members().get(group_key, [])
+    if len(members) <= 1:
+        return group_label
+    last_id = members[-1]
+    return _music21_piece_label_lookup().get((corpus_key, last_id), group_label)
+
+
 @_cache_data_no_ttl
 def list_pieces_for_composer(corpus_key):
     """{label: piece_id} for one composer, e.g. 'Missa De Beata Marie

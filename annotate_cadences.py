@@ -431,6 +431,66 @@ def annotate_homorhythm(score, hr, part_names, min_gap=4.0):
     return score, {'labeled': n_labeled, 'missed_label': n_missed_label, 'colored': n_colored}
 
 
+SECTION_COLOR = '#8855BB'  # violet -- distinct from cadence red, presentation blue, homorhythm green
+
+
+def annotate_movement_sections(score, boundaries):
+    """Marks where a merged multi-part Palestrina movement's original
+    encoded sub-sections started (e.g. Sanctus_92_a/b/c = 'First
+    Section'/'Pleni'/'Hosanna', stitched into one continuous score by
+    corpus_sources.merge_movement_parts -- see that function's own
+    docstring) -- so a user looking at the annotated score can still see
+    where the source's own section boundaries were, even though
+    cadences/points-of-imitation/homorhythm are now analyzed across the
+    WHOLE movement at once rather than per fragment.
+
+    score: a music21 Score (mutated in place AND returned) -- must
+        already have real Measure objects (true for a just-merged
+        movement).
+    boundaries: list of (offset, title) pairs from merge_movement_parts,
+        one per section start (offset 0.0 for the first) -- title is
+        that section's own encoded name (e.g. 'Pleni', 'Crucifixus').
+
+    Uses music21's RehearsalMark, not TextExpression (unlike every other
+    annotate_* function above) -- deliberately: probed directly (not
+    assumed) and found Verovio renders a RehearsalMark on its own
+    dedicated row, clearly separated from an ordinary <direction><words>
+    text (over 1000 tenths apart in a real test, vs. same-row collisions
+    confirmed for TextExpression -- see annotate_presentation_types'
+    docstring), AND it's the standard, semantically correct notation
+    convention for marking a new section in the first place -- solves
+    the "which staff/placement row is left" problem entirely instead of
+    fighting over the 4th and last available combination.
+
+    Returns (score, stats) where stats = {'labeled', 'missed_label'} --
+    no 'colored' key (this doesn't recolor any notes, just marks section
+    starts).
+    """
+    parts = list(score.parts)
+    measure_indices = [_measure_index(p) for p in parts]
+
+    n_labeled, n_missed_label = 0, 0
+    for offset, title in boundaries:
+        # Every boundary's offset is a real measure start (merge_movement_
+        # parts always begins a new section on a fresh Measure) -- find
+        # which measure that is by scanning the top staff's own index
+        # rather than assuming a measure number, since these are freshly
+        # renumbered 1, 2, 3, ... by merge_movement_parts already.
+        target_measure = next(
+            (m for m in measure_indices[0].values() if m.offset == offset), None
+        )
+        ts = target_measure.getContextByClass('TimeSignature') if target_measure is not None else None
+        if ts is not None:
+            rm = expressions.RehearsalMark(title)
+            rm.style.color = SECTION_COLOR
+            target_measure.insert(0, rm)
+            n_labeled += 1
+        else:
+            n_missed_label += 1
+
+    return score, {'labeled': n_labeled, 'missed_label': n_missed_label}
+
+
 def annotate_piece(xml_path, cadences_csv, out_path):
     """CLI entry point: reads everything from disk, calls annotate_score(),
     writes the result back to disk. Kept as a thin wrapper around

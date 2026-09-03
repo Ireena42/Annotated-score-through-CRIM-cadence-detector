@@ -354,7 +354,12 @@ above is the one to share.
     download button use Streamlit's own `type="primary"` styling, which
     pulls its color directly from `.streamlit/config.toml`.
 
-## Finalis precompute (data exists, but the UI filter is currently removed)
+## Finalis precompute and the Modal family filter
+
+*(This section's own history below, up through "Finalis filter UI has
+been removed", is kept as-written — real bugs, found and fixed in that
+order. The filter it describes removing is back, redesigned; see the
+update at the end of this section.)*
 
 A **Finalis** filter for Browse is planned — full-corpus, not scoped to
 one search — but that needs a Finalis *value* for all ~4,300 pieces
@@ -454,6 +459,39 @@ approach would need to consider, at minimum: preferring `Tone` over
 `Low` when the Bassizans CVF is lowercase, and cross-checking `Tone`
 against `piece.final()` the same way `_parts_desynced` already
 cross-checks part durations.
+
+**Update — redesigned, back in the UI:** `compute_finalis()` (in
+`scripts/precompute_finalis.py`) now does exactly the cross-check the
+paragraph above called for, and more: it computes `Low`, `Tone`, and
+`piece.final()` independently, requires them to actually agree (not
+just picks one), and tags every result with a confidence tier
+(`confident_unanimous`/`confident_majority`/`low_confidence_split`/
+`single_signal`/`part_duration_mismatch`/`error`) rather than a single
+undifferentiated guess. Validated against 39 hand-checked pieces across
+two independent random samples (100% on the confident tiers) before the
+full corpus was recomputed — `data/finalis.jsonl` now has one record
+per piece, 4,319/4,319. Browse's own **Modal family** filter (not a
+Finalis pitch-class filter — deliberately coarser, see the code's own
+comments on why) groups by which of the 4 traditional finals (Protus/
+Deuterus/Tritus/Tetrardus) or Glarean's two added ones (Ionian/Aeolian)
+a piece's finalis falls into, with an "only high-confidence results"
+option using those same tiers.
+
+Also since redesigned: Palestrina's long Gloria/Credo/Sanctus settings
+are often split across several encoded files (e.g. Sanctus_92_a/b/c =
+"First Section"/"Pleni"/"Hosanna") — 262 of Palestrina's real movements,
+839 of its 1318 Browse-index rows before this. Browse (and the corpus
+tab) now show ONE row per movement, and analyzing one actually stitches
+its parts into a single continuous score first (`corpus_sources.
+merge_movement_parts`) — cadences/points-of-imitation/homorhythm are
+found across the WHOLE movement, including passages spanning a former
+file boundary, not per fragment. A voice that drops out mid-movement
+for a reduced-voice passage (checked directly: 77% of a random sample
+of split movements do this somewhere, not a rare case) is padded with
+rests rather than naively concatenated by part position, which would
+silently misalign voices for most of the corpus. The original section
+boundaries are still marked on the score (as rehearsal-mark-style
+labels, e.g. "Pleni") so they're not lost.
 
 ## Credits & licensing
 

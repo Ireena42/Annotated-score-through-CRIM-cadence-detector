@@ -391,31 +391,19 @@ def compute_finalis(piece):
     return top_value, source, detail
 
 
-def _movement_group_key(piece_id):
-    """(group_key, part_letter_or_None). group_key is piece_id with its
-    trailing single-letter part suffix removed (e.g. 'Gloria_14_a' ->
-    'Gloria_14'), using the EXACT SAME test corpus_sources.py's own
-    _palestrina_movement_label already uses to detect this suffix (last
-    underscore-separated token is a single alphabetic character) --
-    reused rather than reimplemented so grouping stays consistent with
-    how these pieces are already labeled in the browse index.
-    part_letter is that trailing letter, or None if piece_id has no
-    such suffix (a normal, unsplit movement -- its own group of one).
-
-    Why this exists: Palestrina's long Gloria/Credo settings are often
-    split into several files, one per liturgical text clause (e.g.
-    Gloria_14_a="First Section" through Gloria_14_i="Amen") -- but all
-    parts of one such movement carry the IDENTICAL humdrum:RNB metadata
-    value, meaning the source encoding itself treats finalis as a
-    whole-movement property, not something each part independently
-    arrives at (finalis_findings.md #6). Computing Finalis separately
-    per part meant measuring an internal sectional cadence for every
-    part except the last, not the movement's actual ending.
-    """
-    tokens = piece_id.split('_')
-    if len(tokens) > 1 and len(tokens[-1]) == 1 and tokens[-1].isalpha():
-        return '_'.join(tokens[:-1]), tokens[-1]
-    return piece_id, None
+# _movement_group_key moved to corpus_sources.py (canonical definition,
+# used there now by group_browse_rows()/parse_music21_piece() too --
+# imported here rather than kept as a second, driftable copy). Why this
+# exists at all: Palestrina's long Gloria/Credo settings are often split
+# into several files, one per liturgical text clause (e.g. Gloria_14_a=
+# "First Section" through Gloria_14_i="Amen") -- but all parts of one
+# such movement carry the IDENTICAL humdrum:RNB metadata value, meaning
+# the source encoding itself treats finalis as a whole-movement
+# property, not something each part independently arrives at
+# (finalis_findings.md #6). Computing Finalis separately per part meant
+# measuring an internal sectional cadence for every part except the
+# last, not the movement's actual ending.
+_movement_group_key = corpus_sources._movement_group_key
 
 
 def _group_rows_for_finalis(rows):

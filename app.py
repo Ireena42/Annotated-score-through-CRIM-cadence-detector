@@ -45,14 +45,16 @@ from wordcloud import WordCloud
 sys.path.insert(0, str(Path(__file__).parent))
 from annotate_cadences import (
     annotate_score, annotate_presentation_types, annotate_homorhythm,
-    CADENCE_COLOR, PRESENTATION_COLOR, HOMORHYTHM_COLOR,
+    annotate_movement_sections,
+    CADENCE_COLOR, PRESENTATION_COLOR, HOMORHYTHM_COLOR, SECTION_COLOR,
 )
 from crim_export_cadences import export_cadences_with_partmap  # noqa: F401 (kept for reference)
 import crim_intervals as ci
 from corpus_sources import (
     CORPUS_COMPOSERS, list_pieces_for_composer, fetch_crim_pieces, fetch_jrp_pieces,
     fetch_1520s_pieces, fetch_tasso_pieces, fetch_seils_pieces, fetch_lassus_psalms_pieces,
-    KERN_COLLECTION_BASE_URLS, build_browse_index,
+    KERN_COLLECTION_BASE_URLS, build_browse_index, group_browse_rows, parse_music21_piece,
+    last_member_label, _palestrina_movement_members,
 )  # piece-enumeration layer -- see corpus_sources.py's own module docstring for why
   # this moved out of app.py (precompute_finalis.py needs the identical logic too).
 
@@ -632,7 +634,7 @@ def _crim_edition_info(mei_url):
     return info
 
 
-def run_pipeline(score, source_label, include_cadences=True, include_ptypes=False, include_homorhythm=False):
+def run_pipeline(score, source_label, include_cadences=True, include_ptypes=False, include_homorhythm=False, section_boundaries=None):
     """Shared by both input modes below: given a parsed music21 Score,
     optionally runs each of CRIM's three structural analyses on it and
     writes whichever ones are requested onto the score. Returns
@@ -662,6 +664,15 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
     directly in its own source before relying on this -- so that's
     checked for explicitly rather than assumed away.
 
+    section_boundaries: the (offset, title) list corpus_sources.parse_
+    music21_piece() returns for a merged multi-part Palestrina movement
+    (None for a single-file piece, or anything from a non-music21
+    source) -- when given, this marks the original section boundaries
+    (see annotate_movement_sections) BEFORE any of the three analyses
+    above, and unconditionally (stats['section_labeled']), regardless of
+    which include_* flags are set -- source structure, not an optional
+    analysis result, so it shows even on a plain unannotated download.
+
     error is None unless cadence detection itself failed (see
     _safe_cadences) -- ptypes/homorhythm are individually guarded too (a
     crash in either just skips that one optional feature -- see the
@@ -674,8 +685,19 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
     what to tell the user, rather than this function refusing to return
     anything.
     """
+    stats = {}
+    if section_boundaries:
+        # A merged multi-part Palestrina movement (see corpus_sources.
+        # parse_music21_piece/merge_movement_parts) -- mark where its
+        # original encoded sections started regardless of which of the
+        # three CRIM analyses were actually requested (even a plain,
+        # unannotated download of a merged movement should still show
+        # where 'Pleni'/'Hosanna'/etc. began -- that's source structure,
+        # not an optional analysis result).
+        score, section_stats = annotate_movement_sections(score, section_boundaries)
+        stats['section_labeled'] = section_stats['labeled']
+
     if not (include_cadences or include_ptypes or include_homorhythm):
-        stats = {}
         edition = _humdrum_edition_info(score)
         if edition:
             stats['edition'] = edition
@@ -686,17 +708,18 @@ def run_pipeline(score, source_label, include_cadences=True, include_ptypes=Fals
     # already-built music21 Score directly via its own constructor, which
     # avoids parsing the same piece twice (once for us, once for CRIM).
     piece = ci.main_objs.ImportedPiece(score, source_label)
-    annotated_score, stats = score, {}
+    annotated_score = score
 
     if include_cadences:
         cadences, error = _safe_cadences(piece)
         if error:
             return None, None, error
         if not cadences.empty:
-            annotated_score, stats = annotate_score(score, cadences)
+            annotated_score, cadence_stats = annotate_score(score, cadences)
+            stats.update(cadence_stats)
             _append_timeline(stats, cadences['Measure'], 'Cadence', CADENCE_COLOR)
         else:
-            stats = {'labeled': 0, 'missed_label': 0, 'colored': 0}
+            stats.update({'labeled': 0, 'missed_label': 0, 'colored': 0})
 
     if include_ptypes:
         try:
@@ -1679,8 +1702,27 @@ def preview_piece(collection, native_ref):
 
     if collection == 'music21':
         corpus_key, piece_id = native_ref
-        file_path = _local_corpus_file_path(corpus_key, piece_id)
-        voices, has_text = _local_file_stats(file_path)
+        # A grouped multi-part Palestrina movement (see corpus_sources.
+        # group_browse_rows) has no single file of its own -- piece_id
+        # names the whole movement, not a real file, when it has more
+        # than one member. voices = the MAX any one member reports (the
+        # movement's fullest scoring -- a real merge would need each
+        # member's actual voice NAMES to union correctly, see
+        # corpus_sources.merge_movement_parts, but that needs a real
+        # parse; this stays cheap/header-only, so a reasonable
+        # approximation, not the precise union, is what's shown here).
+        # has_text = True if ANY member has it.
+        members = _palestrina_movement_members().get(piece_id, [piece_id]) if corpus_key == 'palestrina' else [piece_id]
+        voices_list, has_text_list = [], []
+        for member_id in members:
+            file_path = _local_corpus_file_path(corpus_key, member_id)
+            v, t = _local_file_stats(file_path)
+            if v is not None:
+                voices_list.append(v)
+            if t is not None:
+                has_text_list.append(t)
+        voices = max(voices_list) if voices_list else None
+        has_text = any(has_text_list) if has_text_list else None
         return voices, has_text, None
 
     try:
@@ -1918,7 +1960,16 @@ def _browse_row_to_csv_dict(label, collection, native_ref):
            'source_url': '', 'music21_corpus_path': ''}
     if collection == 'music21':
         corpus_key, piece_id = native_ref
-        row['music21_corpus_path'] = f'{corpus_key}/{piece_id}'
+        # A grouped multi-part Palestrina movement's piece_id (see
+        # group_browse_rows) names no real file of its own when it has
+        # more than one member -- m21.corpus.parse('palestrina/Credo_06')
+        # would raise "not found" for someone using this column in their
+        # own script. List every real member path instead (semicolon-
+        # joined, parse order = movement order), so the column stays
+        # directly usable either way -- one path for an unsplit
+        # movement, several for a split one.
+        members = _palestrina_movement_members().get(piece_id, [piece_id]) if corpus_key == 'palestrina' else [piece_id]
+        row['music21_corpus_path'] = ';'.join(f'{corpus_key}/{m}' for m in members)
     elif collection == 'crim':
         # A real gap in CRIM's own catalog, not something wrong with this
         # app: some pieces are listed with an empty mei_links list at all
@@ -2025,10 +2076,11 @@ def annotate_by_collection(collection, native_ref, include_cadences=True, includ
     (annotated_score, stats, error_message)."""
     if collection == 'music21':
         corpus_key, piece_id = native_ref
-        score = m21.corpus.parse(f"{corpus_key}/{piece_id}")
+        score, section_boundaries = parse_music21_piece(corpus_key, piece_id)
         return run_pipeline(
             score, piece_id, include_cadences=include_cadences,
             include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
+            section_boundaries=section_boundaries,
         )
     if collection == 'crim':
         # A real gap in CRIM's own catalog (confirmed directly, see
@@ -2064,7 +2116,7 @@ def _import_piece_by_collection(collection, native_ref):
     nothing here ever reads. Returns (piece, error)."""
     if collection == 'music21':
         corpus_key, piece_id = native_ref
-        score = m21.corpus.parse(f"{corpus_key}/{piece_id}")
+        score, _section_boundaries = parse_music21_piece(corpus_key, piece_id)
         return ci.main_objs.ImportedPiece(score, piece_id), None
     if collection == 'crim':
         if not native_ref['mei_links']:
@@ -2536,7 +2588,16 @@ with tab_browse:
     # this tab are both ready without a separate build step.
     with st.spinner(f"{_random_fetch_message()} (first visit this hour can take ~15s, "
                      "instant after)"):
-        full_index = build_browse_index()
+        # group_browse_rows collapses a Palestrina movement's separately
+        # -encoded parts (e.g. '...: Sanctus (part a)'/'(part b)'/'(part
+        # c)') into ONE row -- real reduction: 1318 -> 717 Palestrina
+        # rows, 262 real movements were showing as up to 9 near-
+        # duplicate rows each. Applied here, not inside build_browse_
+        # index() itself, so scripts/precompute_finalis.py (which calls
+        # build_browse_index() directly) keeps working against today's
+        # per-part-keyed data/finalis.jsonl unchanged -- see
+        # group_browse_rows' own docstring.
+        full_index = group_browse_rows(build_browse_index())
 
     with st.expander("📦 Download the whole corpus metadata, no search needed (all 7 collections)"):
         st.caption(
@@ -2679,9 +2740,20 @@ with tab_browse:
             selected_family_keys = {
                 key for key, label in _MODAL_FAMILIES if label in selected_families
             }
+
+            def _finalis_lookup_label(row):
+                # A grouped Palestrina movement's own label isn't what
+                # data/finalis.jsonl is keyed by (see group_browse_rows'
+                # docstring) -- resolve to its last real member's label
+                # first. Every other row's label already matches.
+                label, collection, native_ref = row
+                if collection == 'music21' and native_ref[0] == 'palestrina':
+                    return last_member_label(label, native_ref[0], native_ref[1])
+                return label
+
             matches = [
                 row for row in matches
-                if (record := finalis_index.get(row[0])) is not None
+                if (record := finalis_index.get(_finalis_lookup_label(row))) is not None
                 and _modal_family_key(record['finalis']) in selected_family_keys
                 and (not only_confident_finalis or record['source'] in _CONFIDENT_FINALIS_SOURCES)
             ]
@@ -2925,6 +2997,16 @@ with tab_corpus:
     composer_name = st.selectbox("Composer", sorted(CORPUS_COMPOSERS.keys()))
     corpus_key = CORPUS_COMPOSERS[composer_name]
     piece_options = list_pieces_for_composer(corpus_key)
+    if corpus_key == 'palestrina':
+        # Same movement-grouping as Browse (see group_browse_rows'
+        # docstring) -- reused via the row-tuple shape it already
+        # expects, rather than a second, dict-shaped copy of the same
+        # logic. Collapses e.g. up to 9 separate '...: Credo (part X)'
+        # entries for one real movement down to one 'Credo'.
+        grouped_rows = group_browse_rows(
+            [(label, 'music21', (corpus_key, pid)) for label, pid in piece_options.items()]
+        )
+        piece_options = {label: native_ref[1] for label, collection, native_ref in grouped_rows}
     piece_label = st.selectbox("Piece", sorted(piece_options.keys()))
     piece_id = piece_options[piece_label]
     render_preview_and_annotate('music21', (corpus_key, piece_id), piece_label, piece_id)
