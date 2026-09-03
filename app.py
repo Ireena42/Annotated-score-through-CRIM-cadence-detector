@@ -257,28 +257,55 @@ def homorhythm_rhythm_only(piece, ngram_length=4):
     crim_intervals' own piece.homorhythm() unconditionally returns None
     regardless of how rhythmically homorhythmic a passage actually is.
 
-    Root cause (confirmed directly by reading homorhythm()'s source,
-    then reproducing its two filter stages by hand on Palestrina's
-    Gloria_12 -- see session notes): homorhythm() requires a passage to
-    match on BOTH a shared duration n-gram AND a shared syllable n-gram
-    across voices. Gloria_12's opening genuinely passes the duration
-    check (33 of 323 candidate 4-note windows have every active voice
-    sharing one duration pattern) -- but the syllable check always comes
-    back empty, because the music21-bundled Palestrina Humdrum corpus
-    has literally no **text spine (checked directly in the raw .krn
-    files, and confirmed no note anywhere has .lyric set) -- not a
+    Root cause for homorhythm() returning nothing at all on this corpus
+    (confirmed directly by reading homorhythm()'s source, then
+    reproducing its two filter stages by hand on Palestrina's Gloria_12
+    -- see session notes): homorhythm() requires a passage to match on
+    BOTH a shared duration n-gram AND a shared syllable n-gram across
+    voices, and the music21-bundled Palestrina Humdrum corpus has
+    literally no **text spine (checked directly in the raw .krn files,
+    and confirmed no note anywhere has .lyric set) -- not a
     Gloria_12-specific fact, a whole-corpus one. With piece.lyrics()
-    all-NaN, the internal merge between duration-passing and
-    lyric-passing offsets is empty for every single piece in this
-    corpus, so homorhythm() silently reports nothing for all of them.
+    all-NaN, the syllable check can never pass, so homorhythm()
+    silently reports nothing for every piece in this corpus.
 
-    This reimplements exactly homorhythm()'s duration-ngram half (same
-    notes()/durations()/ngrams() calls, same full_hr=True semantics: a
-    window counts only when EVERY active voice shares one duration
-    pattern), skipping the syllable-matching step it cannot pass without
-    lyrics. What it finds is real rhythmic homophony (same attack
-    pattern across voices) but, unlike CRIM's own homorhythm(), makes no
-    claim about shared text declamation -- there's no text to check.
+    A FIRST version of this function reimplemented homorhythm()'s
+    duration-ngram half verbatim (same crim_intervals ngrams()/
+    durations() row alignment) -- but that inherited a real bug from
+    homorhythm() itself, caught directly on Gloria_12 after it was
+    reported: crim_intervals' ngrams() aligns rows by ATTACK offset, so
+    a voice only shows up as "active" in a given row if it attacks a
+    note exactly there. A voice sustaining a longer note THROUGH that
+    offset (very much still sounding, just not attacking) is silently
+    absent from that row -- confirmed directly: at Gloria_12 offset
+    134.0, Tenor is mid-note (held from offset 132.0, quarterLength
+    4.0) while Soprano/Alto/Bass all attack together, and the old
+    version flagged that offset as "3 voices homorhythmic," missing
+    that a 4th voice was ALSO sounding, just not moving with the other
+    three. Exactly the false-positive pattern reported: a passage
+    getting marked homorhythmic because SOME of the sounding voices
+    share a rhythm, not ALL of them, inflating the measured density.
+
+    This version works directly from each part's real Note/Chord
+    onsets and durations instead (no crim_intervals ngram/duration
+    alignment at all): at every candidate attack point it computes
+    which voices are SOUNDING (covering that instant -- attacked here
+    or still holding a note from earlier) versus ATTACKING (a note
+    starts exactly here), and only counts the point as a genuine
+    chordal attack when those two sets are equal -- every voice
+    sounding right now is also attacking right now, so no voice is
+    silently holding through while the others move. A run of at least
+    `ngram_length` consecutive chordal attack points, with the same set
+    of voices throughout, becomes one passage (a voice entering or
+    dropping out starts a new run, not a continuation of the old one).
+    Re-verified on Gloria_12: correctly excludes offset 134.0 (Tenor
+    sustaining) while still finding the genuinely 4-voice-unanimous
+    passages (e.g. the real homorhythmic opening).
+
+    What it finds is real rhythmic homophony among every voice
+    genuinely sounding at each moment, but, unlike CRIM's own
+    homorhythm(), makes no claim about shared text declamation --
+    there's no text to check.
 
     Returns the same shape piece.homorhythm() would (MultiIndex
     (Measure, Beat, Offset), an 'hr_voices' column of part names), or
@@ -286,44 +313,66 @@ def homorhythm_rhythm_only(piece, ngram_length=4):
     None-on-empty convention as the real homorhythm(), so callers don't
     need a second code path.
     """
-    nr = piece.notes()
-    dur = piece.durations(df=nr)
-    ng = piece.ngrams(df=dur, n=ngram_length, exclude=[])
-
-    dur_ngrams = [
-        [x for x in row if pd.notnull(x)] for _, row in ng.iterrows()
+    parts = list(piece.score.parts)
+    # Each part's own (onset, quarterLength) pairs for real notes/chords
+    # only (Stream.notes already excludes rests -- a resting voice isn't
+    # "sounding" and correctly has no entry here at all).
+    part_notes = [
+        sorted(((n.offset, n.quarterLength) for n in p.flatten().notes), key=lambda t: t[0])
+        for p in parts
     ]
-    ng['dur_ngrams'] = dur_ngrams
-    ng['active_voices'] = ng['dur_ngrams'].apply(len)
-    ng['number_dur_ngrams'] = ng['dur_ngrams'].apply(lambda lst: len(set(lst)))
-    # full_hr=True semantics, same as homorhythm()'s own default: every
-    # active voice (>1 of them) shares the one duration pattern.
-    ng = ng[(ng['number_dur_ngrams'] < 2) & (ng['active_voices'] > 1)]
-    if ng.empty:
+    # Every distinct note-onset offset across the WHOLE piece -- the only
+    # offsets worth checking as a candidate chordal attack point (nothing
+    # new happens anywhere between two consecutive onsets).
+    all_onsets = sorted({onset for notes in part_notes for onset, _ in notes})
+
+    def _sounding_and_attacking(offset):
+        sounding, attacking = set(), set()
+        for i, notes in enumerate(part_notes):
+            for onset, ql in notes:
+                if onset > offset:
+                    break
+                if onset <= offset < onset + ql:
+                    sounding.add(i)
+                    if onset == offset:
+                        attacking.add(i)
+                    break
+        return sounding, attacking
+
+    chordal_points = []
+    for offset in all_onsets:
+        sounding, attacking = _sounding_and_attacking(offset)
+        # >1 voice sounding (a single voice "moving alone" isn't
+        # homorhythm), and EVERY sounding voice attacks here -- not just
+        # however many happen to attack here.
+        if len(sounding) > 1 and sounding == attacking:
+            chordal_points.append((offset, frozenset(sounding)))
+
+    # Consolidate consecutive chordal points into passages: a run of at
+    # least ngram_length points where the same voices stay sounding+
+    # attacking together throughout. One row per passage (its first
+    # chordal offset), not one per point, matching presentationTypes()'
+    # already-consolidated shape rather than homorhythm()'s own raw,
+    # un-consolidated sliding-window output (see annotate_homorhythm's
+    # min_gap docstring for why that distinction matters downstream).
+    passages, run = [], []
+    for offset, voices in chordal_points:
+        if run and voices != run[-1][1]:
+            if len(run) >= ngram_length:
+                passages.append(run)
+            run = []
+        run.append((offset, voices))
+    if len(run) >= ngram_length:
+        passages.append(run)
+    if not passages:
         return None
 
-    # Same voice-matching logic as homorhythm()'s own source, reproduced
-    # exactly (not reinvented): for each row, find which duration
-    # patterns recur across >1 voice, then record which of THIS row's
-    # original columns (voice names) hold one of those recurring
-    # patterns. Only original per-voice columns can match (their values
-    # are tuples); the derived columns added just above hold a list/int,
-    # which never equals a tuple, so they're naturally skipped.
-    hr_voices = []
-    for _, row in ng.iterrows():
-        seen, hr_ngrams = set(), []
-        for x in row['dur_ngrams']:
-            if x in seen and x not in hr_ngrams:
-                hr_ngrams.append(x)
-            else:
-                seen.add(x)
-        hr_voices.append([name for name, value in row.items() if value in hr_ngrams])
-    ng['hr_voices'] = hr_voices
-    ng['ngram_length'] = int(ngram_length)
-
-    result = piece.detailIndex(
-        ng[['active_voices', 'number_dur_ngrams', 'hr_voices']], offset=True
-    )
+    part_names = piece._getPartNames()
+    rows = [
+        {'Offset': run[0][0], 'hr_voices': [part_names[i] for i in sorted(run[0][1])]}
+        for run in passages
+    ]
+    result = piece.detailIndex(pd.DataFrame(rows).set_index('Offset'), offset=True)
     return result if len(result) else None
 
 
@@ -899,7 +948,8 @@ _METHODS_BLURB_HOMORHYTHM = (
     "Homorhythmic passages were identified using CRIM Intervals' homorhythm() "
     "method, which finds passages where two or more voices share both rhythm and "
     "lyrics; for pieces with no lyrics encoded in the source at all, a rhythm-only "
-    "fallback (same duration-ngram matching, no text check) was used instead."
+    "fallback was used instead, requiring EVERY voice sounding at a given moment "
+    "(not just however many happen to attack together) to move in unison."
 )
 
 
@@ -1383,10 +1433,15 @@ zero passages for every single piece from that source, regardless of
 how rhythmically homophonic the music actually is, since it can never
 pass the lyrics half of the check. This tool falls back to a
 **rhythm-only** version of the same detection for pieces with no lyrics
-at all: same duration-matching logic, no text check (there's nothing to
-check). It finds real rhythmic homophony, just without CRIM's stronger
-"same words at the same time" claim -- worth knowing if you're citing a
-result from a source without text underlay.
+at all, checking each voice's actual note-by-note sounding, not just
+where it attacks: at every moment, every voice genuinely sounding then
+(holding a note, whether it just attacked or is mid-note) has to attack
+together with all the others for that moment to count -- a voice
+sustaining a note while the others move does NOT count as homorhythm,
+even if some subset of the voices happen to move together. It finds
+real rhythmic homophony among everyone actually sounding, just without
+CRIM's stronger "same words at the same time" claim -- worth knowing if
+you're citing a result from a source without text underlay.
 
 **What actually appears on the score:** every note belonging to a
 matching passage is colored **green** (cadences are red, points of
