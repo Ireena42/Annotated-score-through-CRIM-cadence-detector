@@ -1461,12 +1461,26 @@ research into the field:
   this writing; building a new corpus-scale catalogue specifically for
   studying modal cycles (a full set of pieces spanning all the modes)
   across Renaissance polyphony.
-
-**A citation missing something, or reads wrong?** These are transcribed
-by hand from each source's own title page/DOI, not auto-generated --
-open an issue on [this repo's own
-GitHub](https://github.com/vclag/Renaissance-score-workbench) if one
-looks off.
+- Torsten Anders and Benjamin Inden, ["Machine Learning of Symbolic
+  Compositional Rules with Genetic Programming: Dissonance Treatment in
+  Palestrina"](https://doi.org/10.7717/peerj-cs.244), *PeerJ Computer
+  Science* 5 (2019): e244 -- labels dissonances in Palestrina's own
+  Masses (the same music21-bundled corpus this app uses) with a custom
+  algorithm, clusters them into dissonance categories (passing tone,
+  suspension, etc.) with DBSCAN, then learns symbolic composition rules
+  describing each category's treatment with genetic programming --
+  rules expressed as human-readable logic/numeric formulas, not just a
+  black-box classifier.
+- Claire Arthur, Julie E. Cumming, and Peter Schubert, ["The Role of
+  Structural Tones in Establishing Mode in Renaissance
+  Counterpoint"](https://doi.org/10.1093/oxfordhb/9780190945442.013.25),
+  in *The Oxford Handbook of Music and Corpus Studies*, ed. Daniel
+  Shanahan (Oxford: Oxford University Press, 2022) -- a quantitative
+  corpus analysis of 44 Renaissance contrapuntal duos with "secure"
+  modal labels (composed specifically to illustrate the modes, by
+  Lassus, Zarlino, Pontio, and Glarean), testing whether melodic leaps,
+  outlines, and perfect vertical intervals actually highlight a mode's
+  defining tones the way theory predicts.
         """
     )
 
