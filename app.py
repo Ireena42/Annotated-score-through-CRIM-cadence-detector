@@ -1649,6 +1649,128 @@ def _browse_piece_filename_stem(collection, native_ref):
     return Path(native_ref).stem
 
 
+@st.cache_data
+def _load_finalis_index():
+    """{browse_label: {'finalis': pitch_class, 'source': confidence_tier}}
+    for every piece with a successfully precomputed finalis -- see
+    scripts/precompute_finalis.py's own module docstring for the
+    multi-signal heuristic (compute_finalis(): cross-checks the last
+    detected cadence's Low/Tone against crim_intervals' own .final()).
+    Loaded from data/finalis.jsonl, which ships IN this repo as a local
+    file read (this app's own precomputed output, committed alongside
+    the code, refreshed by the Precompute Finalis GitHub Action -- not
+    fetched over the network the way every other collection's piece
+    data is). browse_label is exactly build_browse_index()'s own
+    prefixed label (e.g. '[Palestrina] Missa Quem dicunt homines:
+    Gloria') -- precompute_finalis.py records each result under that
+    same string, so no per-tab prefix reconstruction is needed the way
+    the older, since-removed finalis filter needed (see git history:
+    fe3df79 removed it, this is a fresh implementation on top of the
+    redesigned compute_finalis()).
+
+    Skips rows with finalis=None (source 'error') -- nothing to filter
+    by for those -- but keeps every other source tier, including the
+    low-confidence ones, so the caller can decide whether to show or
+    hide them (see _CONFIDENT_FINALIS_SOURCES) rather than this losing
+    that distinction by only keeping a bare pitch class.
+    """
+    path = Path(__file__).parent / 'data' / 'finalis.jsonl'
+    index = {}
+    if not path.exists():
+        return index
+    with path.open('r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if record.get('finalis'):
+                index[record['label']] = {
+                    'finalis': record['finalis'],
+                    'source': record.get('source'),
+                }
+    return index
+
+
+# Which precompute_finalis.py confidence tiers count as "confident" for
+# the "only confident results" checkbox below -- see compute_finalis()'s
+# own docstring (scripts/precompute_finalis.py) for what each tier means.
+# 'confident_unanimous'/'confident_majority' are the two tiers where
+# multiple independent signals agreed; 'single_signal' (only one signal
+# was even available) and 'low_confidence_split' (signals disagreed) are
+# real, disclosed lower-confidence results, not filtered out by default
+# in the underlying data -- only by this UI checkbox, and only when
+# checked.
+_CONFIDENT_FINALIS_SOURCES = {'confident_unanimous', 'confident_majority'}
+
+# Modal FAMILY, not a specific numbered mode (Dorian/Hypodorian, mode 1
+# vs 2) -- deliberately coarser than showing a raw finalis pitch class on
+# its own. Two independent reasons, not just one:
+# (1) This app's own compute_finalis() only ever determines the finalis
+#     PITCH -- it has no ambitus/range analysis, so it can never actually
+#     tell authentic from plagal. Labeling a G-final piece "Mixolydian"
+#     outright would claim a specific-mode identification this app
+#     cannot support; "Tetrardus family" is the level of claim the data
+#     actually backs.
+# (2) Tompkins, D. C. (2017). "A Cluster Analysis for Mode Identification
+#     in Early Music Genres." In: Mathematics and Computation in Music
+#     (MCM 2017), LNCS vol. 10527, Springer.
+#     https://doi.org/10.1007/978-3-319-71827-9_24 -- ran k-means
+#     clustering of pitch-class key-profiles on this SAME music21-bundled
+#     Palestrina corpus and found only 5 statistically distinct clusters
+#     (Dorian/D, Phrygian/E, Mixolydian/G, Ionian/C, Aeolian/A), not the
+#     full theoretical set -- reporting one specific finalis pitch
+#     implies a precision the actual note content doesn't always
+#     support.
+# The 6-family scheme itself (4 traditional finals -- protus/deuterus/
+# tritus/tetrardus -- plus Ionian and Aeolian as Glarean's own 9th-12th
+# "added" modes) is standard 16th-century theory, not invented here: Heinrich
+# Glarean, Dodecachordon (Basel, 1547).
+_MODAL_FAMILY_BY_FINAL = {
+    'D': 'protus', 'E': 'deuterus', 'F': 'tritus', 'G': 'tetrardus',
+    'C': 'ionian', 'A': 'aeolian',
+}
+_MODAL_FAMILIES = [
+    ('protus', 'Protus (D final) -- Dorian/Hypodorian'),
+    ('deuterus', 'Deuterus (E final) -- Phrygian/Hypophrygian'),
+    ('tritus', 'Tritus (F final) -- Lydian/Hypolydian'),
+    ('tetrardus', 'Tetrardus (G final) -- Mixolydian/Hypomixolydian'),
+    ('ionian', 'Ionian (C final)'),
+    ('aeolian', 'Aeolian (A final)'),
+    ('nonstandard', 'Non-standard/uncertain final'),
+]
+_MODAL_FAMILY_LABELS = dict(_MODAL_FAMILIES)
+# Tompkins' own finding (see _MODAL_FAMILY_BY_FINAL's docstring comment,
+# reason 2): F-final pieces in THIS corpus didn't form their own cluster
+# at all -- they fell into the Ionian one, because sharp-4 gets lowered
+# by ficta/accidentals too consistently for Lydian to read as statistically
+# distinct from Ionian in the actual notes. Kept as its own Tritus family
+# here anyway (matches what's actually encoded, and what compute_finalis()
+# actually measures) -- this caveat is shown instead of silently merging
+# the two, so a result set including Tritus pieces doesn't get read as a
+# stronger claim than the underlying pitch content supports.
+_TRITUS_CAVEAT = (
+    "Tritus (F-final) results: in this Palestrina corpus, F-final pieces' pitch-class "
+    "profiles cluster with Ionian (C-final), not separately -- Tompkins (2017) found "
+    "sharp-4 gets lowered by musica ficta too consistently for Lydian to read as "
+    "statistically distinct from Ionian in the actual notes, even when notated as Lydian."
+)
+
+
+def _modal_family_key(finalis_pitch):
+    """Pitch class (e.g. 'G', 'C#') -> one of _MODAL_FAMILIES' first
+    elements. Anything outside the 6 standard finals (accidental/
+    chromatic finals like 'C#', 'B-', 'F#' -- real but rare in this
+    corpus' precomputed data, ~2.4% of Palestrina pieces, checked
+    directly -- almost certainly transposition or lower-confidence
+    heuristic artifacts, not a 7th family) falls back to 'nonstandard'
+    rather than being force-mapped onto one of the 6 real families."""
+    return _MODAL_FAMILY_BY_FINAL.get(finalis_pitch, 'nonstandard')
+
+
 _FILENAME_UNSAFE_CHARS = re.compile(r'[<>:"/\\|?*]')
 
 
@@ -2431,7 +2553,35 @@ with tab_browse:
              'somewhere, so "josquin missa" finds every Josquin mass movement.',
     )
 
-    if query:
+    finalis_index = _load_finalis_index()
+    selected_families = st.multiselect(
+        "Modal family (finalis-based, optional)",
+        [label for _, label in _MODAL_FAMILIES],
+        key="browse_modal_family",
+        help="Grouped by FAMILY (which of the 4 traditional finals -- D/E/F/G -- plus "
+             "Glarean's added Ionian/C and Aeolian/A, Dodecachordon 1547 -- not a specific "
+             "numbered mode: this app never determines ambitus, so it can't tell authentic "
+             "from plagal, and Tompkins (2017, MCM/LNCS 10527) found this exact Palestrina "
+             "corpus's own pitch content only reliably supports about this many groups, not "
+             "the full theoretical set. Based on the precomputed finalis in data/finalis.jsonl "
+             "-- pieces with no successful finalis result aren't matchable by this filter.",
+    )
+    only_confident_finalis = False
+    if selected_families:
+        only_confident_finalis = st.checkbox(
+            "Only high-confidence results", value=True, key="browse_modal_family_confident",
+            help="Precompute cross-checks up to 3 independent signals per piece (last cadence's "
+                 "resolution tone and bass note, crim_intervals' own .final()) and tags each "
+                 "result by how much they agreed. Checked: only 'confident_unanimous'/"
+                 "'confident_majority' results count. Unchecked: also includes "
+                 "'single_signal' (only one signal was available) and 'low_confidence_split' "
+                 "(signals disagreed) results -- real, disclosed lower-confidence answers, not "
+                 "wrong ones, but worth knowing which is which.",
+        )
+        if 'Tritus (F final) -- Lydian/Hypolydian' in selected_families:
+            st.caption(f"ⓘ {_TRITUS_CAVEAT}")
+
+    if query or selected_families:
         # Reuses full_index, already built above for the word cloud --
         # no second build_browse_index() call needed.
         index = full_index
@@ -2442,6 +2592,10 @@ with tab_browse:
         # every Josquin mass movement (confirmed directly: 0 -> 164 real
         # matches). A single-word query (e.g. "agnus", no composer) behaves
         # exactly as before -- this only adds power for multi-word queries.
+        # An empty query (modal family used on its own, no text typed)
+        # naturally matches everything here -- all(...) over zero terms is
+        # True -- so the family/confidence filter below is what actually
+        # narrows things down in that case.
         #
         # Matched against the label PLUS the source's own raw id/filename
         # (_browse_piece_filename_stem -- already built for download
@@ -2465,6 +2619,17 @@ with tab_browse:
                 for term in terms
             )
         ]
+
+        if selected_families:
+            selected_family_keys = {
+                key for key, label in _MODAL_FAMILIES if label in selected_families
+            }
+            matches = [
+                row for row in matches
+                if (record := finalis_index.get(row[0])) is not None
+                and _modal_family_key(record['finalis']) in selected_family_keys
+                and (not only_confident_finalis or record['source'] in _CONFIDENT_FINALIS_SOURCES)
+            ]
 
         if not matches:
             st.info("No matches.")
