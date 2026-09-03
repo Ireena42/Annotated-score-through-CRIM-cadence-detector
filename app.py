@@ -1369,11 +1369,28 @@ Entry/Imitative Duo/Fuga terminology and classification):
   863-875.
 
 **Modal theory & the Browse tab's Modal family filter** (why it groups
-by family rather than showing a raw finalis pitch, and why Tritus
-carries its own caveat):
+by family rather than showing a raw finalis pitch, why Tritus carries
+its own caveat, and how a piece with a flat in its key signature gets
+reclassified):
 - Heinrich Glarean, *Dodecachordon* (Basel, 1547) -- the primary source
   for the 12-mode system this filter's 6 families are drawn from
   (the 4 traditional finals plus Glarean's own added Ionian/Aeolian).
+- Harold S. Powers, ["Tonal Types and Modal Categories in Renaissance
+  Polyphony"](https://doi.org/10.1525/jams.1981.34.3.03a00030),
+  *Journal of the American Musicological Society* 34, no. 3 (1981):
+  428-470 -- the primary source for this filter's cantus durus/cantus
+  mollis transposition handling (a piece with a flat in the signature
+  gets reclassified to the family it actually sounds like, not the one
+  its bare finalis alone would suggest). Powers' own "tonal type" is
+  three markers (system + cleffing + final), not the two (system +
+  final) this filter uses -- cited here, and in the code's own
+  comments, specifically because that gap was checked against this
+  source rather than left unexamined: Powers cites Siegfried
+  Hermelink's *Dispositiones modorum* (Tutzing, 1960) -- an etic study
+  of Palestrina's (and Lasso's) own tonal types, not independently
+  read here, only as quoted in Powers -- classifying a cantus-mollis,
+  G-final Palestrina piece as "Hypodorian" (transposed up a fourth
+  from D), the same reclassification this filter makes.
 - Daniel C. Tompkins, ["A Cluster Analysis for Mode Identification in
   Early Music
   Genres"](https://link.springer.com/chapter/10.1007/978-3-319-71827-9_24),
@@ -1925,16 +1942,39 @@ _MODAL_FAMILY_BY_FINAL = {
 # cantus mollis (one flat in the signature) doesn't just "soften" a
 # mode -- it transposes the WHOLE diatonic collection up a fourth (down
 # a fifth). A piece under mollis with final X sounds exactly like the
-# UNTRANSPOSED mode on (X - a fourth), just moved. This is standard
-# 16th-century theory, not something invented here -- it's the second
-# half of Powers' own "tonal type" system (cleffing + durus/mollis +
-# final; Powers 1981, already in the Bibliography below) and is
-# discussed at length in Meier's book (also already cited) under
-# "transposition," the other main variable alongside "system" that
-# determines a piece's real modal identity.
+# UNTRANSPOSED mode on (X - a fourth), just moved. Standard 16th-century
+# theory, not invented here -- confirmed directly against Powers 1981
+# (already in the Bibliography below), not just remembered: Powers
+# cites Hermelink's own etic study of PALESTRINA SPECIFICALLY
+# (Dispositiones modorum, 1960), which classifies a mollis, G-final
+# piece as "Hypodorian" (mode 2, transposed up a fourth from D) -- the
+# exact G-final/mollis -> Protus mapping used below, independently
+# attested for this composer.
+#
+# Powers' own "tonal type" is explicitly THREE markers, not two --
+# system (durus/mollis) + CLEFFING + final -- and this mapping only
+# uses two of them, system and final, dropping cleffing. Checked
+# whether that's a real gap before shipping it, not assumed away: read
+# Powers' own worked examples (his mode-5/6 tables, and the Hermelink
+# Hypodorian case above) closely enough to see that where cleffing
+# actually varies, its documented role is distinguishing AUTHENTIC from
+# PLAGAL within one family (mode 5 vs 6, both still "Lydian") -- a
+# finer distinction than this app's own "family, not specific mode"
+# scope already declines to make (see this dict's own header comment).
+# It is not documented as a signal that moves a piece to a DIFFERENT
+# family. Then checked this corpus's own data directly: the soprano
+# clef is '*clefG2' in 1316 of 1318 Palestrina pieces (99.8%),
+# regardless of flats or finalis -- cleffing is effectively constant
+# here, not a second axis this mapping could read even if it tried.
+# Caveat, disclosed rather than hidden: that near-total uniformity
+# could be a real fact about this repertoire, or could be this
+# Humdrum encoding normalizing clefs for legibility rather than
+# preserving whatever the original print/manuscript used -- not
+# independently checked against the original source, so held open.
 #
 # Concretely, for the finals this corpus actually uses:
 #   G + mollis -> sounds like untransposed D-Dorian    -> Protus
+#     (independently attested for Palestrina specifically, above)
 #   F + mollis -> sounds like untransposed C-Ionian     -> Ionian
 #     (the specific case a user flagged directly: F-final with a flat
 #     signature was showing as Tritus/Lydian -- wrong, because the
@@ -2830,10 +2870,16 @@ with tab_browse:
              "piece WITH a flat is grouped as Ionian, not Tritus, since the flat removes "
              "Lydian's own defining raised 4th (standard theory, Powers 1981/Meier 1988, "
              "see Bibliography below) -- checked directly, this reclassifies 459 of 1318 "
-             "Palestrina pieces (35%), not a rare edge case. Not yet done for the other 6 "
-             "collections (would need a per-piece fetch just for the key signature). Based "
-             "on the precomputed finalis in data/finalis.jsonl -- pieces with no successful "
-             "finalis result aren't matchable by this filter.",
+             "Palestrina pieces (35%), not a rare edge case. Uses only 2 of Powers' own 3 "
+             "'tonal type' markers (system + final, not cleffing) -- checked whether that "
+             "matters here rather than assuming: this corpus' own soprano clef is the same "
+             "in 1316 of 1318 pieces regardless of flats, so there's no second signal to "
+             "read even if this checked it; where cleffing DOES vary in Powers' own "
+             "examples, its role is authentic/plagal, a finer distinction this filter "
+             "already doesn't attempt. Not yet done for the other 6 collections (would "
+             "need a per-piece fetch just for the key signature). Based on the precomputed "
+             "finalis in data/finalis.jsonl -- pieces with no successful finalis result "
+             "aren't matchable by this filter.",
     )
     only_confident_finalis = False
     if selected_families:
