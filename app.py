@@ -1736,6 +1736,85 @@ def _annotate_crim_piece(mei_url, include_cadences=True, include_ptypes=False, i
     return annotated_score, stats, None
 
 
+_SPINE_ID_RE = re.compile(r'spine_(\d+)$')
+
+
+def _fix_humdrum_quoted_part_names(score, kern_text):
+    """music21's Humdrum importer implements two of Humdrum's three
+    *I-prefixed instrument conventions -- *IC<class> (e.g. *ICvox) and
+    the short mnemonic *I<code> (e.g. *Ibass, which is how Palestrina's
+    own files name voices, and which DOES come through correctly, e.g.
+    Agnus_00 -> 'Soprano'/'Alto'/'Tenor'/'Tenor'/'Bass') -- but NOT
+    Humdrum's own "printed instrument name" convention, *I"<name> (e.g.
+    *I"Bassus6). Confirmed by reading music21's own source directly
+    (humdrum/spineParser.py's generic, order-has-to-be-last '*I' branch
+    calls humdrum.instruments.fromHumdrumInstrument on *I"Bassus6 the
+    exact same way it would on a short code -- that function only ever
+    looks the string up in a small abbreviation dict, fails, and the
+    caller silently swallows the failure into a no-op MiscTandem, never
+    reaching Part.partName at all), not guessed from behavior alone.
+    Every part of every piece encoded this way renders as a bare,
+    indistinguishable "Voice" -- confirmed directly to be exactly what a
+    user flagged, for a real 24-voice piece where it made the PDF
+    unreadable (no way to tell which of the 24 identical "Voice" staves
+    was which). Checked how widespread this actually is before treating
+    it as a one-off: sampled 10 real pieces from each of the 5 GitHub-
+    hosted kern collections this app reads (see KERN_COLLECTION_BASE_
+    URLS) -- jrp/1520s/tasso/lassus_psalms use *I" for EVERY sampled
+    piece (10/10 each, so this isn't a rare edge case, it's closer to
+    that whole 4-collection share of the corpus, ~2,558 pieces); seils
+    uses it for none (0/10) -- presumably the short-code convention
+    music21 already handles, same as Palestrina.
+
+    Reads *I" (and *I', the paired ABBREVIATED name) tokens straight
+    from the raw kern text -- a cheap header-only scan, same convention
+    already used elsewhere in this project (e.g. corpus_sources.
+    _palestrina_key_signature_flats) -- and applies them to the already-
+    parsed Score's Part objects, matched by column position via each
+    Part's own `.id` (e.g. 'spine_23' -> column 23, 0-indexed from the
+    LEFT of the **kern declaration line) rather than by score.parts'
+    own iteration order, which is NOT the same thing -- checked directly
+    on Agnus_00 (a piece music21 already names correctly) and found
+    score.parts lists spine_4 (the file's own RIGHTMOST/5th column)
+    first, not spine_0 -- i.e. score.parts iterates in the OPPOSITE
+    order from the raw file's left-to-right column order. Using each
+    Part's own id sidesteps needing to know or assume that ordering
+    rule at all.
+
+    Only overrides a part when a real *I" name was actually found for
+    its column -- a column using the short-code convention (which
+    music21 already handles correctly, e.g. every Palestrina file) is
+    left exactly as music21 produced it, never downgraded."""
+    lines = kern_text.split('\n')
+    names_by_col, abbrevs_by_col = {}, {}
+    started = False
+    for line in lines:
+        if line.startswith('**kern'):
+            started = True
+            continue
+        if not started:
+            continue
+        if line.startswith('='):
+            break  # first barline -- real note data starts here, stop scanning
+        for col, tok in enumerate(line.split('\t')):
+            if tok.startswith('*I"'):
+                names_by_col[col] = tok[3:].strip()
+            elif tok.startswith("*I'"):
+                abbrevs_by_col[col] = tok[3:].strip()
+    if not names_by_col:
+        return score
+    for part in score.parts:
+        m = _SPINE_ID_RE.search(part.id or '')
+        if not m:
+            continue
+        col = int(m.group(1))
+        if col in names_by_col:
+            part.partName = names_by_col[col]
+        if col in abbrevs_by_col:
+            part.partAbbreviation = abbrevs_by_col[col]
+    return score
+
+
 def _annotate_kern_from_url(raw_url, source_label, include_cadences=True, include_ptypes=False, include_homorhythm=False):
     """Shared by every GitHub-hosted Humdrum kern tab (JRP, 1520s, Tasso,
     SEILS, Lassus Psalms): fetch the raw file, parse, run the pipeline.
@@ -1744,6 +1823,7 @@ def _annotate_kern_from_url(raw_url, source_label, include_cadences=True, includ
     app -- verified directly before relying on it."""
     kern_text = requests.get(raw_url, timeout=20).text
     score = m21.converter.parse(kern_text)
+    score = _fix_humdrum_quoted_part_names(score, kern_text)
     return run_pipeline(
         score, source_label, include_cadences=include_cadences,
         include_ptypes=include_ptypes, include_homorhythm=include_homorhythm,
@@ -2494,6 +2574,7 @@ def _import_piece_by_collection(collection, native_ref):
     raw_url = KERN_COLLECTION_BASE_URLS[collection] + native_ref
     kern_text = requests.get(raw_url, timeout=20).text
     score = m21.converter.parse(kern_text)
+    score = _fix_humdrum_quoted_part_names(score, kern_text)
     return ci.main_objs.ImportedPiece(score, Path(native_ref).stem), None
 
 

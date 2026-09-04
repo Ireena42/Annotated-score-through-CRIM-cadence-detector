@@ -664,6 +664,76 @@ piece in a single-piece preview. One upside of the different keying:
 looking this up needs no per-row label translation at filter time,
 unlike the modal-family filter's own `_finalis_lookup_label`.
 
+## Real voice/part names for the 5 GitHub-hosted kern collections
+
+Found 2026-09-04, from a user looking at exactly the 24-voice Josquin
+piece the section above mentions ("Qui habitat in adjutorio
+altissimi") and asking why the PDF just says "Voice" 24 times over,
+with no way to tell one staff from another.
+
+Root-caused directly, not guessed: music21's Humdrum importer
+implements two of Humdrum's three `*I`-prefixed instrument
+conventions — `*IC<class>` and the short mnemonic `*I<code>` (e.g.
+`*Ibass`, which is how Palestrina's own files name voices, and which
+DOES come through correctly) — but not Humdrum's own "printed
+instrument name" convention, `*I"<name>` (e.g. `*I"Bassus6`). Read
+`humdrum/spineParser.py`'s own source to confirm: its generic,
+order-has-to-be-last `*I` branch tries the exact same short-code
+lookup on the quoted name too, fails, and the caller silently swallows
+the failure into a no-op object — it never reaches `Part.partName` at
+all. **Checked how widespread this actually is before treating it as
+one piece's problem**: sampled 10 real pieces from each of the 5
+GitHub-hosted kern collections this app reads — `jrp`/`1520s`/`tasso`/
+`lassus_psalms` use `*I"` for *every* sampled piece (10/10 each, so
+this is most of that ~2,558-piece share of the corpus, not a rare
+case); `seils` uses it for none (0/10) — presumably the short-code
+convention Palestrina also uses, unaffected.
+
+Fixed with a new `app.py` helper, `_fix_humdrum_quoted_part_names`,
+called right after parsing in both places these 5 collections get
+turned into a `Score` (`_annotate_kern_from_url`, used by every
+per-collection tab's PDF/preview and by Browse's own bulk downloads;
+`_import_piece_by_collection`, used by the raw analysis-table export).
+Reads `*I"`/`*I'` (full name / abbreviation) tokens straight from the
+raw kern text — a cheap header-only scan, same convention already used
+elsewhere in this project — and matches them to the right `Part` via
+each part's own `.id` (e.g. `spine_23`), which reliably carries its
+0-indexed column position from the file's own `**kern` declaration
+line — checked directly, and deliberately NOT assumed to match
+`score.parts`' own iteration order, which turns out to be the *reverse*
+of the file's left-to-right column order.
+
+Verified end-to-end on the real reported piece: all 24 parts now read
+`Superius`/`Superius2`.../`Bassus6` (matching the file's own explicit
+`Four 6-ex-1 canons at the unison` structural annotation — see below),
+not `Voice` × 24; a real PDF re-rendered cleanly (1.5MB, 0 errors).
+Two regression checks confirmed nothing else moved: a Palestrina piece
+(`*I<code>`-only, no `*I"` at all) came out byte-for-byte identical to
+before; a `seils` piece would fall through this function's own
+`if not names_by_col: return score` guard unchanged (not directly
+re-tested, since no `*I"` tokens exist anywhere in that collection to
+begin with).
+
+**What "24 voices" for a single motet actually means** (the
+musicological half of the same question): NOT 24 independently
+composed melodic lines, and not 24 spatially separated choirs in the
+later Venetian *cori spezzati* sense. The piece's own header literally
+states its structure — `!!LO:TX:Z=20:t=Four 6-ex-1 canons at the
+unison` — confirmed directly against the actual encoded part names
+(`Superius`/`Altus`/`Tenor`/`Bassus`, each split into 6 numbered
+copies, `Bassus`…`Bassus6` etc.): **4 real composed voices** (the
+standard SATB layout), each one independently sung, in canon, by *6*
+singers simultaneously — every copy singing the exact same melody,
+entering one after another at staggered time offsets, all at the same
+pitch level (a canon "at the unison," not transposed) and the same
+notated mensuration (checked: every one of the 24 columns shares the
+identical `*met(C|)` token, ruling out a proportion/mensuration canon
+specifically — this is a plain time-delay canon, a "round," done 4
+times over). 4 × 6 = 24 sounding parts from 4 actually-composed lines —
+one of Josquin's most celebrated demonstrations of pure contrapuntal
+technique (cited via the New Josquin Edition, `NJE 18.8`, this file's
+own source).
+
 ## Credits & licensing
 
 *(The same content is also in the app itself, in the "ℹ️ Credits & data
