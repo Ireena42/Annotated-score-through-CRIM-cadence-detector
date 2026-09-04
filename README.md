@@ -624,6 +624,46 @@ unaffected control pieces (a normal Palestrina piece and a Monteverdi
 piece with no phantom-text measure), confirming neither fix touches
 anything it shouldn't.
 
+## Number of voices filter (Browse tab)
+
+Added alongside the Modal family filter, same tab, same precomputed-
+data pattern (a request live-filtering ~4,300 pieces one-by-one over
+the network on every Streamlit rerun isn't viable, the same reason
+`data/finalis.jsonl` exists). `scripts/precompute_voices.py` writes
+`data/voices.jsonl`, one record per piece: free from the CRIM
+piece-list catalog (`number_of_voices`, already there) or a local file
+for the `music21` collection (Palestrina/Monteverdi, same `**kern`-
+spine-counting/`<score-part >`-counting convention `preview_piece`
+already uses live for a single piece), one raw-file fetch per piece for
+the other 5 (Humdrum) collections. Ran once as a background batch job:
+**3,638 pieces resolved successfully.** Distribution: overwhelmingly 3–6
+voices (483/1,637/878/397), a handful of extremes at both ends (57
+single-voice entries — mostly CRIM's own plainchant-model movements,
+not polyphony — up to a real 24-voice Josquin motet, "Qui habitat in
+adjutorio altissimi," and a documented 12-voice Brumel mass, "Missa Et
+ecce terre motus" — both spot-checked against well-known musicological
+facts about these specific pieces, not just trusted at face value).
+
+One real data-quality catch made while building this: 74 CRIM pieces
+(all Ludwig Daser/Victoria motets) carry a literal `0` in CRIM's own
+`number_of_voices` catalog field — a genuine upstream gap, not real
+0-voice pieces. Treated the same as any other undeterminable case
+(excluded from the file, not silently stored as a wrong value) —
+`voices_for_row`'s CRIM branch now does `... or None` specifically
+because of this, with the 74 affected pieces named in its own code
+comment.
+
+Keyed differently from `finalis.jsonl` on purpose: by the **grouped**
+Browse label (`group_browse_rows`' own output), not the raw per-file
+one — a finalis is only meaningful read off a piece's true ending, so
+the modal-family filter resolves a grouped Palestrina movement to its
+*last* real member; a voice count should reflect the movement's overall
+scoring, so this file takes the **max** across every real member
+instead, matching what `preview_piece` already showed for the same
+piece in a single-piece preview. One upside of the different keying:
+looking this up needs no per-row label translation at filter time,
+unlike the modal-family filter's own `_finalis_lookup_label`.
+
 ## Credits & licensing
 
 *(The same content is also in the app itself, in the "ℹ️ Credits & data

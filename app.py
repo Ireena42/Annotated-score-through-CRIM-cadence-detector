@@ -1975,6 +1975,43 @@ def _load_finalis_index():
     return index
 
 
+@st.cache_data
+def _load_voices_index():
+    """{browse_label: voice_count} for every piece with a successfully
+    precomputed voice count -- see scripts/precompute_voices.py's own
+    module docstring for the per-collection extraction methods. Loaded
+    from data/voices.jsonl, which ships IN this repo the same way data/
+    finalis.jsonl does (this app's own precomputed output, committed
+    alongside the code, not fetched over the network at request time).
+
+    Keyed by the GROUPED Browse label (group_browse_rows' own output),
+    deliberately NOT the raw per-file label data/finalis.jsonl uses --
+    see precompute_voices.py's own module docstring for why a voice
+    count needs different aggregation than a finalis for a Palestrina
+    movement split across several files (max-across-members here, vs.
+    last-real-member for finalis). This means a lookup here needs no
+    per-row label translation the way the Modal family filter needs
+    (contrast this with _finalis_lookup_label below) -- group_browse_
+    rows() already produces exactly the keys this index uses.
+    """
+    path = Path(__file__).parent / 'data' / 'voices.jsonl'
+    index = {}
+    if not path.exists():
+        return index
+    with path.open('r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if record.get('voices'):
+                index[record['label']] = record['voices']
+    return index
+
+
 # Which precompute_finalis.py confidence tiers count as "confident" for
 # the "only confident results" checkbox below -- see compute_finalis()'s
 # own docstring (scripts/precompute_finalis.py) for what each tier means.
@@ -3044,7 +3081,21 @@ with tab_browse:
         if 'Tritus -- Lydian/Hypolydian' in selected_families:
             st.caption(f"ⓘ {_TRITUS_CAVEAT}")
 
-    if query or selected_families:
+    voices_index = _load_voices_index()
+    selected_voices = st.multiselect(
+        "Number of voices",
+        sorted(set(voices_index.values())),
+        key="browse_num_voices",
+        help="Precomputed per piece (scripts/precompute_voices.py) -- free from the CRIM "
+             "piece-list catalog or a local file for CRIM/music21, one raw-file fetch per piece "
+             "for the other 5 collections. For a Palestrina movement split across several "
+             "encoded files (see the aggregation note above), this is the MAX voice count seen "
+             "across its real members, not just one file's own count -- a reduced-voice passage "
+             "partway through a movement doesn't undercount its overall scoring. Pieces with no "
+             "successfully precomputed voice count aren't matchable by this filter.",
+    )
+
+    if query or selected_families or selected_voices:
         # Reuses full_index, already built above for the word cloud --
         # no second build_browse_index() call needed.
         index = full_index
@@ -3103,6 +3154,17 @@ with tab_browse:
                 if (record := finalis_index.get(_finalis_lookup_label(row))) is not None
                 and _modal_family_key(record['finalis'], record['flats']) in selected_family_keys
                 and (not only_confident_finalis or record['source'] in _CONFIDENT_FINALIS_SOURCES)
+            ]
+
+        if selected_voices:
+            # voices_index is already keyed by the same grouped label
+            # every row in `matches` carries -- see _load_voices_index's
+            # own docstring for why this needs no per-row translation
+            # the way the modal-family lookup above does.
+            selected_voices_set = set(selected_voices)
+            matches = [
+                row for row in matches
+                if voices_index.get(row[0]) in selected_voices_set
             ]
 
         if not matches:

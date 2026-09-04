@@ -231,6 +231,30 @@ def _palestrina_key_signature_flats():
     return flats
 
 
+@_cache_data_no_ttl
+def _palestrina_voice_counts():
+    """{piece_id: voice_count} for every Palestrina file -- read directly
+    from the raw .krn spine-declaration line (the first line starting
+    with '**', e.g. '**kern\\t**kern\\t**kern\\t**kern' = 4 voices),
+    same cheap header-scan convention _palestrina_key_signature_flats
+    uses for flats, and the same '**kern'-counting rule app.py's
+    _local_file_stats/preview_piece already use live for a single piece
+    -- reused here, not reinvented, so a batch precompute (scripts/
+    precompute_voices.py) and a live single-piece preview never
+    disagree on the same file."""
+    voices = {}
+    for f in m21.corpus.getComposer('palestrina'):
+        try:
+            with open(f, encoding='utf-8', errors='ignore') as fh:
+                for line in fh:
+                    if line.startswith('**'):
+                        voices[f.stem] = line.count('**kern') or None
+                        break
+        except Exception:
+            pass
+    return voices
+
+
 def _voice_slot_keys(score):
     """Ordered [(part_name, occurrence_index), ...] for one Score's
     parts -- a stable identity for a voice even when several of a
